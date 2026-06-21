@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "project": {
+    "repo": "TseFamily/tse-family-learning",
+    "name": "LearningQuest",
+    "lifecycle": "active",
+    "layer": "application",
+    "summary": "Mobile-first LearningQuest static learning platform foundation with PWA shell, content-pack registry, browser-local progress, validation, mobile smoke tests, and deployment notes.",
+    "goals": [
+      "Provide a reusable, mobile-native learning practice product foundation with curriculum packs and browser-local learner progress.",
+      "Keep static app runtime, content-pack registry, starter packs, PWA shell, validation, mobile smoke tests, and deployment docs coherent.",
+      "Continue generalizing from family prototype toward public commercial-grade learning product behavior without hardcoded private learner assumptions."
+    ],
+    "nonGoals": [
+      "Own a company-wide education platform, every future curriculum, school admissions policy, or private learner identity source of truth.",
+      "Hide one family's private data, school-specific policy, or learner-specific behavior in reusable product defaults.",
+      "Publish enterprise doctrine, project manifest schema, org rulesets, rollout issue reconciliation, or shared CI policy."
+    ]
+  },
+  "boundaries": {
+    "owns": [
+      {
+        "name": "learningquest-static-app",
+        "description": "The static app shell, Node server, PWA assets, browser-local learner progress model, export/import behavior, and product UI."
+      },
+      {
+        "name": "learningquest-content-packs",
+        "description": "The content-pack registry, starter curriculum packs, question bank, schemas, and runtime loading behavior."
+      },
+      {
+        "name": "learningquest-validation",
+        "description": "Static validation script, Playwright mobile smoke test, Dockerfile, deployment notes, and CI workflow evidence."
+      }
+    ],
+    "doesNotOwn": [
+      "Company-wide education platform ownership, all future curriculum, school admissions policy, or private learner identity source of truth.",
+      "Private family data, one learner's personalized policy, school-specific admissions guarantees, or external content-provider behavior.",
+      "Enterprise doctrine, project manifest schema, rollout issue reconciliation, org rulesets, or shared workflow implementation."
+    ],
+    "publicSurfaces": [
+      {
+        "type": "documentation",
+        "name": "Product README",
+        "location": "README.md"
+      },
+      {
+        "type": "api",
+        "name": "Static app shell",
+        "location": "index.html"
+      },
+      {
+        "type": "api",
+        "name": "Static Node server",
+        "location": "server.js"
+      },
+      {
+        "type": "manifest",
+        "name": "Content-pack registry",
+        "location": "content-packs/registry.json"
+      },
+      {
+        "type": "manifest",
+        "name": "Starter question bank",
+        "location": "questions.json"
+      },
+      {
+        "type": "manifest",
+        "name": "PWA manifest and service worker",
+        "location": "manifest.webmanifest and sw.js"
+      },
+      {
+        "type": "workflow",
+        "name": "CI workflow",
+        "location": ".github/workflows/ci.yml"
+      },
+      {
+        "type": "manifest",
+        "name": "Project control-plane manifest",
+        "location": ".doctrine/project.json"
+      }
+    ],
+    "allowedDependencies": [
+      {
+        "repo": "SylphxAI/doctrine",
+        "surface": "project manifest schema, standards, and rollout audit",
+        "direction": "downward"
+      },
+      {
+        "repo": "microsoft/playwright",
+        "surface": "documented Playwright browser smoke testing behavior",
+        "direction": "external"
+      }
+    ],
+    "forbiddenCouplings": [
+      "Do not hardcode private learner names, school-specific promises, or family-only behavior as reusable product defaults.",
+      "Do not make curriculum packs depend on undocumented app internals instead of the content-pack registry contract.",
+      "Do not make other education products import this repository's internal question bank, progress model, or static app implementation without a documented public surface.",
+      "Do not publish enterprise process policy from this repository instead of SylphxAI/doctrine or SylphxAI/.github."
+    ]
+  },
+  "documentation": {
+    "adr": {
+      "path": "docs/adr/",
+      "status": "planned"
+    },
+    "specs": {
+      "path": "README.md",
+      "status": "present"
+    },
+    "catalog": {
+      "path": ".doctrine/project.json",
+      "status": "present"
+    },
+    "runbooks": {
+      "path": "DEPLOY.md",
+      "status": "present"
+    },
+    "generatedReferences": {
+      "path": "content-packs/registry.json",
+      "status": "present"
+    }
+  },
+  "delivery": {
+    "ciModel": "legacy-ci",
+    "requiredContexts": [
+      "validate"
+    ],
+    "deployPath": "Pull requests and merge groups run .github/workflows/ci.yml for validation, build, and Playwright mobile smoke; deployment uses the normal Sylphx product path for project tart-duo-uvt9.",
+    "productionProof": "Production changes require CI plus deployed app readback for affected routes, content packs, PWA assets, and browser-local progress export/import behavior.",
+    "recoveryClass": "source-revertable"
+  },
+  "adoption": {
+    "status": "baseline",
+    "gaps": [
+      {
+        "id": "adr29-not-adopted",
+        "description": "Upgrade from legacy CI to ADR-29 admission contexts when the app is ready for full central policy enforcement.",
+        "owner": "TseFamily/tse-family-learning",
+        "target": "Before full adoption"
+      },
+      {
+        "id": "commercial-boundary-needs-adr",
+        "description": "Document the boundary between family prototype data, public product foundation, and reusable curriculum-pack contract.",
+        "owner": "TseFamily/tse-family-learning",
+        "target": "Before commercial-grade operation"
+      },
+      {
+        "id": "deployment-proof-missing",
+        "description": "Document the hosting URL, product-path readback, PWA smoke, and content-pack smoke required after production changes.",
+        "owner": "TseFamily/tse-family-learning",
+        "target": "Before production lifecycle promotion"
+      }
+    ]
+  }
+}
