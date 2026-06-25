@@ -1,6 +1,6 @@
 {
   "id": "learningquest-content-pack-registry-v1",
-  "updated": "2026-06-13",
+  "updated": "2026-06-25",
   "packs": [
     {
       "id": "hk-chinese-basics-v1",
@@ -115,9 +115,9 @@
       "domain": "Life in the UK",
       "language": "English",
       "learners": "Adult learners",
-      "activity": "Practice questions + starter mock mode + weak-topic review",
+      "activity": "Practice questions + starter mock mode + full timed mock + weak-topic review",
       "readiness": "Live slice",
-      "next": "Expand to a 24-question timed mock with full official-topic weighting and review mode.",
+      "next": "Add adaptive weak-topic drills that pull from saved full-mock review data.",
       "schema": [
         "topic",
         "prompt",
