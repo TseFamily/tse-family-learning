@@ -97,7 +97,7 @@ test('mobile app shell opens without horizontal overflow and mission onboarding 
   expect(state.mandarinPackId).toBe('mandarin-basics-v1');
   expect(state.mathsFoundationPackId).toBe('maths-foundation-v1');
   expect(state.lifeUKPackId).toBe('life-uk-v1');
-  expect(state.lifeUKQuestionCount).toBe(12);
+  expect(state.lifeUKQuestionCount).toBe(24);
   expect(state.lifeUKPracticeCount).toBe(6);
   expect(state.lifeUKPassMark).toBe(75);
   expect(state.lifeUKTopics).toEqual(expect.arrayContaining(['Government', 'Parliament', 'Law']));
@@ -404,4 +404,57 @@ test('registered content packs fall back when registry is unavailable', async ({
   expect(state.mandarinPackId).toBe('mandarin-basics-v1');
   expect(state.mathsFoundationPackId).toBe('maths-foundation-v1');
   expect(state.lifeUKPackId).toBe('life-uk-v1');
+});
+
+test('Life in the UK full timed mock renders, scores answers, and records progress', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.lifeUKPackId === 'life-uk-v1',
+    null,
+    { timeout: 10000 }
+  );
+
+  await expect(page.getByRole('button', { name: 'Start 24-question full mock (45 min)' })).toBeVisible();
+  await page.getByRole('button', { name: 'Start 24-question full mock (45 min)' }).tap();
+
+  await expect(page.locator('#life-uk-mock-area')).toBeVisible();
+  await expect(page.locator('#life-uk-mock-grid .life-uk-mock-card').first().getByText('Government')).toBeVisible();
+  await expect(page.locator('#life-uk-mock-grid .life-uk-mock-card').first().getByText('Who appoints the Prime Minister after a general election?')).toBeVisible();
+  await expect(page.locator('.life-uk-mock-timer')).toContainText(/\d{2}:\d{2}/);
+  await expect(page.locator('.life-uk-mock-status')).toContainText('Answered 0/24');
+
+  const firstMockCard = page.locator('#life-uk-mock-grid .life-uk-mock-card').first();
+  await firstMockCard.getByRole('button', { name: 'The monarch' }).tap();
+  await expect(firstMockCard.getByText('✅ Correct.')).toBeVisible();
+  await expect(page.locator('.life-uk-mock-status')).toContainText('Answered 1/24');
+  await expect(page.locator('.life-uk-mock-status')).toContainText('Correct 1');
+
+  const secondMockCard = page.locator('#life-uk-mock-grid .life-uk-mock-card').nth(1);
+  await secondMockCard.getByRole('button', { name: 'House of Lords' }).tap();
+  await expect(secondMockCard.getByText('Noted — review this after the mock.')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Finish mock early' }).tap();
+  await expect(page.locator('.life-uk-mock-result')).toBeVisible();
+  await expect(page.locator('.life-uk-mock-result h4')).toContainText(/Full timed mock complete/);
+  await expect(page.locator('#life-uk-mock-area')).toContainText('1/24 correct');
+  await expect(page.locator('#life-uk-mock-area')).toContainText('75% pass target');
+  await expect(page.locator('.life-uk-mock-review-item').first()).toContainText('Q1.');
+
+  const state = await page.evaluate(() => window.__learningQuestTestState);
+  expect(state.lifeUKFullMockReady).toBe(true);
+  expect(state.lifeUKFullMockAvailableQuestions).toBe(24);
+  expect(state.lifeUKFullMockQuestionCount).toBe(24);
+  expect(state.lifeUKFullMockTimeLimitSeconds).toBe(45 * 60);
+  expect(state.latestLifeUKMockProgress).toMatchObject({
+    activityType: 'life-uk-practice',
+    practiceMode: 'life-uk-full-mock',
+    correct: 1,
+    total: 24,
+    attempted: 2,
+    timedMock: true
+  });
+  expect(state.latestLifeUKMockProgress.passed).toBe(false);
+  expect(state.latestLifeUKMockProgress.weakSkills).toContain('Parliament');
 });

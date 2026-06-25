@@ -405,6 +405,25 @@
     .life-uk-feedback { min-height: 1.2em; color: #1d4ed8; font-size: 0.78rem; font-weight: 900; }
     .life-uk-feedback.incorrect { color: #be123c; }
     .life-uk-explanation { color: var(--subtext); font-size: 0.8rem; line-height: 1.35; }
+    .life-uk-mock-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0 6px; }
+    .life-uk-mock-start { font-size: 0.92rem; }
+    .life-uk-mock-area { margin-top: 8px; display: grid; gap: 12px; }
+    .life-uk-mock-status { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 8px 12px; font-size: 0.85rem; font-weight: 800; color: #1e3a8a; }
+    .life-uk-mock-timer { font-variant-numeric: tabular-nums; background: #1d4ed8; color: #fff; border-radius: 999px; padding: 4px 10px; font-weight: 900; }
+    .life-uk-mock-timer.urgent { background: #be123c; }
+    .life-uk-mock-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+    .life-uk-mock-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .life-uk-mock-card { border: 1px solid #bfdbfe; background: linear-gradient(180deg, #eff6ff, #fff); border-radius: 16px; padding: 12px; display: grid; gap: 8px; align-content: start; }
+    .life-uk-mock-result { border: 1px solid #bfdbfe; background: #f8fbff; border-radius: 16px; padding: 14px; display: grid; gap: 8px; }
+    .life-uk-mock-result h4 { margin: 0; color: #1e3a8a; font-size: 1.05rem; }
+    .life-uk-mock-result-stat { font-size: 0.85rem; color: #1d4ed8; font-weight: 800; }
+    .life-uk-mock-result-pass { color: #166534; }
+    .life-uk-mock-result-fail { color: #be123c; }
+    .life-uk-mock-review { display: grid; gap: 6px; }
+    .life-uk-mock-review-item { border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 10px; font-size: 0.82rem; }
+    .life-uk-mock-review-q { font-weight: 800; color: #1e3a8a; }
+    .life-uk-mock-review-ans { color: var(--subtext); }
+    .life-uk-mock-review-incorrect { border-color: #fb7185; background: #fff1f2; }
     .maths-card { border: 1px solid #bbf7d0; background: linear-gradient(180deg, #f0fdf4, #fff); border-radius: 16px; padding: 12px; display: grid; gap: 8px; align-content: start; }
     .maths-topic { color: #15803d; font-size: 0.74rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
     .maths-prompt { color: #14532d; font-size: 1.05rem; font-weight: 900; line-height: 1.25; }
@@ -907,7 +926,7 @@
             <div class="matching-panel" id="mandarin-matching-panel"><h3>🔗 Simplified Mandarin matching practice</h3><p>Match Simplified characters to English meaning, then compare Pinyin and Traditional forms.</p><div class="matching-grid" id="mandarin-matching-grid"></div></div>
             <div class="comparison-panel" id="comparison-panel"><h3>🪞 Traditional/Simplified comparison drill</h3><p>Compare shared meanings across the runtime HK Chinese and Mandarin packs before moving into audio prompts.</p><div class="comparison-grid" id="comparison-grid"></div></div>
             <div class="maths-panel" id="maths-foundation-panel"><h3>🧮 Maths Foundation practice cards</h3><p>Number bonds, place value, skip counting, and times-table prompts are runtime-loaded from the content-pack registry.</p><div class="maths-grid" id="maths-foundation-grid"></div></div>
-            <div class="life-uk-panel" id="life-uk-panel"><h3>🇬🇧 Life in the UK starter mock</h3><p>Starter citizenship questions are runtime-loaded from the content-pack registry, with a 75% pass target and weak-topic review.</p><div class="life-uk-grid" id="life-uk-grid"></div></div>
+            <div class="life-uk-panel" id="life-uk-panel"><h3>🇬🇧 Life in the UK starter mock</h3><p>Starter citizenship questions are runtime-loaded from the content-pack registry, with a 75% pass target, a 24-question full timed mock, and weak-topic review.</p><div class="life-uk-mock-actions" id="life-uk-mock-actions"><button class="btn btn-secondary life-uk-mock-start" type="button" onclick="startLifeUKFullMock()">⏱️ Start 24-question full mock (45 min)</button></div><div class="life-uk-mock-area" id="life-uk-mock-area"></div><div class="life-uk-grid" id="life-uk-grid"></div></div>
           </article>
 
           <article class="section-card rail" id="progress">
@@ -1020,7 +1039,7 @@
       { id: 'hk-chinese-basics-v1', path: 'content-packs/hk-chinese-basics.json', kind: 'flashcards', title: 'Traditional HK Chinese basics', domain: 'Chinese · Traditional HK', language: '繁體中文 + Cantonese', learners: 'All learners', activity: 'Flashcards + matching + comparison + audio prompts + listen/repeat', readiness: 'Live slice', next: 'Expand family words into colours, numbers, greetings, Jyutping, comparison drills, and audio prompts.', schema: ['traditional', 'jyutping', 'canto', 'english', 'prompt'], renderTarget: 'flashcard-grid', recommendedStages: ['early', 'primary', 'adult'], recommendedGoals: ['confidence', 'language', 'mastery'], progressionSteps: ['Start with family words and greetings', 'Practise colours, numbers, and Jyutping recall', 'Move into matching practice, comparison drills, audio prompts, and short household phrases'] },
       { id: 'mandarin-basics-v1', path: 'content-packs/mandarin-basics.json', kind: 'flashcards', title: 'Simplified Mandarin basics', domain: 'Chinese · Simplified Mandarin', language: '简体中文 + Pinyin', learners: 'All learners', activity: 'Flashcards + matching + comparison + audio prompts + listen/repeat', readiness: 'Live slice', next: 'Expand into matching practice, audio prompts, and Traditional/Simplified comparison drills.', schema: ['simplified', 'traditional', 'pinyin', 'english', 'prompt'], renderTarget: 'mandarin-flashcard-grid', recommendedStages: ['early', 'primary', 'adult'], recommendedGoals: ['language', 'confidence', 'mastery'], progressionSteps: ['Start with greetings and core family words', 'Compare Simplified, Traditional, and Pinyin forms', 'Use matching practice and comparison drills, then try audio prompts'] },
       { id: 'maths-foundation-v1', path: 'content-packs/maths-foundation.json', kind: 'practice-cards', title: 'Maths Foundation practice', domain: 'Maths Foundation', language: 'English', learners: 'Early and primary learners', activity: 'Practice cards + Number-line models + Adaptive answer entry + weak-skill rotation + mental maths + confidence drills', readiness: 'Live slice', next: 'Add adaptive number-line hints for more operations and learner-specific mixed review.', schema: ['topic', 'skill', 'prompt', 'answer', 'strategy'], renderTarget: 'maths-foundation-grid', recommendedStages: ['early', 'primary'], recommendedGoals: ['confidence', 'mastery'], progressionSteps: ['Start with number bonds to 10 and 20', 'Practise place value and skip counting', 'Move into times tables, fractions, and short word problems', 'Type answers and unlock strategy feedback', 'Review weak skills first with number-line support'] },
-      { id: 'life-uk-v1', path: 'content-packs/life-uk.json', kind: 'mock-questions', title: 'Life in the UK starter mock', domain: 'Life in the UK', language: 'English', learners: 'Adult learners', activity: 'Practice questions + starter mock mode + weak-topic review', readiness: 'Live slice', next: 'Expand to a 24-question timed mock with full official-topic weighting and review mode.', schema: ['topic', 'prompt', 'options', 'answer', 'explanation'], renderTarget: 'life-uk-grid', recommendedStages: ['adult'], recommendedGoals: ['exam-ready', 'mastery'], progressionSteps: ['Start with civic basics and everyday UK facts', 'Practise weak citizenship topics from saved attempts', 'Build toward a 24-question, 45-minute mock test'] }
+      { id: 'life-uk-v1', path: 'content-packs/life-uk.json', kind: 'mock-questions', title: 'Life in the UK starter mock', domain: 'Life in the UK', language: 'English', learners: 'Adult learners', activity: 'Practice questions + starter mock mode + full timed mock + weak-topic review', readiness: 'Live slice', next: 'Add adaptive weak-topic drills that pull from saved full-mock review data.', schema: ['topic', 'prompt', 'options', 'answer', 'explanation'], renderTarget: 'life-uk-grid', recommendedStages: ['adult'], recommendedGoals: ['exam-ready', 'mastery'], progressionSteps: ['Start with civic basics and everyday UK facts', 'Practise weak citizenship topics from saved attempts', 'Build toward a 24-question, 45-minute mock test'] }
     ];
     let contentPackRegistry = [...FALLBACK_CONTENT_PACK_REGISTRY];
     let contentPackRegistryError = null;
@@ -1040,12 +1059,16 @@
     const mathsFoundationPracticeScores = {};
     const lifeUKPracticeScores = {};
     const lifeUKSelectedAnswers = {};
+    const lifeUKMockSelectedAnswers = {};
+    let lifeUKMockState = null;
     const audioPromptReplayCounts = {};
     const audioPromptSlowReplayCounts = {};
     const audioPromptRates = {};
     const CHINESE_AUDIO_PROMPT_LIMIT = 5;
     const MATHS_FOUNDATION_PRACTICE_LIMIT = 6;
     const LIFE_UK_PRACTICE_LIMIT = 6;
+    const LIFE_UK_FULL_MOCK_QUESTION_COUNT = 24;
+    const LIFE_UK_FULL_MOCK_TIME_LIMIT_SECONDS = 45 * 60;
 
     function speechSynthesisAvailable() {
       return typeof window !== 'undefined' && 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
@@ -2441,6 +2464,238 @@
       updateRecommendedCurriculumTestState(null, null, saved);
     }
 
+    function lifeUKFullMockQuestions() {
+      return lifeUKQuestions.slice(0, LIFE_UK_FULL_MOCK_QUESTION_COUNT).map((question, index) => ({ ...question, index: index + 1 }));
+    }
+
+    function startLifeUKFullMock() {
+      if (!lifeUKQuestions.length) return;
+      const total = lifeUKFullMockQuestions().length;
+      if (!total) return;
+      for (const key of Object.keys(lifeUKMockSelectedAnswers)) delete lifeUKMockSelectedAnswers[key];
+      lifeUKMockState = {
+        total,
+        answered: 0,
+        correct: 0,
+        timeLeft: LIFE_UK_FULL_MOCK_TIME_LIMIT_SECONDS,
+        finished: false,
+        submitted: false
+      };
+      renderLifeUKFullMock();
+      const area = document.getElementById('life-uk-mock-area');
+      if (area) area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function lifeUKMockTimerElement() {
+      const area = document.getElementById('life-uk-mock-area');
+      return area ? area.querySelector('.life-uk-mock-timer') : null;
+    }
+
+    function startLifeUKMockTimer() {
+      stopLifeUKMockTimer();
+      lifeUKMockState.timerId = setInterval(() => {
+        if (!lifeUKMockState) return;
+        lifeUKMockState.timeLeft -= 1;
+        if (lifeUKMockState.timeLeft <= 0) {
+          lifeUKMockState.timeLeft = 0;
+          renderLifeUKMockTimer();
+          finishLifeUKFullMock(true);
+          return;
+        }
+        renderLifeUKMockTimer();
+      }, 1000);
+    }
+
+    function stopLifeUKMockTimer() {
+      if (lifeUKMockState && lifeUKMockState.timerId) {
+        clearInterval(lifeUKMockState.timerId);
+        lifeUKMockState.timerId = null;
+      }
+    }
+
+    function renderLifeUKMockTimer() {
+      const el = lifeUKMockTimerElement();
+      if (!el || !lifeUKMockState) return;
+      const m = Math.floor(lifeUKMockState.timeLeft / 60).toString().padStart(2, '0');
+      const s = (lifeUKMockState.timeLeft % 60).toString().padStart(2, '0');
+      el.textContent = `${m}:${s}`;
+      el.className = 'life-uk-mock-timer' + (lifeUKMockState.timeLeft <= 300 ? ' urgent' : '');
+    }
+
+    function recordLifeUKMockAnswer(questionIndex, answerIndex) {
+      if (!lifeUKMockState || lifeUKMockState.finished) return;
+      const question = lifeUKFullMockQuestions().find(item => item.index === Number(questionIndex));
+      if (!question) return;
+      const alreadyAnswered = lifeUKMockSelectedAnswers[question.index] !== undefined;
+      lifeUKMockSelectedAnswers[question.index] = Number(answerIndex);
+      if (!alreadyAnswered) {
+        lifeUKMockState.answered += 1;
+        if (Number(answerIndex) === Number(question.answer)) lifeUKMockState.correct += 1;
+      } else {
+        lifeUKMockState.correct = Object.entries(lifeUKMockSelectedAnswers).filter(([idx, ans]) => {
+          const q = lifeUKFullMockQuestions().find(item => item.index === Number(idx));
+          return q && Number(ans) === Number(q.answer);
+        }).length;
+      }
+      renderLifeUKFullMockStatus();
+      const gridEl = document.getElementById('life-uk-mock-grid');
+      if (gridEl) {
+        gridEl.innerHTML = lifeUKFullMockQuestions().map(question => lifeUKMockCardHtml(question)).join('');
+      }
+      if (lifeUKMockState.answered >= lifeUKMockState.total) {
+        finishLifeUKFullMock(false);
+      }
+      updateRecommendedCurriculumTestState(null, null, window.__learningQuestTestState?.latestLifeUKProgress || null);
+    }
+
+    function saveLifeUKMockProgress(finishedByTime = false) {
+      if (!lifeUKMockState) return null;
+      const total = lifeUKMockState.total;
+      const correct = lifeUKMockState.correct;
+      const attempted = lifeUKMockState.answered;
+      const percent = total ? Math.round((correct / total) * 100) : 0;
+      const passMark = Number(lifeUKPack?.mock?.passMarkPercent || 75);
+      const passed = attempted >= total && percent >= passMark;
+      const skillResults = {};
+      for (const question of lifeUKFullMockQuestions()) {
+        const ans = lifeUKMockSelectedAnswers[question.index];
+        if (ans === undefined) continue;
+        skillResults[question.topic] = skillResults[question.topic] || { correct: 0, attempted: 0 };
+        skillResults[question.topic].attempted += 1;
+        if (Number(ans) === Number(question.answer)) skillResults[question.topic].correct += 1;
+      }
+      const weakSkills = Object.entries(skillResults)
+        .filter(([, r]) => r.attempted && r.correct < r.attempted)
+        .map(([topic]) => topic);
+      const learner = activeLearner();
+      const entry = {
+        learner: learner.id,
+        date: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+        completedAt: new Date().toISOString(),
+        correct,
+        total,
+        percent,
+        focus: 'Life in the UK full timed mock',
+        subjects: { 'Life in the UK': { correct, total } },
+        practiceMode: 'life-uk-full-mock',
+        difficultyMode: finishedByTime ? 'timed-mock-auto' : 'timed-mock',
+        activityType: 'life-uk-practice',
+        attempted,
+        passMark,
+        passed,
+        skillResults,
+        weakSkills,
+        timedMock: true,
+        timeExpired: Boolean(finishedByTime)
+      };
+      const history = upsertHistoryEntry(entry, item => item.activityType === 'life-uk-practice' && item.practiceMode === 'life-uk-full-mock');
+      renderHistory(history);
+      return entry;
+    }
+
+    function finishLifeUKFullMock(finishedByTime) {
+      if (!lifeUKMockState || lifeUKMockState.finished) return;
+      lifeUKMockState.finished = true;
+      stopLifeUKMockTimer();
+      const saved = saveLifeUKMockProgress(finishedByTime);
+      lifeUKMockState.result = saved;
+      renderLifeUKFullMock();
+      updateRecommendedCurriculumTestState(null, null, saved);
+    }
+
+    function renderLifeUKFullMock() {
+      const area = document.getElementById('life-uk-mock-area');
+      if (!area) return;
+      if (!lifeUKMockState) { area.innerHTML = ''; return; }
+      if (!lifeUKMockState.timerId) startLifeUKMockTimer();
+      const total = lifeUKMockState.total;
+      const passMark = Number(lifeUKPack?.mock?.passMarkPercent || 75);
+      if (!lifeUKMockState.finished) {
+        area.innerHTML = `
+          <div class="life-uk-mock-status">
+            <span class="life-uk-mock-timer">45:00</span>
+            <span>Answered ${lifeUKMockState.answered}/${total}</span>
+            <span>Correct ${lifeUKMockState.correct}</span>
+            <span>${passMark}% to pass</span>
+            <span class="life-uk-mock-controls">
+              <button class="btn btn-secondary" type="button" onclick="finishLifeUKFullMock(false)">Finish mock early</button>
+              <button class="btn btn-secondary" type="button" onclick="cancelLifeUKFullMock()">Cancel</button>
+            </span>
+          </div>
+          <div class="life-uk-mock-grid" id="life-uk-mock-grid">
+            ${lifeUKFullMockQuestions().map(question => lifeUKMockCardHtml(question)).join('')}
+          </div>
+        `;
+        renderLifeUKMockTimer();
+        return;
+      }
+      const result = lifeUKMockState.result || {};
+      const percent = result.percent || 0;
+      const passed = result.passed;
+      const reviewList = lifeUKFullMockQuestions().map(question => {
+        const userAnswer = lifeUKMockSelectedAnswers[question.index];
+        const correct = userAnswer !== undefined && Number(userAnswer) === Number(question.answer);
+        const wrongChoice = userAnswer !== undefined ? question.options[userAnswer] : '(no answer)';
+        return `
+          <div class="life-uk-mock-review-item ${correct ? '' : 'life-uk-mock-review-incorrect'}">
+            <div class="life-uk-mock-review-q">Q${question.index}. ${escapeHTML(question.prompt)}</div>
+            <div class="life-uk-mock-review-ans">${correct ? '✅ Correct: ' + escapeHTML(question.options[question.answer]) : `❌ Your answer: ${escapeHTML(wrongChoice)} → Correct: ${escapeHTML(question.options[question.answer])}`}</div>
+          </div>`;
+      }).join('');
+      const weakText = (result.weakSkills && result.weakSkills.length) ? escapeHTML(result.weakSkills.join(', ')) : 'No weak topics — strong mock.';
+      area.innerHTML = `
+        <div class="life-uk-mock-result">
+          <h4>${result.timeExpired ? '⏰ Time expired — mock submitted' : '🏁 Full timed mock complete'}</h4>
+          <div class="life-uk-mock-result-stat ${passed ? 'life-uk-mock-result-pass' : 'life-uk-mock-result-fail'}">${result.correct}/${result.total} correct · ${percent}% · ${passMark}% pass target · ${passed ? 'PASSED' : 'Not yet — review weak topics'}</div>
+          <div class="life-uk-mock-result-stat">Answered: ${result.attempted}/${result.total}</div>
+          <div class="life-uk-mock-result-stat">Weak topics: ${weakText}</div>
+          <div class="life-uk-mock-controls">
+            <button class="btn btn-primary" type="button" onclick="startLifeUKFullMock()">Try another full mock</button>
+          </div>
+          <div class="life-uk-mock-review">${reviewList}</div>
+        </div>
+      `;
+    }
+
+    function renderLifeUKFullMockStatus() {
+      if (!lifeUKMockState || lifeUKMockState.finished) return;
+      const area = document.getElementById('life-uk-mock-area');
+      if (!area) return;
+      const status = area.querySelector('.life-uk-mock-status');
+      if (!status) return;
+      const spans = status.querySelectorAll('span:not(.life-uk-mock-timer):not(.life-uk-mock-controls)');
+      if (spans[0]) spans[0].textContent = `Answered ${lifeUKMockState.answered}/${lifeUKMockState.total}`;
+      if (spans[1]) spans[1].textContent = `Correct ${lifeUKMockState.correct}`;
+    }
+
+    function lifeUKMockCardHtml(question) {
+      const selectedAnswer = lifeUKMockSelectedAnswers[question.index];
+      const answered = selectedAnswer !== undefined;
+      return `
+        <article class="life-uk-mock-card" data-life-uk-mock-question-index="${question.index}">
+          <div class="life-uk-topic">${escapeHTML(question.topic)}</div>
+          <div class="life-uk-question">${escapeHTML(question.prompt)}</div>
+          <div class="life-uk-options">
+            ${question.options.map((option, optionIndex) => {
+              const selected = answered && optionIndex === Number(selectedAnswer);
+              const correct = answered && optionIndex === Number(question.answer);
+              const wrong = selected && !correct;
+              return `<button class="life-uk-option ${correct ? 'correct' : ''} ${wrong ? 'incorrect' : ''}" type="button" onclick="recordLifeUKMockAnswer(${question.index}, ${optionIndex})" ${answered ? 'disabled' : ''}>${escapeHTML(option)}</button>`;
+            }).join('')}
+          </div>
+          <div class="life-uk-feedback ${answered && Number(selectedAnswer) !== Number(question.answer) ? 'incorrect' : ''}">${answered ? (Number(selectedAnswer) === Number(question.answer) ? '✅ Correct.' : 'Noted — review this after the mock.') : 'Pick one answer.'}</div>
+        </article>
+      `;
+    }
+
+    function cancelLifeUKFullMock() {
+      stopLifeUKMockTimer();
+      lifeUKMockState = null;
+      for (const key of Object.keys(lifeUKMockSelectedAnswers)) delete lifeUKMockSelectedAnswers[key];
+      const area = document.getElementById('life-uk-mock-area');
+      if (area) area.innerHTML = '';
+    }
+
     function updateRecommendedCurriculumTestState(lastMatchingProgress = null, lastMathsFoundationProgress = null, lastLifeUKProgress = null) {
       const history = loadHistory();
       const latestMatchingProgress = lastMatchingProgress || history.find(item => item.activityType === 'matching-practice') || null;
@@ -2470,6 +2725,11 @@
         lifeUKPracticeScores: lifeUKPracticeScore(lifeUKPractice.length || LIFE_UK_PRACTICE_LIMIT),
         lifeUKWeakTopics: lifeUKWeakTopics(),
         lifeUKPassMark: Number(lifeUKPack?.mock?.passMarkPercent || 75),
+        lifeUKFullMockQuestionCount: Number(lifeUKPack?.mock?.questionCount || LIFE_UK_FULL_MOCK_QUESTION_COUNT),
+        lifeUKFullMockTimeLimitSeconds: LIFE_UK_FULL_MOCK_TIME_LIMIT_SECONDS,
+        lifeUKFullMockReady: Boolean(lifeUKQuestions.length >= LIFE_UK_FULL_MOCK_QUESTION_COUNT),
+        lifeUKFullMockAvailableQuestions: lifeUKQuestions.length,
+        latestLifeUKMockProgress: history.find(item => item.activityType === 'life-uk-practice' && item.practiceMode === 'life-uk-full-mock') || null,
         latestLifeUKProgress,
         matchingPracticeScores: { hkChinese: matchingPracticeScore('hkChinese', hkChineseFlashcards.length ? Math.min(4, hkChineseFlashcards.length) : 0), mandarin: matchingPracticeScore('mandarin', mandarinFlashcards.length ? Math.min(4, mandarinFlashcards.length) : 0) },
         mathsFoundationPracticeScores: mathsFoundationPracticeScore(mathsPracticeCards.length || MATHS_FOUNDATION_PRACTICE_LIMIT),

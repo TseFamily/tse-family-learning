@@ -4,9 +4,9 @@
   "domain": "Life in the UK",
   "language": "English",
   "learners": "Adult learners",
-  "activity": "Practice questions + starter mock mode + weak-topic review",
+  "activity": "Practice questions + starter mock mode + full timed mock + weak-topic review",
   "readiness": "Live slice",
-  "next": "Expand to a 24-question timed mock with full official-topic weighting and review mode.",
+  "next": "Add adaptive weak-topic drills that pull from saved full-mock review data.",
   "recommendedStages": ["adult"],
   "recommendedGoals": ["exam-ready", "mastery"],
   "progressionSteps": [
@@ -104,6 +104,90 @@
       "options": ["Crown Court trial", "County Court hearing", "Council meeting", "Public inquiry"],
       "answer": 0,
       "explanation": "Serious criminal cases can be heard in the Crown Court with a jury."
+    },
+    {
+      "topic": "Values and principles",
+      "prompt": "Which of these is a fundamental British value?",
+      "options": ["Democracy and the rule of law", "Compulsory military service", "State religion for all citizens", "Hereditary political office"],
+      "answer": 0,
+      "explanation": "Fundamental British values include democracy, the rule of law, individual liberty, and mutual respect and tolerance."
+    },
+    {
+      "topic": "Economy",
+      "prompt": "What is the currency of the UK?",
+      "options": ["Pound sterling", "Euro", "Dollar", "Franc"],
+      "answer": 0,
+      "explanation": "The UK's currency is the pound sterling."
+    },
+    {
+      "topic": "History",
+      "prompt": "In which year did the Norman invasion (Battle of Hastings) take place?",
+      "options": ["1066", "1215", "1485", "1707"],
+      "answer": 0,
+      "explanation": "The Norman invasion and the Battle of Hastings took place in 1066."
+    },
+    {
+      "topic": "Culture",
+      "prompt": "Who wrote 'Romeo and Juliet' and 'Hamlet'?",
+      "options": ["William Shakespeare", "Geoffrey Chaucer", "Jane Austen", "Charles Dickens"],
+      "answer": 0,
+      "explanation": "William Shakespeare wrote many of the most famous plays in the English language."
+    },
+    {
+      "topic": "Geography",
+      "prompt": "What is the highest mountain in the UK?",
+      "options": ["Ben Nevis", "Snowdon", "Scafell Pike", "Slieve Donard"],
+      "answer": 0,
+      "explanation": "Ben Nevis, in Scotland, is the highest mountain in the UK."
+    },
+    {
+      "topic": "History",
+      "prompt": "Which king established the Church of England?",
+      "options": ["Henry VIII", "Henry VII", "Elizabeth I", "James I"],
+      "answer": 0,
+      "explanation": "Henry VIII broke from Rome and established the Church of England in the 16th century."
+    },
+    {
+      "topic": "Society",
+      "prompt": "Which report led to the creation of the modern welfare state?",
+      "options": ["The Beveridge Report", "The Magna Carta", "The Domesday Book", "The Bill of Rights"],
+      "answer": 0,
+      "explanation": "The Beveridge Report of 1942 shaped the modern welfare state and the NHS."
+    },
+    {
+      "topic": "Parliament",
+      "prompt": "How often are general elections required to be held, at most?",
+      "options": ["Every 5 years", "Every 3 years", "Every 7 years", "Every 10 years"],
+      "answer": 0,
+      "explanation": "Under current law, a general election must be held at least every five years."
+    },
+    {
+      "topic": "Culture",
+      "prompt": "Who is the patron saint of England?",
+      "options": ["St George", "St Andrew", "St David", "St Patrick"],
+      "answer": 0,
+      "explanation": "St George is the patron saint of England."
+    },
+    {
+      "topic": "History",
+      "prompt": "The Industrial Revolution is most associated with developments in which industry first?",
+      "options": ["Textiles", "Aircraft", "Computing", "Space travel"],
+      "answer": 0,
+      "explanation": "The Industrial Revolution began with mechanisation of the textile industry in the 18th century."
+    },
+    {
+      "topic": "Democracy",
+      "prompt": "What is the minimum age to stand as an MP in the UK?",
+      "options": ["18", "21", "25", "16"],
+      "answer": 0,
+      "explanation": "Since 2006, the minimum age to stand as a Member of Parliament has been 18."
+    },
+    {
+      "topic": "Values and principles",
+      "prompt": "Which of these describes the UK's system of government?",
+      "options": ["A parliamentary democracy and constitutional monarchy", "An absolute monarchy", "A military government", "A theocracy"],
+      "answer": 0,
+      "explanation": "The UK is a parliamentary democracy and a constitutional monarchy."
     }
   ],
   "sourcePath": "content-packs/life-uk.json"
