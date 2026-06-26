@@ -115,9 +115,9 @@
       "domain": "Life in the UK",
       "language": "English",
       "learners": "Adult learners",
-      "activity": "Practice questions + starter mock mode + full timed mock + weak-topic review",
+      "activity": "Practice questions + starter mock mode + full timed mock + weak-topic review + adaptive weak-topic drill",
       "readiness": "Live slice",
-      "next": "Add adaptive weak-topic drills that pull from saved full-mock review data.",
+      "next": "Add topic-spaced repetition across the entire question bank once weak-topic drills are live.",
       "schema": [
         "topic",
         "prompt",
@@ -136,7 +136,8 @@
       "progressionSteps": [
         "Start with civic basics and everyday UK facts",
         "Practise weak citizenship topics from saved attempts",
-        "Build toward a 24-question, 45-minute mock test"
+        "Build toward a 24-question, 45-minute mock test",
+        "Run adaptive weak-topic drills from saved mock review data"
       ]
     }
   ]

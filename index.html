@@ -424,6 +424,17 @@
     .life-uk-mock-review-q { font-weight: 800; color: #1e3a8a; }
     .life-uk-mock-review-ans { color: var(--subtext); }
     .life-uk-mock-review-incorrect { border-color: #fb7185; background: #fff1f2; }
+    .life-uk-drill-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0 6px; }
+    .life-uk-drill-start { font-size: 0.92rem; }
+    .life-uk-drill-area { margin-top: 8px; display: grid; gap: 12px; }
+    .life-uk-drill-status { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 8px 12px; font-size: 0.85rem; font-weight: 800; color: #1e3a8a; }
+    .life-uk-drill-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+    .life-uk-drill-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .life-uk-drill-card { border: 1px solid #bfdbfe; background: linear-gradient(180deg, #eff6ff, #fff); border-radius: 16px; padding: 12px; display: grid; gap: 8px; align-content: start; }
+    .life-uk-drill-result { border: 1px solid #bfdbfe; background: #f8fbff; border-radius: 16px; padding: 14px; display: grid; gap: 8px; }
+    .life-uk-drill-result h4 { margin: 0; color: #1e3a8a; font-size: 1.05rem; }
+    .life-uk-drill-result-stat { font-size: 0.85rem; color: #1d4ed8; font-weight: 800; }
+    .life-uk-drill-empty { border: 1px dashed #bfdbfe; background: #f8fbff; border-radius: 12px; padding: 14px; color: #1d4ed8; font-size: 0.88rem; font-weight: 800; line-height: 1.4; }
     .maths-card { border: 1px solid #bbf7d0; background: linear-gradient(180deg, #f0fdf4, #fff); border-radius: 16px; padding: 12px; display: grid; gap: 8px; align-content: start; }
     .maths-topic { color: #15803d; font-size: 0.74rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
     .maths-prompt { color: #14532d; font-size: 1.05rem; font-weight: 900; line-height: 1.25; }
@@ -505,7 +516,7 @@
       .question-text { font-size: 1.1rem; }
       .option { padding: 13px 14px; font-size: 0.97rem; }
       .stats-grid, .badge-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .domain-grid, .curriculum-grid, .mission-metrics, .flashcard-grid, .matching-grid, .comparison-grid, .comparison-forms, .maths-grid, .life-uk-grid { grid-template-columns: 1fr; }
+      .domain-grid, .curriculum-grid, .mission-metrics, .flashcard-grid, .matching-grid, .comparison-grid, .comparison-forms, .maths-grid, .life-uk-grid, .life-uk-drill-grid { grid-template-columns: 1fr; }
       .family-row, .leaderboard-row { grid-template-columns: 1fr; text-align: left; }
       .family-stat, .family-focus, .family-action, .leaderboard-score { text-align: left; justify-items: start; }
     }
@@ -609,7 +620,7 @@
       .section-card.wide { grid-column: 1 / -1; }
       .domain-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .curriculum-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .flashcard-grid, .matching-grid, .comparison-grid, .maths-grid, .life-uk-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .flashcard-grid, .matching-grid, .comparison-grid, .maths-grid, .life-uk-grid, .life-uk-drill-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .start-cta-sticky { bottom: 20px; max-width: 420px; margin-left: auto; }
     }
     @media (min-width: 1080px) {
@@ -926,7 +937,7 @@
             <div class="matching-panel" id="mandarin-matching-panel"><h3>🔗 Simplified Mandarin matching practice</h3><p>Match Simplified characters to English meaning, then compare Pinyin and Traditional forms.</p><div class="matching-grid" id="mandarin-matching-grid"></div></div>
             <div class="comparison-panel" id="comparison-panel"><h3>🪞 Traditional/Simplified comparison drill</h3><p>Compare shared meanings across the runtime HK Chinese and Mandarin packs before moving into audio prompts.</p><div class="comparison-grid" id="comparison-grid"></div></div>
             <div class="maths-panel" id="maths-foundation-panel"><h3>🧮 Maths Foundation practice cards</h3><p>Number bonds, place value, skip counting, and times-table prompts are runtime-loaded from the content-pack registry.</p><div class="maths-grid" id="maths-foundation-grid"></div></div>
-            <div class="life-uk-panel" id="life-uk-panel"><h3>🇬🇧 Life in the UK starter mock</h3><p>Starter citizenship questions are runtime-loaded from the content-pack registry, with a 75% pass target, a 24-question full timed mock, and weak-topic review.</p><div class="life-uk-mock-actions" id="life-uk-mock-actions"><button class="btn btn-secondary life-uk-mock-start" type="button" onclick="startLifeUKFullMock()">⏱️ Start 24-question full mock (45 min)</button></div><div class="life-uk-mock-area" id="life-uk-mock-area"></div><div class="life-uk-grid" id="life-uk-grid"></div></div>
+            <div class="life-uk-panel" id="life-uk-panel"><h3>🇬🇧 Life in the UK starter mock</h3><p>Starter citizenship questions are runtime-loaded from the content-pack registry, with a 75% pass target, a 24-question full timed mock, and weak-topic review.</p><div class="life-uk-mock-actions" id="life-uk-mock-actions"><button class="btn btn-secondary life-uk-mock-start" type="button" onclick="startLifeUKFullMock()">⏱️ Start 24-question full mock (45 min)</button></div><div class="life-uk-mock-area" id="life-uk-mock-area"></div><div class="life-uk-drill-actions" id="life-uk-drill-actions"></div><div class="life-uk-drill-area" id="life-uk-drill-area"></div><div class="life-uk-grid" id="life-uk-grid"></div></div>
           </article>
 
           <article class="section-card rail" id="progress">
@@ -1031,7 +1042,7 @@
       { id: 'maths-foundation', icon: '🧮', title: 'Maths Foundation', audience: 'Primary learners', status: 'Roadmap slice', state: 'next', description: 'Numbers, bonds, times tables, word problems, and confidence drills.' },
       { id: 'primary', icon: '📚', title: 'Primary Learning', audience: 'Primary learners', status: 'Planned', state: 'planned', description: 'Reading, spelling, science, school skills, and age-banded practice.' },
       { id: 'french', icon: '🇫🇷', title: 'French', audience: 'Family', status: 'Planned', state: 'planned', description: 'Vocabulary, phrases, listening prompts, grammar, and spaced recall.' },
-      { id: 'life-uk', icon: '🇬🇧', title: 'Life in the UK', audience: 'Adult learners', status: 'Live slice', state: 'next', description: 'Starter mock questions, 75% pass target, and weak-topic review.' },
+      { id: 'life-uk', icon: '🇬🇧', title: 'Life in the UK', audience: 'Adult learners', status: 'Live slice', state: 'next', description: 'Starter mock questions, 75% pass target, weak-topic review, and adaptive drills.' },
       { id: 'english', icon: '✍️', title: 'English Mastery', audience: 'Family', status: 'Planned', state: 'planned', description: 'Grammar, comprehension, writing, vocabulary, and reading confidence.' }
     ];
     const CONTENT_PACK_REGISTRY_PATH = 'content-packs/registry.json';
@@ -1039,7 +1050,7 @@
       { id: 'hk-chinese-basics-v1', path: 'content-packs/hk-chinese-basics.json', kind: 'flashcards', title: 'Traditional HK Chinese basics', domain: 'Chinese · Traditional HK', language: '繁體中文 + Cantonese', learners: 'All learners', activity: 'Flashcards + matching + comparison + audio prompts + listen/repeat', readiness: 'Live slice', next: 'Expand family words into colours, numbers, greetings, Jyutping, comparison drills, and audio prompts.', schema: ['traditional', 'jyutping', 'canto', 'english', 'prompt'], renderTarget: 'flashcard-grid', recommendedStages: ['early', 'primary', 'adult'], recommendedGoals: ['confidence', 'language', 'mastery'], progressionSteps: ['Start with family words and greetings', 'Practise colours, numbers, and Jyutping recall', 'Move into matching practice, comparison drills, audio prompts, and short household phrases'] },
       { id: 'mandarin-basics-v1', path: 'content-packs/mandarin-basics.json', kind: 'flashcards', title: 'Simplified Mandarin basics', domain: 'Chinese · Simplified Mandarin', language: '简体中文 + Pinyin', learners: 'All learners', activity: 'Flashcards + matching + comparison + audio prompts + listen/repeat', readiness: 'Live slice', next: 'Expand into matching practice, audio prompts, and Traditional/Simplified comparison drills.', schema: ['simplified', 'traditional', 'pinyin', 'english', 'prompt'], renderTarget: 'mandarin-flashcard-grid', recommendedStages: ['early', 'primary', 'adult'], recommendedGoals: ['language', 'confidence', 'mastery'], progressionSteps: ['Start with greetings and core family words', 'Compare Simplified, Traditional, and Pinyin forms', 'Use matching practice and comparison drills, then try audio prompts'] },
       { id: 'maths-foundation-v1', path: 'content-packs/maths-foundation.json', kind: 'practice-cards', title: 'Maths Foundation practice', domain: 'Maths Foundation', language: 'English', learners: 'Early and primary learners', activity: 'Practice cards + Number-line models + Adaptive answer entry + weak-skill rotation + mental maths + confidence drills', readiness: 'Live slice', next: 'Add adaptive number-line hints for more operations and learner-specific mixed review.', schema: ['topic', 'skill', 'prompt', 'answer', 'strategy'], renderTarget: 'maths-foundation-grid', recommendedStages: ['early', 'primary'], recommendedGoals: ['confidence', 'mastery'], progressionSteps: ['Start with number bonds to 10 and 20', 'Practise place value and skip counting', 'Move into times tables, fractions, and short word problems', 'Type answers and unlock strategy feedback', 'Review weak skills first with number-line support'] },
-      { id: 'life-uk-v1', path: 'content-packs/life-uk.json', kind: 'mock-questions', title: 'Life in the UK starter mock', domain: 'Life in the UK', language: 'English', learners: 'Adult learners', activity: 'Practice questions + starter mock mode + full timed mock + weak-topic review', readiness: 'Live slice', next: 'Add adaptive weak-topic drills that pull from saved full-mock review data.', schema: ['topic', 'prompt', 'options', 'answer', 'explanation'], renderTarget: 'life-uk-grid', recommendedStages: ['adult'], recommendedGoals: ['exam-ready', 'mastery'], progressionSteps: ['Start with civic basics and everyday UK facts', 'Practise weak citizenship topics from saved attempts', 'Build toward a 24-question, 45-minute mock test'] }
+      { id: 'life-uk-v1', path: 'content-packs/life-uk.json', kind: 'mock-questions', title: 'Life in the UK starter mock', domain: 'Life in the UK', language: 'English', learners: 'Adult learners', activity: 'Practice questions + starter mock mode + full timed mock + weak-topic review + adaptive weak-topic drill', readiness: 'Live slice', next: 'Add topic-spaced repetition across the entire question bank once weak-topic drills are live.', schema: ['topic', 'prompt', 'options', 'answer', 'explanation'], renderTarget: 'life-uk-grid', recommendedStages: ['adult'], recommendedGoals: ['exam-ready', 'mastery'], progressionSteps: ['Start with civic basics and everyday UK facts', 'Practise weak citizenship topics from saved attempts', 'Build toward a 24-question, 45-minute mock test', 'Run adaptive weak-topic drills from saved mock review data'] }
     ];
     let contentPackRegistry = [...FALLBACK_CONTENT_PACK_REGISTRY];
     let contentPackRegistryError = null;
@@ -1061,6 +1072,10 @@
     const lifeUKSelectedAnswers = {};
     const lifeUKMockSelectedAnswers = {};
     let lifeUKMockState = null;
+    const lifeUKDrillSelectedAnswers = {};
+    const lifeUKDrillScores = {};
+    let lifeUKDrillState = null;
+    const LIFE_UK_DRILL_QUESTION_COUNT = 6;
     const audioPromptReplayCounts = {};
     const audioPromptSlowReplayCounts = {};
     const audioPromptRates = {};
@@ -1909,6 +1924,7 @@
       renderChineseMatchingPractice();
       renderMathsFoundationPractice();
       renderLifeUKPractice();
+      renderLifeUKDrill();
       updateRecommendedCurriculumTestState();
     }
 
@@ -2696,6 +2712,263 @@
       if (area) area.innerHTML = '';
     }
 
+    function lifeUKDrillPool() {
+      const pool = [];
+      const seen = new Set();
+      const weakTopics = lifeUKWeakTopics();
+      const sources = [];
+      for (const question of lifeUKFullMockQuestions()) {
+        if (weakTopics.includes(question.topic) && !seen.has(`${question.topic}::${question.index}`)) {
+          seen.add(`${question.topic}::${question.index}`);
+          sources.push({ question, source: 'mock' });
+        }
+      }
+      for (const entry of loadHistory()) {
+        if (!entry || entry.activityType !== 'life-uk-practice' || !Array.isArray(entry.weakSkills)) continue;
+        for (const topic of entry.weakSkills) {
+          for (const question of lifeUKQuestions) {
+            if (question.topic !== topic) continue;
+            const key = `${question.topic}::${question.index}`;
+            if (seen.has(key)) continue;
+            seen.add(key);
+            sources.push({ question, source: entry.practiceMode || 'life-uk-history' });
+          }
+        }
+      }
+      if (!sources.length) {
+        for (const question of lifeUKQuestions) {
+          sources.push({ question, source: 'starter' });
+        }
+      }
+      const limit = Math.min(LIFE_UK_DRILL_QUESTION_COUNT, sources.length);
+      const startIndex = sources.length > limit ? Math.floor(Math.random() * sources.length) : 0;
+      for (let i = 0; i < limit; i += 1) {
+        const picked = sources[(startIndex + i) % sources.length];
+        pool.push({ ...picked.question, drillIndex: i + 1, source: picked.source });
+      }
+      return pool;
+    }
+
+    function lifeUKDrillSourceLabel(source) {
+      if (source === 'mock' || source === 'life-uk-full-mock') return 'Full-mock review';
+      if (source === 'starter' || source === 'life-uk-starter-mock') return 'Starter rotation';
+      return 'History review';
+    }
+
+    function startLifeUKDrill() {
+      const pool = lifeUKDrillPool();
+      if (!pool.length) return;
+      for (const key of Object.keys(lifeUKDrillSelectedAnswers)) delete lifeUKDrillSelectedAnswers[key];
+      for (const key of Object.keys(lifeUKDrillScores)) delete lifeUKDrillScores[key];
+      const focusTopics = Array.from(new Set(pool.map(question => question.topic)));
+      const sources = Array.from(new Set(pool.map(question => lifeUKDrillSourceLabel(question.source))));
+      lifeUKDrillState = {
+        total: pool.length,
+        answered: 0,
+        correct: 0,
+        pool,
+        focusTopics,
+        sources,
+        finished: false
+      };
+      renderLifeUKDrill();
+      const area = document.getElementById('life-uk-drill-area');
+      if (area) area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function cancelLifeUKDrill() {
+      lifeUKDrillState = null;
+      for (const key of Object.keys(lifeUKDrillSelectedAnswers)) delete lifeUKDrillSelectedAnswers[key];
+      for (const key of Object.keys(lifeUKDrillScores)) delete lifeUKDrillScores[key];
+      const area = document.getElementById('life-uk-drill-area');
+      if (area) area.innerHTML = '';
+    }
+
+    function recordLifeUKDrillAnswer(questionIndex, answerIndex) {
+      if (!lifeUKDrillState || lifeUKDrillState.finished) return;
+      const question = lifeUKDrillState.pool.find(item => item.drillIndex === Number(questionIndex));
+      if (!question) return;
+      const alreadyAnswered = lifeUKDrillSelectedAnswers[question.drillIndex] !== undefined;
+      lifeUKDrillSelectedAnswers[question.drillIndex] = Number(answerIndex);
+      const correct = Number(answerIndex) === Number(question.answer);
+      lifeUKDrillScores[question.drillIndex] = correct;
+      if (!alreadyAnswered) {
+        lifeUKDrillState.answered += 1;
+        if (correct) lifeUKDrillState.correct += 1;
+      } else {
+        lifeUKDrillState.correct = lifeUKDrillState.pool.filter(item => lifeUKDrillScores[item.drillIndex] === true).length;
+      }
+      const grid = document.getElementById('life-uk-drill-grid');
+      if (grid) {
+        grid.innerHTML = lifeUKDrillState.pool.map(item => lifeUKDrillCardHtml(item)).join('');
+      }
+      renderLifeUKDrillStatus();
+      if (lifeUKDrillState.answered >= lifeUKDrillState.total) {
+        finishLifeUKDrill();
+      }
+    }
+
+    function finishLifeUKDrill() {
+      if (!lifeUKDrillState || lifeUKDrillState.finished) return;
+      lifeUKDrillState.finished = true;
+      const saved = saveLifeUKDrillProgress();
+      lifeUKDrillState.result = saved;
+      renderLifeUKDrill();
+      updateRecommendedCurriculumTestState(null, null, null);
+    }
+
+    function saveLifeUKDrillProgress() {
+      if (!lifeUKDrillState) return null;
+      const total = lifeUKDrillState.total;
+      const correct = lifeUKDrillState.correct;
+      const attempted = lifeUKDrillState.answered;
+      const percent = total ? Math.round((correct / total) * 100) : 0;
+      const passMark = Number(lifeUKPack?.mock?.passMarkPercent || 75);
+      const skillResults = {};
+      for (const question of lifeUKDrillState.pool) {
+        const ans = lifeUKDrillSelectedAnswers[question.drillIndex];
+        if (ans === undefined) continue;
+        skillResults[question.topic] = skillResults[question.topic] || { correct: 0, attempted: 0 };
+        skillResults[question.topic].attempted += 1;
+        if (Number(ans) === Number(question.answer)) skillResults[question.topic].correct += 1;
+      }
+      const weakSkills = Object.entries(skillResults)
+        .filter(([, r]) => r.attempted && r.correct < r.attempted)
+        .map(([topic]) => topic);
+      const learner = activeLearner();
+      const entry = {
+        learner: learner.id,
+        date: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+        completedAt: new Date().toISOString(),
+        correct,
+        total,
+        percent,
+        focus: 'Life in the UK adaptive weak-topic drill',
+        subjects: { 'Life in the UK': { correct, total } },
+        practiceMode: 'life-uk-weak-topic-drill',
+        difficultyMode: 'weak-topic-drill',
+        activityType: 'life-uk-practice',
+        attempted,
+        passMark,
+        passed: attempted >= total && percent >= passMark,
+        skillResults,
+        weakSkills,
+        timedMock: false,
+        focusTopics: lifeUKDrillState.focusTopics.slice(),
+        drillSources: lifeUKDrillState.sources.slice()
+      };
+      const history = upsertHistoryEntry(entry, item => item.activityType === 'life-uk-practice' && item.practiceMode === 'life-uk-weak-topic-drill');
+      renderHistory(history);
+      return entry;
+    }
+
+    function lifeUKDrillCardHtml(question) {
+      const selectedAnswer = lifeUKDrillSelectedAnswers[question.drillIndex];
+      const answered = selectedAnswer !== undefined;
+      return `
+        <article class="life-uk-drill-card" data-life-uk-drill-question-index="${question.drillIndex}">
+          <div class="life-uk-topic">${escapeHTML(question.topic)} · ${escapeHTML(lifeUKDrillSourceLabel(question.source))}</div>
+          <div class="life-uk-question">${escapeHTML(question.prompt)}</div>
+          <div class="life-uk-options">
+            ${question.options.map((option, optionIndex) => {
+              const selected = answered && optionIndex === Number(selectedAnswer);
+              const correct = answered && optionIndex === Number(question.answer);
+              const wrong = selected && !correct;
+              return `<button class="life-uk-option ${correct ? 'correct' : ''} ${wrong ? 'incorrect' : ''}" type="button" onclick="recordLifeUKDrillAnswer(${question.drillIndex}, ${optionIndex})" ${answered ? 'disabled' : ''}>${escapeHTML(option)}</button>`;
+            }).join('')}
+          </div>
+          <div class="life-uk-feedback ${answered && Number(selectedAnswer) !== Number(question.answer) ? 'incorrect' : ''}">${answered ? (Number(selectedAnswer) === Number(question.answer) ? '✅ Correct — drill score updated.' : 'Noted — this question stays in the weak-topic pool.') : 'Pick one answer to bank the drill score.'}</div>
+        </article>
+      `;
+    }
+
+    function renderLifeUKDrillStatus() {
+      if (!lifeUKDrillState || lifeUKDrillState.finished) return;
+      const area = document.getElementById('life-uk-drill-area');
+      if (!area) return;
+      const status = area.querySelector('.life-uk-drill-status');
+      if (!status) return;
+      const spans = status.querySelectorAll('span:not(.life-uk-drill-controls)');
+      if (spans[0]) spans[0].textContent = `Drill Q${lifeUKDrillState.answered}/${lifeUKDrillState.total}`;
+      if (spans[1]) spans[1].textContent = `Correct ${lifeUKDrillState.correct}`;
+      if (spans[2]) spans[2].textContent = `Topics: ${lifeUKDrillState.focusTopics.join(', ')}`;
+    }
+
+    function renderLifeUKDrill() {
+      const actions = document.getElementById('life-uk-drill-actions');
+      if (actions) {
+        if (!lifeUKQuestions.length) {
+          actions.innerHTML = '';
+        } else {
+          const weakTopics = lifeUKWeakTopics();
+          const label = weakTopics.length
+            ? `🎯 Start weak-topic drill (${weakTopics.length} flagged)`
+            : '🎯 Start adaptive drill (all topics)';
+          actions.innerHTML = `<button class="btn btn-secondary life-uk-drill-start" type="button" onclick="startLifeUKDrill()">${label}</button>`;
+        }
+      }
+      const area = document.getElementById('life-uk-drill-area');
+      if (!area) return;
+      if (!lifeUKDrillState) {
+        if (!lifeUKQuestions.length) {
+          area.innerHTML = '';
+        } else {
+          const weakTopics = lifeUKWeakTopics();
+          if (weakTopics.length) {
+            area.innerHTML = `<div class="life-uk-drill-empty">Adaptive weak-topic drill ready · pulling from <strong>${weakTopics.length}</strong> flagged topic${weakTopics.length === 1 ? '' : 's'}: ${escapeHTML(weakTopics.join(', '))}.</div>`;
+          } else {
+            area.innerHTML = `<div class="life-uk-drill-empty">No weak topics yet · the adaptive drill will rotate across the full 24-question bank once you finish a starter or full mock.</div>`;
+          }
+        }
+        return;
+      }
+      if (!lifeUKDrillState.finished) {
+        area.innerHTML = `
+          <div class="life-uk-drill-status">
+            <span>Drill Q${lifeUKDrillState.answered}/${lifeUKDrillState.total}</span>
+            <span>Correct ${lifeUKDrillState.correct}</span>
+            <span>Topics: ${lifeUKDrillState.focusTopics.join(', ')}</span>
+            <span class="life-uk-drill-controls">
+              <button class="btn btn-secondary" type="button" onclick="finishLifeUKDrill()">Finish drill early</button>
+              <button class="btn btn-secondary" type="button" onclick="cancelLifeUKDrill()">Cancel</button>
+            </span>
+          </div>
+          <div class="life-uk-drill-grid" id="life-uk-drill-grid">
+            ${lifeUKDrillState.pool.map(question => lifeUKDrillCardHtml(question)).join('')}
+          </div>
+        `;
+        return;
+      }
+      const result = lifeUKDrillState.result || {};
+      const percent = result.percent || 0;
+      const passed = result.passed;
+      const weakText = (result.weakSkills && result.weakSkills.length) ? escapeHTML(result.weakSkills.join(', ')) : 'No weak topics left in this drill — try the full mock next.';
+      const reviewList = lifeUKDrillState.pool.map(question => {
+        const userAnswer = lifeUKDrillSelectedAnswers[question.drillIndex];
+        const correct = userAnswer !== undefined && Number(userAnswer) === Number(question.answer);
+        const wrongChoice = userAnswer !== undefined ? question.options[userAnswer] : '(no answer)';
+        return `
+          <div class="life-uk-mock-review-item ${correct ? '' : 'life-uk-mock-review-incorrect'}">
+            <div class="life-uk-mock-review-q">D${question.drillIndex}. ${escapeHTML(question.topic)} · ${escapeHTML(question.prompt)}</div>
+            <div class="life-uk-mock-review-ans">${correct ? '✅ Correct: ' + escapeHTML(question.options[question.answer]) : `❌ Your answer: ${escapeHTML(wrongChoice)} → Correct: ${escapeHTML(question.options[question.answer])}`}</div>
+          </div>`;
+      }).join('');
+      area.innerHTML = `
+        <div class="life-uk-drill-result">
+          <h4>🎯 Adaptive weak-topic drill complete</h4>
+          <div class="life-uk-drill-result-stat ${passed ? 'life-uk-mock-result-pass' : 'life-uk-mock-result-fail'}">${result.correct}/${result.total} correct · ${percent}% · ${result.passMark}% pass target · ${passed ? 'PASSED' : 'Keep practising flagged topics'}</div>
+          <div class="life-uk-drill-result-stat">Sources: ${escapeHTML((result.drillSources || []).join(', '))}</div>
+          <div class="life-uk-drill-result-stat">Topics covered: ${escapeHTML((result.focusTopics || []).join(', '))}</div>
+          <div class="life-uk-drill-result-stat">Weak topics after drill: ${weakText}</div>
+          <div class="life-uk-mock-controls">
+            <button class="btn btn-primary" type="button" onclick="startLifeUKDrill()">Run drill again</button>
+            <button class="btn btn-secondary" type="button" onclick="cancelLifeUKDrill()">Hide drill</button>
+          </div>
+          <div class="life-uk-mock-review">${reviewList}</div>
+        </div>
+      `;
+    }
+
     function updateRecommendedCurriculumTestState(lastMatchingProgress = null, lastMathsFoundationProgress = null, lastLifeUKProgress = null) {
       const history = loadHistory();
       const latestMatchingProgress = lastMatchingProgress || history.find(item => item.activityType === 'matching-practice') || null;
@@ -2731,6 +3004,14 @@
         lifeUKFullMockAvailableQuestions: lifeUKQuestions.length,
         latestLifeUKMockProgress: history.find(item => item.activityType === 'life-uk-practice' && item.practiceMode === 'life-uk-full-mock') || null,
         latestLifeUKProgress,
+        lifeUKDrillState: lifeUKDrillState ? { total: lifeUKDrillState.total, answered: lifeUKDrillState.answered, correct: lifeUKDrillState.correct, finished: lifeUKDrillState.finished, focusTopics: lifeUKDrillState.focusTopics.slice(), sources: lifeUKDrillState.sources.slice() } : null,
+        lifeUKDrillSources: lifeUKDrillState ? lifeUKDrillState.sources.slice() : [],
+        lifeUKDrillFocusTopics: lifeUKDrillState ? lifeUKDrillState.focusTopics.slice() : [],
+        lifeUKDrillSourcePoolCount: (window.__learningQuestTestState && window.__learningQuestTestState.lifeUKDrillSourcePoolCount) || 0,
+        lifeUKDrillPoolSize: lifeUKDrillState ? lifeUKDrillState.pool.length : 0,
+        lifeUKDrillQuestionCount: LIFE_UK_DRILL_QUESTION_COUNT,
+        lifeUKWeakTopicDrillReady: lifeUKQuestions.length >= 1,
+        latestLifeUKDrillProgress: history.find(item => item.activityType === 'life-uk-practice' && item.practiceMode === 'life-uk-weak-topic-drill') || null,
         matchingPracticeScores: { hkChinese: matchingPracticeScore('hkChinese', hkChineseFlashcards.length ? Math.min(4, hkChineseFlashcards.length) : 0), mandarin: matchingPracticeScore('mandarin', mandarinFlashcards.length ? Math.min(4, mandarinFlashcards.length) : 0) },
         mathsFoundationPracticeScores: mathsFoundationPracticeScore(mathsPracticeCards.length || MATHS_FOUNDATION_PRACTICE_LIMIT),
         comparisonDrillPairs: comparisonDrillCards().map(card => ({ traditional: card.traditional, simplified: card.simplified, english: card.english, changed: card.changed })),
@@ -3012,18 +3293,19 @@
         lifeUKPack = validateLifeUKPack(await response.json());
         lifeUKQuestions = lifeUKPack.questions;
         lifeUKPackError = null;
-        window.__learningQuestTestState = { ...(window.__learningQuestTestState || {}), lifeUKPackId: lifeUKPack.id, lifeUKPackError: null };
+        window.__learningQuestTestState = { ...(window.__learningQuestTestState || {}), lifeUKPackId: lifeUKPack.id, lifeUKPackError: null, lifeUKDrillSourcePoolCount: lifeUKQuestions.length };
         return lifeUKPack;
       } catch (error) {
         lifeUKPack = null;
         lifeUKQuestions = [];
         lifeUKPackError = error.message || 'Could not load the Life in the UK content pack';
-        window.__learningQuestTestState = { ...(window.__learningQuestTestState || {}), lifeUKPackId: null, lifeUKPackError };
+        window.__learningQuestTestState = { ...(window.__learningQuestTestState || {}), lifeUKPackId: null, lifeUKPackError, lifeUKDrillSourcePoolCount: 0 };
         console.warn(lifeUKPackError);
         return null;
       } finally {
         renderCurriculumPacks();
         renderLifeUKPractice();
+        renderLifeUKDrill();
       }
     }
 
@@ -3164,6 +3446,7 @@
     renderMandarinFlashcards();
     renderMathsFoundationPractice();
     renderLifeUKPractice();
+    renderLifeUKDrill();
     loadContentPackRegistry()
       .then(() => Promise.all([
         fetch('questions.json?v=' + Date.now()).then(r => r.json()),

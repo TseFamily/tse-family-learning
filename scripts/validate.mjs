@@ -69,6 +69,8 @@ function validateLifeUKPackFile(path, expectedId, fields, label) {
   if (!pack.activity || !pack.activity.includes('starter mock mode')) throw new Error(`${label} pack metadata must advertise starter mock mode`);
   if (!pack.activity || !pack.activity.includes('weak-topic review')) throw new Error(`${label} pack metadata must advertise weak-topic review`);
   if (!pack.activity || !pack.activity.includes('full timed mock')) throw new Error(`${label} pack metadata must advertise a full timed mock`);
+  if (!pack.activity || !pack.activity.includes('adaptive weak-topic drill')) throw new Error(`${label} pack metadata must advertise an adaptive weak-topic drill`);
+  if (!pack.progressionSteps.includes('Run adaptive weak-topic drills from saved mock review data')) throw new Error(`${label} pack missing adaptive drill progression step`);
   if (!pack.mock || Number(pack.mock.passMarkPercent) !== 75) throw new Error(`${label} pack must declare a 75% pass mark`);
   if (!pack.mock || Number(pack.mock.timeLimitMinutes) !== 45) throw new Error(`${label} pack must declare the 45-minute mock target`);
   if (!Array.isArray(pack.questions) || pack.questions.length < 10) throw new Error(`${label} pack needs at least 10 questions`);
@@ -118,6 +120,8 @@ for (const [id, path, fields] of [
     if (!registered.activity.includes('weak-topic review')) throw new Error('Content pack registry life-uk-v1 missing weak-topic review activity');
     if (!registered.progressionSteps.includes('Build toward a 24-question, 45-minute mock test')) throw new Error('Content pack registry life-uk-v1 missing timed-mock progression step');
     if (!registered.activity.includes('full timed mock')) throw new Error('Content pack registry life-uk-v1 missing full timed mock activity');
+    if (!registered.activity.includes('adaptive weak-topic drill')) throw new Error('Content pack registry life-uk-v1 missing adaptive weak-topic drill activity');
+    if (!registered.progressionSteps.includes('Run adaptive weak-topic drills from saved mock review data')) throw new Error('Content pack registry life-uk-v1 missing adaptive drill progression step');
   } else {
     if (!registered.activity.includes('matching')) throw new Error(`Content pack registry ${id} missing matching activity`);
     if (!registered.activity.includes('comparison')) throw new Error(`Content pack registry ${id} missing comparison activity`);
@@ -258,7 +262,16 @@ for (const marker of [
   'LIFE_UK_FULL_MOCK_TIME_LIMIT_SECONDS',
   'Start 24-question full mock (45 min)',
   'life-uk-mock-area',
-  'life-uk-full-mock'
+  'life-uk-full-mock',
+  'life-uk-drill-actions',
+  'life-uk-drill-area',
+  'life-uk-drill-start',
+  'renderLifeUKDrill',
+  'startLifeUKDrill',
+  'lifeUKDrillState',
+  'lifeUKDrillPoolSize',
+  'life-uk-weak-topic-drill',
+  'LIFE_UK_DRILL_QUESTION_COUNT'
 ]) {
   if (!html.includes(marker)) throw new Error(`Missing runtime HK Chinese content-pack marker: ${marker}`);
 }

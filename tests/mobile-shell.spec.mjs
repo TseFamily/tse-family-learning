@@ -458,3 +458,64 @@ test('Life in the UK full timed mock renders, scores answers, and records progre
   expect(state.latestLifeUKMockProgress.passed).toBe(false);
   expect(state.latestLifeUKMockProgress.weakSkills).toContain('Parliament');
 });
+
+test('Life in the UK adaptive weak-topic drill pulls from full-mock weak skills and persists progress', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.lifeUKPackId === 'life-uk-v1',
+    null,
+    { timeout: 10000 }
+  );
+
+  await expect(page.getByRole('button', { name: 'Start 24-question full mock (45 min)' })).toBeVisible();
+  await page.getByRole('button', { name: 'Start 24-question full mock (45 min)' }).tap();
+
+  await expect(page.locator('#life-uk-mock-area')).toBeVisible();
+
+  const firstMockCard = page.locator('#life-uk-mock-grid .life-uk-mock-card').first();
+  await firstMockCard.getByRole('button', { name: 'The monarch' }).tap();
+
+  const secondMockCard = page.locator('#life-uk-mock-grid .life-uk-mock-card').nth(1);
+  await secondMockCard.getByRole('button', { name: 'House of Lords' }).tap();
+
+  await page.getByRole('button', { name: 'Finish mock early' }).tap();
+  await expect(page.locator('.life-uk-mock-result')).toBeVisible();
+
+  await expect(page.locator('.life-uk-drill-start')).toBeVisible();
+  const drillLabel = await page.locator('.life-uk-drill-start').first().textContent();
+  expect(drillLabel || '').toMatch(/Start weak-topic drill|Start adaptive drill/);
+  await page.locator('.life-uk-drill-start').first().tap();
+
+  await expect(page.locator('#life-uk-drill-area')).toBeVisible();
+  await expect(page.locator('.life-uk-drill-status')).toContainText(/Drill Q\d+\/\d+/);
+  await expect(page.locator('.life-uk-drill-grid .life-uk-drill-card').first()).toBeVisible();
+  await expect(page.locator('.life-uk-drill-grid .life-uk-drill-card').first().getByText(/Full-mock review|History review/)).toBeVisible();
+
+  const drillCards = page.locator('.life-uk-drill-grid .life-uk-drill-card');
+  const count = await drillCards.count();
+  for (let i = 0; i < count; i += 1) {
+    const card = drillCards.nth(i);
+    await card.locator('.life-uk-option').first().tap();
+  }
+
+  await expect(page.locator('.life-uk-drill-result')).toBeVisible();
+  await expect(page.locator('.life-uk-drill-result h4')).toContainText(/Adaptive weak-topic drill complete/);
+  await expect(page.locator('.life-uk-drill-result')).toContainText(/75% pass target/);
+
+  const state = await page.evaluate(() => window.__learningQuestTestState);
+  expect(state.lifeUKWeakTopicDrillReady).toBe(true);
+  expect(state.lifeUKDrillQuestionCount).toBe(6);
+  expect(state.lifeUKDrillPoolSize).toBeGreaterThan(0);
+  expect(state.lifeUKDrillPoolSize).toBeLessThanOrEqual(6);
+  expect(state.lifeUKDrillSourcePoolCount).toBe(24);
+  expect(state.lifeUKDrillSources).toEqual(expect.arrayContaining(['Full-mock review']));
+  expect(state.latestLifeUKDrillProgress).toMatchObject({
+    activityType: 'life-uk-practice',
+    practiceMode: 'life-uk-weak-topic-drill',
+    timedMock: false,
+    difficultyMode: 'weak-topic-drill'
+  });
+  expect(state.latestLifeUKDrillProgress.drillSources).toEqual(expect.arrayContaining(['Full-mock review']));
+});
