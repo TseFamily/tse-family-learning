@@ -4,15 +4,21 @@
   "domain": "Life in the UK",
   "language": "English",
   "learners": "Adult learners",
-  "activity": "Practice questions + starter mock mode + full timed mock + weak-topic review",
+  "activity": "Practice questions + starter mock mode + full timed mock + weak-topic review + adaptive weak-topic drill",
   "readiness": "Live slice",
-  "next": "Add adaptive weak-topic drills that pull from saved full-mock review data.",
-  "recommendedStages": ["adult"],
-  "recommendedGoals": ["exam-ready", "mastery"],
+  "next": "Add topic-spaced repetition across the entire question bank once weak-topic drills are live.",
+  "recommendedStages": [
+    "adult"
+  ],
+  "recommendedGoals": [
+    "exam-ready",
+    "mastery"
+  ],
   "progressionSteps": [
     "Start with civic basics and everyday UK facts",
     "Practise weak citizenship topics from saved attempts",
-    "Build toward a 24-question, 45-minute mock test"
+    "Build toward a 24-question, 45-minute mock test",
+    "Run adaptive weak-topic drills from saved mock review data"
   ],
   "mock": {
     "questionCount": 24,
@@ -24,168 +30,288 @@
     {
       "topic": "Government",
       "prompt": "Who appoints the Prime Minister after a general election?",
-      "options": ["The monarch", "The Speaker", "The Mayor of London", "The Supreme Court"],
+      "options": [
+        "The monarch",
+        "The Speaker",
+        "The Mayor of London",
+        "The Supreme Court"
+      ],
       "answer": 0,
       "explanation": "The monarch appoints as Prime Minister the person most likely to command the confidence of the House of Commons."
     },
     {
       "topic": "Parliament",
       "prompt": "Which part of Parliament is made up of elected MPs?",
-      "options": ["House of Commons", "House of Lords", "Privy Council", "Civil Service"],
+      "options": [
+        "House of Commons",
+        "House of Lords",
+        "Privy Council",
+        "Civil Service"
+      ],
       "answer": 0,
       "explanation": "Members of Parliament are elected to the House of Commons."
     },
     {
       "topic": "Law",
       "prompt": "Which document from 1215 is often linked with limits on royal power?",
-      "options": ["Magna Carta", "Bill of Rights 1689", "Domesday Book", "Act of Union"],
+      "options": [
+        "Magna Carta",
+        "Bill of Rights 1689",
+        "Domesday Book",
+        "Act of Union"
+      ],
       "answer": 0,
       "explanation": "Magna Carta was agreed in 1215 and is associated with limiting the power of the monarch."
     },
     {
       "topic": "Rights and responsibilities",
       "prompt": "What is one responsibility of people living in the UK?",
-      "options": ["Obeying the law", "Choosing the monarch", "Serving as an MP", "Owning a car"],
+      "options": [
+        "Obeying the law",
+        "Choosing the monarch",
+        "Serving as an MP",
+        "Owning a car"
+      ],
       "answer": 0,
       "explanation": "Everyone living in the UK is expected to obey the law."
     },
     {
       "topic": "History",
       "prompt": "What event is remembered on Remembrance Day?",
-      "options": ["The service and sacrifice of people in wars", "The signing of Magna Carta", "The coronation of every monarch", "The start of the school year"],
+      "options": [
+        "The service and sacrifice of people in wars",
+        "The signing of Magna Carta",
+        "The coronation of every monarch",
+        "The start of the school year"
+      ],
       "answer": 0,
       "explanation": "Remembrance Day honours those who served and died in wars and conflicts."
     },
     {
       "topic": "UK nations",
       "prompt": "Which city is the capital of Wales?",
-      "options": ["Cardiff", "Edinburgh", "Belfast", "Manchester"],
+      "options": [
+        "Cardiff",
+        "Edinburgh",
+        "Belfast",
+        "Manchester"
+      ],
       "answer": 0,
       "explanation": "Cardiff is the capital city of Wales."
     },
     {
       "topic": "Democracy",
       "prompt": "At what age can most citizens vote in UK general elections?",
-      "options": ["18", "16", "21", "25"],
+      "options": [
+        "18",
+        "16",
+        "21",
+        "25"
+      ],
       "answer": 0,
       "explanation": "Most citizens can vote in UK general elections from age 18."
     },
     {
       "topic": "Society",
       "prompt": "Which service provides healthcare funded mainly through taxation?",
-      "options": ["NHS", "DVLA", "BBC", "HMRC"],
+      "options": [
+        "NHS",
+        "DVLA",
+        "BBC",
+        "HMRC"
+      ],
       "answer": 0,
       "explanation": "The National Health Service provides healthcare funded mainly through taxation."
     },
     {
       "topic": "Geography",
       "prompt": "Which of these is one of the four countries of the UK?",
-      "options": ["Northern Ireland", "Republic of Ireland", "Isle of Man", "Jersey"],
+      "options": [
+        "Northern Ireland",
+        "Republic of Ireland",
+        "Isle of Man",
+        "Jersey"
+      ],
       "answer": 0,
       "explanation": "The UK is made up of England, Scotland, Wales, and Northern Ireland."
     },
     {
       "topic": "Culture",
       "prompt": "Which flower is commonly associated with Remembrance?",
-      "options": ["Poppy", "Daffodil", "Rose", "Thistle"],
+      "options": [
+        "Poppy",
+        "Daffodil",
+        "Rose",
+        "Thistle"
+      ],
       "answer": 0,
       "explanation": "The poppy is used as a symbol of Remembrance."
     },
     {
       "topic": "Government",
       "prompt": "Where does the UK Parliament meet?",
-      "options": ["Palace of Westminster", "Buckingham Palace", "Windsor Castle", "10 Downing Street"],
+      "options": [
+        "Palace of Westminster",
+        "Buckingham Palace",
+        "Windsor Castle",
+        "10 Downing Street"
+      ],
       "answer": 0,
       "explanation": "The UK Parliament meets at the Palace of Westminster in London."
     },
     {
       "topic": "Law",
       "prompt": "What type of trial uses a jury in serious criminal cases?",
-      "options": ["Crown Court trial", "County Court hearing", "Council meeting", "Public inquiry"],
+      "options": [
+        "Crown Court trial",
+        "County Court hearing",
+        "Council meeting",
+        "Public inquiry"
+      ],
       "answer": 0,
       "explanation": "Serious criminal cases can be heard in the Crown Court with a jury."
     },
     {
       "topic": "Values and principles",
       "prompt": "Which of these is a fundamental British value?",
-      "options": ["Democracy and the rule of law", "Compulsory military service", "State religion for all citizens", "Hereditary political office"],
+      "options": [
+        "Democracy and the rule of law",
+        "Compulsory military service",
+        "State religion for all citizens",
+        "Hereditary political office"
+      ],
       "answer": 0,
       "explanation": "Fundamental British values include democracy, the rule of law, individual liberty, and mutual respect and tolerance."
     },
     {
       "topic": "Economy",
       "prompt": "What is the currency of the UK?",
-      "options": ["Pound sterling", "Euro", "Dollar", "Franc"],
+      "options": [
+        "Pound sterling",
+        "Euro",
+        "Dollar",
+        "Franc"
+      ],
       "answer": 0,
       "explanation": "The UK's currency is the pound sterling."
     },
     {
       "topic": "History",
       "prompt": "In which year did the Norman invasion (Battle of Hastings) take place?",
-      "options": ["1066", "1215", "1485", "1707"],
+      "options": [
+        "1066",
+        "1215",
+        "1485",
+        "1707"
+      ],
       "answer": 0,
       "explanation": "The Norman invasion and the Battle of Hastings took place in 1066."
     },
     {
       "topic": "Culture",
       "prompt": "Who wrote 'Romeo and Juliet' and 'Hamlet'?",
-      "options": ["William Shakespeare", "Geoffrey Chaucer", "Jane Austen", "Charles Dickens"],
+      "options": [
+        "William Shakespeare",
+        "Geoffrey Chaucer",
+        "Jane Austen",
+        "Charles Dickens"
+      ],
       "answer": 0,
       "explanation": "William Shakespeare wrote many of the most famous plays in the English language."
     },
     {
       "topic": "Geography",
       "prompt": "What is the highest mountain in the UK?",
-      "options": ["Ben Nevis", "Snowdon", "Scafell Pike", "Slieve Donard"],
+      "options": [
+        "Ben Nevis",
+        "Snowdon",
+        "Scafell Pike",
+        "Slieve Donard"
+      ],
       "answer": 0,
       "explanation": "Ben Nevis, in Scotland, is the highest mountain in the UK."
     },
     {
       "topic": "History",
       "prompt": "Which king established the Church of England?",
-      "options": ["Henry VIII", "Henry VII", "Elizabeth I", "James I"],
+      "options": [
+        "Henry VIII",
+        "Henry VII",
+        "Elizabeth I",
+        "James I"
+      ],
       "answer": 0,
       "explanation": "Henry VIII broke from Rome and established the Church of England in the 16th century."
     },
     {
       "topic": "Society",
       "prompt": "Which report led to the creation of the modern welfare state?",
-      "options": ["The Beveridge Report", "The Magna Carta", "The Domesday Book", "The Bill of Rights"],
+      "options": [
+        "The Beveridge Report",
+        "The Magna Carta",
+        "The Domesday Book",
+        "The Bill of Rights"
+      ],
       "answer": 0,
       "explanation": "The Beveridge Report of 1942 shaped the modern welfare state and the NHS."
     },
     {
       "topic": "Parliament",
       "prompt": "How often are general elections required to be held, at most?",
-      "options": ["Every 5 years", "Every 3 years", "Every 7 years", "Every 10 years"],
+      "options": [
+        "Every 5 years",
+        "Every 3 years",
+        "Every 7 years",
+        "Every 10 years"
+      ],
       "answer": 0,
       "explanation": "Under current law, a general election must be held at least every five years."
     },
     {
       "topic": "Culture",
       "prompt": "Who is the patron saint of England?",
-      "options": ["St George", "St Andrew", "St David", "St Patrick"],
+      "options": [
+        "St George",
+        "St Andrew",
+        "St David",
+        "St Patrick"
+      ],
       "answer": 0,
       "explanation": "St George is the patron saint of England."
     },
     {
       "topic": "History",
       "prompt": "The Industrial Revolution is most associated with developments in which industry first?",
-      "options": ["Textiles", "Aircraft", "Computing", "Space travel"],
+      "options": [
+        "Textiles",
+        "Aircraft",
+        "Computing",
+        "Space travel"
+      ],
       "answer": 0,
       "explanation": "The Industrial Revolution began with mechanisation of the textile industry in the 18th century."
     },
     {
       "topic": "Democracy",
       "prompt": "What is the minimum age to stand as an MP in the UK?",
-      "options": ["18", "21", "25", "16"],
+      "options": [
+        "18",
+        "21",
+        "25",
+        "16"
+      ],
       "answer": 0,
       "explanation": "Since 2006, the minimum age to stand as a Member of Parliament has been 18."
     },
     {
       "topic": "Values and principles",
       "prompt": "Which of these describes the UK's system of government?",
-      "options": ["A parliamentary democracy and constitutional monarchy", "An absolute monarchy", "A military government", "A theocracy"],
+      "options": [
+        "A parliamentary democracy and constitutional monarchy",
+        "An absolute monarchy",
+        "A military government",
+        "A theocracy"
+      ],
       "answer": 0,
       "explanation": "The UK is a parliamentary democracy and a constitutional monarchy."
     }
