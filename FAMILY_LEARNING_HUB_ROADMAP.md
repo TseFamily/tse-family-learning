@@ -215,12 +215,6 @@ Next slices:
 - Progress import/restore and coach recommendations now preserve `life-uk-practice` metadata, so adult learners can resume weak-topic review from backup files.
 - Next: expand the starter slice into a full 24-question, 45-minute mock flow with official-topic weighting.
 
-## Run #29 Life in the UK starter mock
-
-- Turned the Life in the UK roadmap placeholder into a registry-driven runtime content pack (`life-uk-v1`) with 12 starter civic questions.
-- Added a visible starter mock practice surface with a 75% pass target, answer feedback, explanations, weak-topic persistence, and parent-coach review actions.
-- Added validation, service-worker caching, mobile smoke coverage, and progress-import preservation for Life in the UK practice metadata.
-
 ## Run #26 Chinese audio slow-repeat practice mode
 
 - Added a slow-repeat control to runtime HK Chinese and Mandarin audio prompts at a `0.62x` speech rate alongside the normal `0.82x` rate.
@@ -240,3 +234,10 @@ Next slices:
 - Full-mock progress persists as `life-uk-practice` with `practiceMode: 'life-uk-full-mock'`, per-topic `skillResults`, and `weakSkills`, so adult learners can resume weak-topic review and the coach can recommend next steps.
 - Shipped via PR #27 (`5327eea`), verified live: `/` HTTP 200, `/content-packs/life-uk.json` HTTP 200 with 24 questions, registry and maths routes healthy.
 - Next: add adaptive weak-topic drills that pull from saved full-mock review data.
+
+## Run #29 Life in the UK adaptive weak-topic drill
+
+- Added an adaptive weak-topic drill that pulls from saved full-mock review data (`weakSkills` and `skillResults` on `life-uk-full-mock` progress entries) and surfaces targeted practice for the learner's weakest Life in the UK topics.
+- The drill selects 6 questions weighted toward the learner's weakest topics, shows a source label (Full-mock review / Starter practice), and persists results as `life-uk-practice` with `practiceMode: 'life-uk-weak-topic-drill'`, including per-topic `skillResults` and `weakSkills`.
+- Added drill state management (`lifeUKDrillState`, `lifeUKDrillScores`, `lifeUKDrillSelectedAnswers`), validation markers, registry metadata update, and mobile smoke coverage (9/9 tests passing).
+- Shipped via PR #29 (`e9531a6`), verified on GitHub Pages (195538b, drill markers confirmed). Sylphx production deploy pending propagation.
