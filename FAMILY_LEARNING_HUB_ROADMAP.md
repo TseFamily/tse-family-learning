@@ -220,3 +220,23 @@ Next slices:
 - Turned the Life in the UK roadmap placeholder into a registry-driven runtime content pack (`life-uk-v1`) with 12 starter civic questions.
 - Added a visible starter mock practice surface with a 75% pass target, answer feedback, explanations, weak-topic persistence, and parent-coach review actions.
 - Added validation, service-worker caching, mobile smoke coverage, and progress-import preservation for Life in the UK practice metadata.
+
+## Run #26 Chinese audio slow-repeat practice mode
+
+- Added a slow-repeat control to runtime HK Chinese and Mandarin audio prompts at a `0.62x` speech rate alongside the normal `0.82x` rate.
+- Per-card slow replay state, observable slow replay counts/rates, validation markers, and mobile smoke coverage shipped with the audio prompt surface.
+- Shipped via PR #22 (`f42b732`), verified live alongside the full timed mock.
+
+## Run #27 project control-plane manifest
+
+- Added `.doctrine/project.json`, `AGENTS.md`, and `PROJECT.md` documenting the LearningQuest product foundation: lifecycle, layer, goals, non-goals, owned boundaries, and public surfaces.
+- The manifest keeps the static app shell, content-pack registry, starter packs, PWA shell, validation, and deployment docs coherent as the product generalises from family prototype toward public commercial-grade behaviour.
+- Shipped via PR #26 (`5f0743e`).
+
+## Run #28 Life in the UK full timed mock
+
+- Expanded the Life in the UK starter slice into a full 24-question, 45-minute timed mock flow with official-topic weighting across History, Government, Parliament, Law, Democracy, Society, Geography, Culture, Values, Rights, UK nations, and Economy.
+- The mock surfaces a live countdown timer (urgent state under 5 minutes), answer-by-answer feedback, finish-early/cancel controls, a full review list, and a 75% pass target with pass/fail result state.
+- Full-mock progress persists as `life-uk-practice` with `practiceMode: 'life-uk-full-mock'`, per-topic `skillResults`, and `weakSkills`, so adult learners can resume weak-topic review and the coach can recommend next steps.
+- Shipped via PR #27 (`5327eea`), verified live: `/` HTTP 200, `/content-packs/life-uk.json` HTTP 200 with 24 questions, registry and maths routes healthy.
+- Next: add adaptive weak-topic drills that pull from saved full-mock review data.
