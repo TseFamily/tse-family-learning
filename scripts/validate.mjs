@@ -271,7 +271,11 @@ for (const marker of [
   'lifeUKDrillState',
   'lifeUKDrillPoolSize',
   'life-uk-weak-topic-drill',
-  'LIFE_UK_DRILL_QUESTION_COUNT'
+  'LIFE_UK_DRILL_QUESTION_COUNT',
+  'life-uk-topic-breakdown',
+  'lifeUKTopicBreakdownHtml',
+  'lifeUKTopicBreakdownRows',
+  'Per-topic breakdown'
 ]) {
   if (!html.includes(marker)) throw new Error(`Missing runtime HK Chinese content-pack marker: ${marker}`);
 }
