@@ -241,3 +241,10 @@ Next slices:
 - The drill selects 6 questions weighted toward the learner's weakest topics, shows a source label (Full-mock review / Starter practice), and persists results as `life-uk-practice` with `practiceMode: 'life-uk-weak-topic-drill'`, including per-topic `skillResults` and `weakSkills`.
 - Added drill state management (`lifeUKDrillState`, `lifeUKDrillScores`, `lifeUKDrillSelectedAnswers`), validation markers, registry metadata update, and mobile smoke coverage (9/9 tests passing).
 - Shipped via PR #29 (`e9531a6`), verified on GitHub Pages (195538b, drill markers confirmed). Sylphx production deploy pending propagation.
+
+## Run #30 Life in the UK per-topic scoring breakdown
+
+- Added a per-topic correct/attempted breakdown table to the Life in the UK full-timed-mock and adaptive weak-topic-drill result views, rendered from saved `skillResults`.
+- Each row shows topic, score (e.g. `0/2 · 0%`), and a strong/weak colour cue, sorted by weakest topics first so learners can see exactly where to focus next.
+- Added `lifeUKTopicBreakdownRows`, `lifeUKTopicBreakdownHtml`, `.life-uk-topic-breakdown` styles, validation markers (`life-uk-topic-breakdown`, `Per-topic breakdown`), and mobile smoke assertions verifying the breakdown renders in both mock and drill result views.
+- Next: add topic-spaced repetition across the entire question bank using the per-topic breakdown as the prioritisation signal.

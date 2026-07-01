@@ -457,6 +457,10 @@ test('Life in the UK full timed mock renders, scores answers, and records progre
   });
   expect(state.latestLifeUKMockProgress.passed).toBe(false);
   expect(state.latestLifeUKMockProgress.weakSkills).toContain('Parliament');
+  expect(state.latestLifeUKMockProgress.skillResults).toMatchObject({ Parliament: { correct: 0, attempted: 1 } });
+  await expect(page.locator('.life-uk-topic-breakdown')).toBeVisible();
+  await expect(page.locator('.life-uk-topic-breakdown')).toContainText('Per-topic breakdown');
+  await expect(page.locator('.life-uk-topic-breakdown')).toContainText('Parliament');
 });
 
 test('Life in the UK adaptive weak-topic drill pulls from full-mock weak skills and persists progress', async ({ page }) => {
@@ -518,4 +522,8 @@ test('Life in the UK adaptive weak-topic drill pulls from full-mock weak skills 
     difficultyMode: 'weak-topic-drill'
   });
   expect(state.latestLifeUKDrillProgress.drillSources).toEqual(expect.arrayContaining(['Full-mock review']));
+  expect(state.latestLifeUKDrillProgress.skillResults).toBeDefined();
+  expect(Object.keys(state.latestLifeUKDrillProgress.skillResults).length).toBeGreaterThan(0);
+  await expect(page.locator('.life-uk-drill-result .life-uk-topic-breakdown')).toBeVisible();
+  await expect(page.locator('.life-uk-drill-result .life-uk-topic-breakdown')).toContainText('Per-topic breakdown');
 });

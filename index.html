@@ -430,6 +430,14 @@
     .life-uk-drill-status { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 8px 12px; font-size: 0.85rem; font-weight: 800; color: #1e3a8a; }
     .life-uk-drill-controls { display: flex; gap: 8px; flex-wrap: wrap; }
     .life-uk-drill-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .life-uk-topic-breakdown { display: grid; gap: 4px; border: 1px solid #bfdbfe; border-radius: 10px; padding: 8px 10px; background: #fff; }
+    .life-uk-topic-breakdown h5 { margin: 0 0 4px; font-size: 0.82rem; color: #1e3a8a; }
+    .life-uk-topic-breakdown-row { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; padding: 3px 0; border-bottom: 1px solid #eef2ff; }
+    .life-uk-topic-breakdown-row:last-child { border-bottom: none; }
+    .life-uk-topic-breakdown-topic { color: #1e3a8a; font-weight: 700; }
+    .life-uk-topic-breakdown-score { font-variant-numeric: tabular-nums; font-weight: 800; color: #1d4ed8; }
+    .life-uk-topic-breakdown-score.weak { color: #be123c; }
+    .life-uk-topic-breakdown-score.strong { color: #166534; }
     .life-uk-drill-card { border: 1px solid #bfdbfe; background: linear-gradient(180deg, #eff6ff, #fff); border-radius: 16px; padding: 12px; display: grid; gap: 8px; align-content: start; }
     .life-uk-drill-result { border: 1px solid #bfdbfe; background: #f8fbff; border-radius: 16px; padding: 14px; display: grid; gap: 8px; }
     .life-uk-drill-result h4 { margin: 0; color: #1e3a8a; font-size: 1.05rem; }
@@ -2665,6 +2673,7 @@
           <div class="life-uk-mock-result-stat ${passed ? 'life-uk-mock-result-pass' : 'life-uk-mock-result-fail'}">${result.correct}/${result.total} correct · ${percent}% · ${passMark}% pass target · ${passed ? 'PASSED' : 'Not yet — review weak topics'}</div>
           <div class="life-uk-mock-result-stat">Answered: ${result.attempted}/${result.total}</div>
           <div class="life-uk-mock-result-stat">Weak topics: ${weakText}</div>
+          ${lifeUKTopicBreakdownHtml(result.skillResults)}
           <div class="life-uk-mock-controls">
             <button class="btn btn-primary" type="button" onclick="startLifeUKFullMock()">Try another full mock</button>
           </div>
@@ -2894,6 +2903,26 @@
       if (spans[2]) spans[2].textContent = `Topics: ${lifeUKDrillState.focusTopics.join(', ')}`;
     }
 
+    function lifeUKTopicBreakdownRows(skillResults) {
+      const entries = Object.entries(skillResults || {}).filter(([, r]) => r && r.attempted);
+      return entries.map(([topic, r]) => {
+        const ratio = r.correct / r.attempted;
+        const cls = r.correct >= r.attempted ? 'strong' : (r.correct === 0 ? 'weak' : '');
+        return { topic, correct: r.correct, attempted: r.attempted, percent: Math.round(ratio * 100), cls };
+      }).sort((a, b) => a.percent - b.percent || a.topic.localeCompare(b.topic));
+    }
+
+    function lifeUKTopicBreakdownHtml(skillResults) {
+      const rows = lifeUKTopicBreakdownRows(skillResults);
+      if (!rows.length) return '';
+      const rowHtml = rows.map(row => `
+          <div class="life-uk-topic-breakdown-row">
+            <span class="life-uk-topic-breakdown-topic">${escapeHTML(row.topic)}</span>
+            <span class="life-uk-topic-breakdown-score ${row.cls}">${row.correct}/${row.attempted} · ${row.percent}%</span>
+          </div>`).join('');
+      return `<div class="life-uk-topic-breakdown"><h5>Per-topic breakdown</h5>${rowHtml}</div>`;
+    }
+
     function renderLifeUKDrill() {
       const actions = document.getElementById('life-uk-drill-actions');
       if (actions) {
@@ -2960,6 +2989,7 @@
           <div class="life-uk-drill-result-stat">Sources: ${escapeHTML((result.drillSources || []).join(', '))}</div>
           <div class="life-uk-drill-result-stat">Topics covered: ${escapeHTML((result.focusTopics || []).join(', '))}</div>
           <div class="life-uk-drill-result-stat">Weak topics after drill: ${weakText}</div>
+          ${lifeUKTopicBreakdownHtml(result.skillResults)}
           <div class="life-uk-mock-controls">
             <button class="btn btn-primary" type="button" onclick="startLifeUKDrill()">Run drill again</button>
             <button class="btn btn-secondary" type="button" onclick="cancelLifeUKDrill()">Hide drill</button>
