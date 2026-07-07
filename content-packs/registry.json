@@ -7,8 +7,8 @@
       "path": "content-packs/hk-chinese-basics.json",
       "kind": "flashcards",
       "title": "Traditional HK Chinese basics",
-      "domain": "Chinese · Traditional HK",
-      "language": "繁體中文 + Cantonese",
+      "domain": "Chinese \u00b7 Traditional HK",
+      "language": "\u7e41\u9ad4\u4e2d\u6587 + Cantonese",
       "learners": "All learners",
       "activity": "Flashcards + matching + comparison + audio prompts + listen/repeat",
       "readiness": "Live slice",
@@ -42,8 +42,8 @@
       "path": "content-packs/mandarin-basics.json",
       "kind": "flashcards",
       "title": "Simplified Mandarin basics",
-      "domain": "Chinese · Simplified Mandarin",
-      "language": "简体中文 + Pinyin",
+      "domain": "Chinese \u00b7 Simplified Mandarin",
+      "language": "\u7b80\u4f53\u4e2d\u6587 + Pinyin",
       "learners": "All learners",
       "activity": "Flashcards + matching + comparison + audio prompts + listen/repeat",
       "readiness": "Live slice",
@@ -115,9 +115,9 @@
       "domain": "Life in the UK",
       "language": "English",
       "learners": "Adult learners",
-      "activity": "Practice questions + starter mock mode + full timed mock + weak-topic review + adaptive weak-topic drill",
+      "activity": "Practice questions + expanded question bank + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill",
       "readiness": "Live slice",
-      "next": "Add topic-spaced repetition across the entire question bank once weak-topic drills are live.",
+      "next": "Add topic-spaced repetition across the expanded question bank using per-topic breakdown as the prioritisation signal.",
       "schema": [
         "topic",
         "prompt",
@@ -136,7 +136,7 @@
       "progressionSteps": [
         "Start with civic basics and everyday UK facts",
         "Practise weak citizenship topics from saved attempts",
-        "Build toward a 24-question, 45-minute mock test",
+        "Build toward a 24-question, 45-minute mock test from an expanded bank",
         "Run adaptive weak-topic drills from saved mock review data"
       ]
     }

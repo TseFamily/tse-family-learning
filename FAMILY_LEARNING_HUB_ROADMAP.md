@@ -248,3 +248,11 @@ Next slices:
 - Each row shows topic, score (e.g. `0/2 · 0%`), and a strong/weak colour cue, sorted by weakest topics first so learners can see exactly where to focus next.
 - Added `lifeUKTopicBreakdownRows`, `lifeUKTopicBreakdownHtml`, `.life-uk-topic-breakdown` styles, validation markers (`life-uk-topic-breakdown`, `Per-topic breakdown`), and mobile smoke assertions verifying the breakdown renders in both mock and drill result views.
 - Next: add topic-spaced repetition across the entire question bank using the per-topic breakdown as the prioritisation signal.
+
+## Run #31 Life in the UK expanded question bank + shuffled selection
+
+- Expanded the Life in the UK content pack from 24 to 48 questions, adding 24 new accurate citizenship questions so every one of the 12 official topics now has at least 4 questions (was as low as 1-2 for some topics).
+- The full timed mock and adaptive weak-topic drill now draw from a Fisher-Yates shuffle of the full 48-question bank each run (`lifeUKShuffledQuestions`), so repeat mock attempts see a fresh 24-question selection instead of always the same first 24 questions in file order.
+- Validation now enforces a 40+ question minimum, per-topic coverage of at least 4 questions per topic, and duplicate-prompt detection, so future content edits cannot silently regress bank coverage or variety.
+- Added `lifeUKFullMockSelectedQuestions` runtime state, updated registry/content-pack metadata (`expanded question bank`, `shuffled selection`), validation markers, and mobile smoke coverage (9/9 tests passing, including a fixed-shuffle assertion for full-mock and drill flows).
+- Next: add topic-spaced repetition across the expanded question bank using the per-topic breakdown as the prioritisation signal.

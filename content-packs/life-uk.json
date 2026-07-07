@@ -4,9 +4,9 @@
   "domain": "Life in the UK",
   "language": "English",
   "learners": "Adult learners",
-  "activity": "Practice questions + starter mock mode + full timed mock + weak-topic review + adaptive weak-topic drill",
+  "activity": "Practice questions + expanded question bank + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill",
   "readiness": "Live slice",
-  "next": "Add topic-spaced repetition across the entire question bank once weak-topic drills are live.",
+  "next": "Add topic-spaced repetition across the expanded question bank using per-topic breakdown as the prioritisation signal.",
   "recommendedStages": [
     "adult"
   ],
@@ -17,7 +17,7 @@
   "progressionSteps": [
     "Start with civic basics and everyday UK facts",
     "Practise weak citizenship topics from saved attempts",
-    "Build toward a 24-question, 45-minute mock test",
+    "Build toward a 24-question, 45-minute mock test from an expanded bank",
     "Run adaptive weak-topic drills from saved mock review data"
   ],
   "mock": {
@@ -314,6 +314,294 @@
       ],
       "answer": 0,
       "explanation": "The UK is a parliamentary democracy and a constitutional monarchy."
+    },
+    {
+      "topic": "Government",
+      "prompt": "Who is the head of state in the UK?",
+      "options": [
+        "The monarch",
+        "The Prime Minister",
+        "The Speaker of the House of Commons",
+        "The Lord Mayor of London"
+      ],
+      "answer": 0,
+      "explanation": "The monarch is the UK head of state, while elected politicians run the government."
+    },
+    {
+      "topic": "Government",
+      "prompt": "Where is the official London residence and office of the Prime Minister?",
+      "options": [
+        "10 Downing Street",
+        "Buckingham Palace",
+        "Windsor Castle",
+        "The Old Bailey"
+      ],
+      "answer": 0,
+      "explanation": "The Prime Minister works and lives at 10 Downing Street in London."
+    },
+    {
+      "topic": "Parliament",
+      "prompt": "What do MPs in the House of Commons do?",
+      "options": [
+        "Represent their constituents and make laws",
+        "Command the armed forces directly",
+        "Choose local school uniforms",
+        "Run the courts"
+      ],
+      "answer": 0,
+      "explanation": "MPs represent people in their constituencies, debate issues, and vote on laws."
+    },
+    {
+      "topic": "Parliament",
+      "prompt": "Which part of Parliament can review and suggest changes to bills?",
+      "options": [
+        "House of Lords",
+        "Crown Court",
+        "Civil Service",
+        "Bank of England"
+      ],
+      "answer": 0,
+      "explanation": "The House of Lords reviews legislation and can suggest amendments."
+    },
+    {
+      "topic": "Law",
+      "prompt": "What does the rule of law mean?",
+      "options": [
+        "Everyone must obey the law",
+        "Only judges can vote",
+        "Parliament cannot change laws",
+        "The police write all laws"
+      ],
+      "answer": 0,
+      "explanation": "The rule of law means laws apply to everyone and no one is above the law."
+    },
+    {
+      "topic": "Law",
+      "prompt": "What is the number for the police when it is not an emergency?",
+      "options": [
+        "101",
+        "999",
+        "111",
+        "123"
+      ],
+      "answer": 0,
+      "explanation": "101 is used to contact the police for non-emergency matters. In an emergency, call 999 or 112."
+    },
+    {
+      "topic": "Rights and responsibilities",
+      "prompt": "What should you normally do if you are called for jury service?",
+      "options": [
+        "Attend unless you are formally excused",
+        "Ignore the letter",
+        "Choose the judge yourself",
+        "Ask your MP to decide the case"
+      ],
+      "answer": 0,
+      "explanation": "Jury service is a civic responsibility, and people called should attend unless excused."
+    },
+    {
+      "topic": "Rights and responsibilities",
+      "prompt": "Which freedom is protected in the UK?",
+      "options": [
+        "Freedom to practise or change your religion",
+        "Freedom to break traffic laws",
+        "Freedom to avoid all taxes",
+        "Freedom to stop other people voting"
+      ],
+      "answer": 0,
+      "explanation": "People in the UK have freedom of religion, including the right to practise or change their religion."
+    },
+    {
+      "topic": "Rights and responsibilities",
+      "prompt": "What is the usual minimum legal age to buy alcohol in the UK?",
+      "options": [
+        "18",
+        "16",
+        "21",
+        "25"
+      ],
+      "answer": 0,
+      "explanation": "The usual minimum legal age to buy alcohol in the UK is 18."
+    },
+    {
+      "topic": "UK nations",
+      "prompt": "Which city is the capital of Scotland?",
+      "options": [
+        "Edinburgh",
+        "Glasgow",
+        "Cardiff",
+        "Belfast"
+      ],
+      "answer": 0,
+      "explanation": "Edinburgh is the capital city of Scotland."
+    },
+    {
+      "topic": "UK nations",
+      "prompt": "Which city is the capital of Northern Ireland?",
+      "options": [
+        "Belfast",
+        "Derry/Londonderry",
+        "Dublin",
+        "Cardiff"
+      ],
+      "answer": 0,
+      "explanation": "Belfast is the capital city of Northern Ireland."
+    },
+    {
+      "topic": "UK nations",
+      "prompt": "Which city is the capital of England?",
+      "options": [
+        "London",
+        "Manchester",
+        "Birmingham",
+        "Leeds"
+      ],
+      "answer": 0,
+      "explanation": "London is the capital city of England and of the UK."
+    },
+    {
+      "topic": "Democracy",
+      "prompt": "What is a referendum?",
+      "options": [
+        "A public vote on a specific question",
+        "A speech by the monarch",
+        "A court sentence",
+        "A local tax bill"
+      ],
+      "answer": 0,
+      "explanation": "A referendum asks voters to vote directly on a specific question."
+    },
+    {
+      "topic": "Democracy",
+      "prompt": "Which is one way citizens can take part in UK democracy?",
+      "options": [
+        "Vote in elections",
+        "Choose court verdicts online",
+        "Appoint the monarch",
+        "Cancel laws by email"
+      ],
+      "answer": 0,
+      "explanation": "Voting in elections is one of the main ways citizens take part in democracy."
+    },
+    {
+      "topic": "Society",
+      "prompt": "Which organisation gives free, confidential advice on problems such as debt or housing?",
+      "options": [
+        "Citizens Advice",
+        "DVLA",
+        "Met Office",
+        "Royal Mail"
+      ],
+      "answer": 0,
+      "explanation": "Citizens Advice offers free, confidential and independent advice."
+    },
+    {
+      "topic": "Society",
+      "prompt": "What is one common way people contribute to their local community?",
+      "options": [
+        "Volunteering for charities or community groups",
+        "Refusing to help neighbours",
+        "Avoiding elections",
+        "Leaving all decisions to the police"
+      ],
+      "answer": 0,
+      "explanation": "Volunteering is a common way to support local communities and charities."
+    },
+    {
+      "topic": "Geography",
+      "prompt": "What is the longest river in the UK?",
+      "options": [
+        "River Severn",
+        "River Thames",
+        "River Trent",
+        "River Clyde"
+      ],
+      "answer": 0,
+      "explanation": "The River Severn is the longest river in the UK."
+    },
+    {
+      "topic": "Geography",
+      "prompt": "Which body of water separates England from France?",
+      "options": [
+        "The English Channel",
+        "The North Sea",
+        "The Irish Sea",
+        "The Atlantic Ocean"
+      ],
+      "answer": 0,
+      "explanation": "The English Channel separates southern England from northern France."
+    },
+    {
+      "topic": "Culture",
+      "prompt": "What are the Proms?",
+      "options": [
+        "A summer season of classical music concerts",
+        "A football league",
+        "A bank holiday weekend",
+        "A legal ceremony"
+      ],
+      "answer": 0,
+      "explanation": "The Proms are a famous annual season of classical music concerts."
+    },
+    {
+      "topic": "Values and principles",
+      "prompt": "What does mutual respect and tolerance mean?",
+      "options": [
+        "Respecting people with different beliefs and opinions",
+        "Only accepting people who agree with you",
+        "Avoiding all public debate",
+        "Letting the government choose your friends"
+      ],
+      "answer": 0,
+      "explanation": "Mutual respect and tolerance means respecting people who have different beliefs, cultures, and opinions."
+    },
+    {
+      "topic": "Values and principles",
+      "prompt": "Which British value supports people expressing their opinions peacefully?",
+      "options": [
+        "Individual liberty",
+        "Compulsory voting",
+        "Rule by one party",
+        "Automatic citizenship"
+      ],
+      "answer": 0,
+      "explanation": "Individual liberty includes the freedom to hold and express opinions within the law."
+    },
+    {
+      "topic": "Economy",
+      "prompt": "Which government body collects Income Tax and National Insurance?",
+      "options": [
+        "HM Revenue and Customs (HMRC)",
+        "NHS",
+        "DVLA",
+        "BBC"
+      ],
+      "answer": 0,
+      "explanation": "HM Revenue and Customs collects taxes, including Income Tax and National Insurance."
+    },
+    {
+      "topic": "Economy",
+      "prompt": "What is the National Minimum Wage?",
+      "options": [
+        "The legal minimum hourly pay for most workers",
+        "A tax paid only by companies",
+        "A pension for every child",
+        "A fee for using the NHS"
+      ],
+      "answer": 0,
+      "explanation": "The National Minimum Wage sets a legal minimum hourly rate for most workers."
+    },
+    {
+      "topic": "Economy",
+      "prompt": "What do people usually need before starting paid work in the UK?",
+      "options": [
+        "A National Insurance number",
+        "A TV Licence number",
+        "A passport from every UK nation",
+        "A House of Lords pass"
+      ],
+      "answer": 0,
+      "explanation": "People usually need a National Insurance number for work, tax, and benefit records."
     }
   ],
   "sourcePath": "content-packs/life-uk.json"
