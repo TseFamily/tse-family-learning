@@ -66,6 +66,7 @@ function validateLifeUKPackFile(path, expectedId, fields, label) {
   const pack = JSON.parse(fs.readFileSync(path, 'utf8'));
   if (pack.id !== expectedId) throw new Error(`${label} pack id changed unexpectedly`);
   if (!pack.activity || !pack.activity.includes('Practice questions')) throw new Error(`${label} pack metadata must advertise practice questions`);
+  if (!pack.activity || !pack.activity.includes('expanded question bank')) throw new Error(`${label} pack metadata must advertise expanded question bank`);
   if (!pack.activity || !pack.activity.includes('starter mock mode')) throw new Error(`${label} pack metadata must advertise starter mock mode`);
   if (!pack.activity || !pack.activity.includes('weak-topic review')) throw new Error(`${label} pack metadata must advertise weak-topic review`);
   if (!pack.activity || !pack.activity.includes('full timed mock')) throw new Error(`${label} pack metadata must advertise a full timed mock`);
@@ -73,14 +74,21 @@ function validateLifeUKPackFile(path, expectedId, fields, label) {
   if (!pack.progressionSteps.includes('Run adaptive weak-topic drills from saved mock review data')) throw new Error(`${label} pack missing adaptive drill progression step`);
   if (!pack.mock || Number(pack.mock.passMarkPercent) !== 75) throw new Error(`${label} pack must declare a 75% pass mark`);
   if (!pack.mock || Number(pack.mock.timeLimitMinutes) !== 45) throw new Error(`${label} pack must declare the 45-minute mock target`);
-  if (!Array.isArray(pack.questions) || pack.questions.length < 10) throw new Error(`${label} pack needs at least 10 questions`);
+  if (!Array.isArray(pack.questions) || pack.questions.length < 40) throw new Error(`${label} pack needs at least 40 questions`);
+  const topicCounts = {};
+  const prompts = new Set();
   for (const [i, question] of pack.questions.entries()) {
     for (const field of fields) {
       if (question[field] === undefined || question[field] === null || question[field] === '') throw new Error(`${label} question ${i + 1} missing ${field}`);
     }
     if (!Array.isArray(question.options) || question.options.length < 4) throw new Error(`${label} question ${i + 1} needs at least four options`);
     if (!Number.isInteger(Number(question.answer)) || Number(question.answer) < 0 || Number(question.answer) >= question.options.length) throw new Error(`${label} question ${i + 1} has invalid answer`);
+    if (prompts.has(question.prompt)) throw new Error(`${label} duplicate prompt: ${question.prompt}`);
+    prompts.add(question.prompt);
+    topicCounts[question.topic] = (topicCounts[question.topic] || 0) + 1;
   }
+  const undercoveredTopics = Object.entries(topicCounts).filter(([, count]) => count < 4);
+  if (undercoveredTopics.length) throw new Error(`${label} topics need at least four questions: ${undercoveredTopics.map(([topic, count]) => `${topic} (${count})`).join(', ')}`);
   return pack;
 }
 
@@ -116,9 +124,11 @@ for (const [id, path, fields] of [
   } else if (id === 'life-uk-v1') {
     if (registered.kind !== 'mock-questions') throw new Error('Content pack registry life-uk-v1 must use mock-questions kind');
     if (!registered.activity.includes('Practice questions')) throw new Error('Content pack registry life-uk-v1 missing practice-question activity');
+    if (!registered.activity.includes('expanded question bank')) throw new Error('Content pack registry life-uk-v1 missing expanded question bank activity');
+    if (!registered.activity.includes('shuffled selection')) throw new Error('Content pack registry life-uk-v1 missing shuffled selection activity');
     if (!registered.activity.includes('starter mock mode')) throw new Error('Content pack registry life-uk-v1 missing starter mock mode activity');
     if (!registered.activity.includes('weak-topic review')) throw new Error('Content pack registry life-uk-v1 missing weak-topic review activity');
-    if (!registered.progressionSteps.includes('Build toward a 24-question, 45-minute mock test')) throw new Error('Content pack registry life-uk-v1 missing timed-mock progression step');
+    if (!registered.progressionSteps.includes('Build toward a 24-question, 45-minute mock test from an expanded bank')) throw new Error('Content pack registry life-uk-v1 missing expanded timed-mock progression step');
     if (!registered.activity.includes('full timed mock')) throw new Error('Content pack registry life-uk-v1 missing full timed mock activity');
     if (!registered.activity.includes('adaptive weak-topic drill')) throw new Error('Content pack registry life-uk-v1 missing adaptive weak-topic drill activity');
     if (!registered.progressionSteps.includes('Run adaptive weak-topic drills from saved mock review data')) throw new Error('Content pack registry life-uk-v1 missing adaptive drill progression step');
@@ -246,7 +256,11 @@ for (const marker of [
   'latestLifeUKProgress',
   'lifeUKWeakTopics',
   '75% pass target',
-  'Build toward a 24-question, 45-minute mock test',
+  'Build toward a 24-question, 45-minute mock test from an expanded bank',
+  'expanded question bank',
+  'shuffled selection',
+  'lifeUKShuffledQuestions',
+  'lifeUKFullMockSelectedQuestions',
   'starter mock mode',
   'weak-topic review',
   'Question practice remains available',

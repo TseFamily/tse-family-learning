@@ -945,7 +945,7 @@
             <div class="matching-panel" id="mandarin-matching-panel"><h3>🔗 Simplified Mandarin matching practice</h3><p>Match Simplified characters to English meaning, then compare Pinyin and Traditional forms.</p><div class="matching-grid" id="mandarin-matching-grid"></div></div>
             <div class="comparison-panel" id="comparison-panel"><h3>🪞 Traditional/Simplified comparison drill</h3><p>Compare shared meanings across the runtime HK Chinese and Mandarin packs before moving into audio prompts.</p><div class="comparison-grid" id="comparison-grid"></div></div>
             <div class="maths-panel" id="maths-foundation-panel"><h3>🧮 Maths Foundation practice cards</h3><p>Number bonds, place value, skip counting, and times-table prompts are runtime-loaded from the content-pack registry.</p><div class="maths-grid" id="maths-foundation-grid"></div></div>
-            <div class="life-uk-panel" id="life-uk-panel"><h3>🇬🇧 Life in the UK starter mock</h3><p>Starter citizenship questions are runtime-loaded from the content-pack registry, with a 75% pass target, a 24-question full timed mock, and weak-topic review.</p><div class="life-uk-mock-actions" id="life-uk-mock-actions"><button class="btn btn-secondary life-uk-mock-start" type="button" onclick="startLifeUKFullMock()">⏱️ Start 24-question full mock (45 min)</button></div><div class="life-uk-mock-area" id="life-uk-mock-area"></div><div class="life-uk-drill-actions" id="life-uk-drill-actions"></div><div class="life-uk-drill-area" id="life-uk-drill-area"></div><div class="life-uk-grid" id="life-uk-grid"></div></div>
+            <div class="life-uk-panel" id="life-uk-panel"><h3>🇬🇧 Life in the UK starter mock</h3><p>Expanded citizenship questions are runtime-loaded from the content-pack registry, with a 75% pass target, a shuffled 24-question full timed mock, and weak-topic review.</p><div class="life-uk-mock-actions" id="life-uk-mock-actions"><button class="btn btn-secondary life-uk-mock-start" type="button" onclick="startLifeUKFullMock()">⏱️ Start 24-question full mock (45 min)</button></div><div class="life-uk-mock-area" id="life-uk-mock-area"></div><div class="life-uk-drill-actions" id="life-uk-drill-actions"></div><div class="life-uk-drill-area" id="life-uk-drill-area"></div><div class="life-uk-grid" id="life-uk-grid"></div></div>
           </article>
 
           <article class="section-card rail" id="progress">
@@ -1050,7 +1050,7 @@
       { id: 'maths-foundation', icon: '🧮', title: 'Maths Foundation', audience: 'Primary learners', status: 'Roadmap slice', state: 'next', description: 'Numbers, bonds, times tables, word problems, and confidence drills.' },
       { id: 'primary', icon: '📚', title: 'Primary Learning', audience: 'Primary learners', status: 'Planned', state: 'planned', description: 'Reading, spelling, science, school skills, and age-banded practice.' },
       { id: 'french', icon: '🇫🇷', title: 'French', audience: 'Family', status: 'Planned', state: 'planned', description: 'Vocabulary, phrases, listening prompts, grammar, and spaced recall.' },
-      { id: 'life-uk', icon: '🇬🇧', title: 'Life in the UK', audience: 'Adult learners', status: 'Live slice', state: 'next', description: 'Starter mock questions, 75% pass target, weak-topic review, and adaptive drills.' },
+      { id: 'life-uk', icon: '🇬🇧', title: 'Life in the UK', audience: 'Adult learners', status: 'Live slice', state: 'next', description: 'Expanded 48-question bank, 75% pass target, shuffled mocks, weak-topic review, and adaptive drills.' },
       { id: 'english', icon: '✍️', title: 'English Mastery', audience: 'Family', status: 'Planned', state: 'planned', description: 'Grammar, comprehension, writing, vocabulary, and reading confidence.' }
     ];
     const CONTENT_PACK_REGISTRY_PATH = 'content-packs/registry.json';
@@ -1058,7 +1058,7 @@
       { id: 'hk-chinese-basics-v1', path: 'content-packs/hk-chinese-basics.json', kind: 'flashcards', title: 'Traditional HK Chinese basics', domain: 'Chinese · Traditional HK', language: '繁體中文 + Cantonese', learners: 'All learners', activity: 'Flashcards + matching + comparison + audio prompts + listen/repeat', readiness: 'Live slice', next: 'Expand family words into colours, numbers, greetings, Jyutping, comparison drills, and audio prompts.', schema: ['traditional', 'jyutping', 'canto', 'english', 'prompt'], renderTarget: 'flashcard-grid', recommendedStages: ['early', 'primary', 'adult'], recommendedGoals: ['confidence', 'language', 'mastery'], progressionSteps: ['Start with family words and greetings', 'Practise colours, numbers, and Jyutping recall', 'Move into matching practice, comparison drills, audio prompts, and short household phrases'] },
       { id: 'mandarin-basics-v1', path: 'content-packs/mandarin-basics.json', kind: 'flashcards', title: 'Simplified Mandarin basics', domain: 'Chinese · Simplified Mandarin', language: '简体中文 + Pinyin', learners: 'All learners', activity: 'Flashcards + matching + comparison + audio prompts + listen/repeat', readiness: 'Live slice', next: 'Expand into matching practice, audio prompts, and Traditional/Simplified comparison drills.', schema: ['simplified', 'traditional', 'pinyin', 'english', 'prompt'], renderTarget: 'mandarin-flashcard-grid', recommendedStages: ['early', 'primary', 'adult'], recommendedGoals: ['language', 'confidence', 'mastery'], progressionSteps: ['Start with greetings and core family words', 'Compare Simplified, Traditional, and Pinyin forms', 'Use matching practice and comparison drills, then try audio prompts'] },
       { id: 'maths-foundation-v1', path: 'content-packs/maths-foundation.json', kind: 'practice-cards', title: 'Maths Foundation practice', domain: 'Maths Foundation', language: 'English', learners: 'Early and primary learners', activity: 'Practice cards + Number-line models + Adaptive answer entry + weak-skill rotation + mental maths + confidence drills', readiness: 'Live slice', next: 'Add adaptive number-line hints for more operations and learner-specific mixed review.', schema: ['topic', 'skill', 'prompt', 'answer', 'strategy'], renderTarget: 'maths-foundation-grid', recommendedStages: ['early', 'primary'], recommendedGoals: ['confidence', 'mastery'], progressionSteps: ['Start with number bonds to 10 and 20', 'Practise place value and skip counting', 'Move into times tables, fractions, and short word problems', 'Type answers and unlock strategy feedback', 'Review weak skills first with number-line support'] },
-      { id: 'life-uk-v1', path: 'content-packs/life-uk.json', kind: 'mock-questions', title: 'Life in the UK starter mock', domain: 'Life in the UK', language: 'English', learners: 'Adult learners', activity: 'Practice questions + starter mock mode + full timed mock + weak-topic review + adaptive weak-topic drill', readiness: 'Live slice', next: 'Add topic-spaced repetition across the entire question bank once weak-topic drills are live.', schema: ['topic', 'prompt', 'options', 'answer', 'explanation'], renderTarget: 'life-uk-grid', recommendedStages: ['adult'], recommendedGoals: ['exam-ready', 'mastery'], progressionSteps: ['Start with civic basics and everyday UK facts', 'Practise weak citizenship topics from saved attempts', 'Build toward a 24-question, 45-minute mock test', 'Run adaptive weak-topic drills from saved mock review data'] }
+      { id: 'life-uk-v1', path: 'content-packs/life-uk.json', kind: 'mock-questions', title: 'Life in the UK starter mock', domain: 'Life in the UK', language: 'English', learners: 'Adult learners', activity: 'Practice questions + expanded question bank + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill', readiness: 'Live slice', next: 'Add topic-spaced repetition across the expanded question bank using per-topic breakdown as the prioritisation signal.', schema: ['topic', 'prompt', 'options', 'answer', 'explanation'], renderTarget: 'life-uk-grid', recommendedStages: ['adult'], recommendedGoals: ['exam-ready', 'mastery'], progressionSteps: ['Start with civic basics and everyday UK facts', 'Practise weak citizenship topics from saved attempts', 'Build toward a 24-question, 45-minute mock test from an expanded bank', 'Run adaptive weak-topic drills from saved mock review data'] }
     ];
     let contentPackRegistry = [...FALLBACK_CONTENT_PACK_REGISTRY];
     let contentPackRegistryError = null;
@@ -2488,13 +2488,26 @@
       updateRecommendedCurriculumTestState(null, null, saved);
     }
 
+    function lifeUKShuffledQuestions(sourceQuestions = lifeUKQuestions) {
+      const shuffled = sourceQuestions.slice();
+      for (let i = shuffled.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
     function lifeUKFullMockQuestions() {
-      return lifeUKQuestions.slice(0, LIFE_UK_FULL_MOCK_QUESTION_COUNT).map((question, index) => ({ ...question, index: index + 1 }));
+      const source = lifeUKMockState && Array.isArray(lifeUKMockState.questions) && lifeUKMockState.questions.length
+        ? lifeUKMockState.questions
+        : lifeUKQuestions.slice(0, LIFE_UK_FULL_MOCK_QUESTION_COUNT);
+      return source.slice(0, LIFE_UK_FULL_MOCK_QUESTION_COUNT).map((question, index) => ({ ...question, index: index + 1 }));
     }
 
     function startLifeUKFullMock() {
       if (!lifeUKQuestions.length) return;
-      const total = lifeUKFullMockQuestions().length;
+      const questions = lifeUKShuffledQuestions(lifeUKQuestions).slice(0, LIFE_UK_FULL_MOCK_QUESTION_COUNT);
+      const total = questions.length;
       if (!total) return;
       for (const key of Object.keys(lifeUKMockSelectedAnswers)) delete lifeUKMockSelectedAnswers[key];
       lifeUKMockState = {
@@ -2503,7 +2516,9 @@
         correct: 0,
         timeLeft: LIFE_UK_FULL_MOCK_TIME_LIMIT_SECONDS,
         finished: false,
-        submitted: false
+        submitted: false,
+        questions,
+        bankSize: lifeUKQuestions.length
       };
       renderLifeUKFullMock();
       const area = document.getElementById('life-uk-mock-area');
@@ -2946,7 +2961,7 @@
           if (weakTopics.length) {
             area.innerHTML = `<div class="life-uk-drill-empty">Adaptive weak-topic drill ready · pulling from <strong>${weakTopics.length}</strong> flagged topic${weakTopics.length === 1 ? '' : 's'}: ${escapeHTML(weakTopics.join(', '))}.</div>`;
           } else {
-            area.innerHTML = `<div class="life-uk-drill-empty">No weak topics yet · the adaptive drill will rotate across the full 24-question bank once you finish a starter or full mock.</div>`;
+            area.innerHTML = `<div class="life-uk-drill-empty">No weak topics yet · the adaptive drill will rotate across the expanded question bank once you finish a starter or full mock.</div>`;
           }
         }
         return;
@@ -3032,6 +3047,7 @@
         lifeUKFullMockTimeLimitSeconds: LIFE_UK_FULL_MOCK_TIME_LIMIT_SECONDS,
         lifeUKFullMockReady: Boolean(lifeUKQuestions.length >= LIFE_UK_FULL_MOCK_QUESTION_COUNT),
         lifeUKFullMockAvailableQuestions: lifeUKQuestions.length,
+        lifeUKFullMockSelectedQuestions: lifeUKMockState && Array.isArray(lifeUKMockState.questions) ? lifeUKMockState.questions.length : 0,
         latestLifeUKMockProgress: history.find(item => item.activityType === 'life-uk-practice' && item.practiceMode === 'life-uk-full-mock') || null,
         latestLifeUKProgress,
         lifeUKDrillState: lifeUKDrillState ? { total: lifeUKDrillState.total, answered: lifeUKDrillState.answered, correct: lifeUKDrillState.correct, finished: lifeUKDrillState.finished, focusTopics: lifeUKDrillState.focusTopics.slice(), sources: lifeUKDrillState.sources.slice() } : null,
@@ -3304,14 +3320,19 @@
     function validateLifeUKPack(pack) {
       if (!pack || pack.id !== 'life-uk-v1') throw new Error('Unexpected Life in the UK content pack id');
       if (!pack.mock || Number(pack.mock.passMarkPercent) !== 75) throw new Error('Life in the UK pack must declare the 75% pass mark');
-      if (!Array.isArray(pack.questions) || pack.questions.length < 10) throw new Error('Life in the UK content pack needs at least 10 questions');
+      if (!Array.isArray(pack.questions) || pack.questions.length < 40) throw new Error('Life in the UK content pack needs at least 40 questions');
+      const topicCounts = {};
       pack.questions.forEach((question, index) => {
         ['topic', 'prompt', 'options', 'answer', 'explanation'].forEach(field => {
           if (question[field] === undefined || question[field] === null || question[field] === '') throw new Error(`Life in the UK question ${index + 1} missing ${field}`);
         });
         if (!Array.isArray(question.options) || question.options.length < 4) throw new Error(`Life in the UK question ${index + 1} needs four options`);
         if (!Number.isInteger(Number(question.answer)) || Number(question.answer) < 0 || Number(question.answer) >= question.options.length) throw new Error(`Life in the UK question ${index + 1} has invalid answer`);
+        topicCounts[question.topic] = (topicCounts[question.topic] || 0) + 1;
       });
+      for (const [topic, count] of Object.entries(topicCounts)) {
+        if (count < 4) throw new Error(`Life in the UK topic ${topic} needs at least four questions`);
+      }
       return pack;
     }
 

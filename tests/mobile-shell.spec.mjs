@@ -97,7 +97,7 @@ test('mobile app shell opens without horizontal overflow and mission onboarding 
   expect(state.mandarinPackId).toBe('mandarin-basics-v1');
   expect(state.mathsFoundationPackId).toBe('maths-foundation-v1');
   expect(state.lifeUKPackId).toBe('life-uk-v1');
-  expect(state.lifeUKQuestionCount).toBe(24);
+  expect(state.lifeUKQuestionCount).toBe(48);
   expect(state.lifeUKPracticeCount).toBe(6);
   expect(state.lifeUKPassMark).toBe(75);
   expect(state.lifeUKTopics).toEqual(expect.arrayContaining(['Government', 'Parliament', 'Law']));
@@ -417,6 +417,7 @@ test('Life in the UK full timed mock renders, scores answers, and records progre
   );
 
   await expect(page.getByRole('button', { name: 'Start 24-question full mock (45 min)' })).toBeVisible();
+  await page.evaluate(() => { Math.random = () => 0.999999; });
   await page.getByRole('button', { name: 'Start 24-question full mock (45 min)' }).tap();
 
   await expect(page.locator('#life-uk-mock-area')).toBeVisible();
@@ -444,7 +445,8 @@ test('Life in the UK full timed mock renders, scores answers, and records progre
 
   const state = await page.evaluate(() => window.__learningQuestTestState);
   expect(state.lifeUKFullMockReady).toBe(true);
-  expect(state.lifeUKFullMockAvailableQuestions).toBe(24);
+  expect(state.lifeUKFullMockAvailableQuestions).toBe(48);
+  expect(state.lifeUKFullMockSelectedQuestions).toBe(24);
   expect(state.lifeUKFullMockQuestionCount).toBe(24);
   expect(state.lifeUKFullMockTimeLimitSeconds).toBe(45 * 60);
   expect(state.latestLifeUKMockProgress).toMatchObject({
@@ -474,6 +476,7 @@ test('Life in the UK adaptive weak-topic drill pulls from full-mock weak skills 
   );
 
   await expect(page.getByRole('button', { name: 'Start 24-question full mock (45 min)' })).toBeVisible();
+  await page.evaluate(() => { Math.random = () => 0.999999; });
   await page.getByRole('button', { name: 'Start 24-question full mock (45 min)' }).tap();
 
   await expect(page.locator('#life-uk-mock-area')).toBeVisible();
@@ -513,7 +516,7 @@ test('Life in the UK adaptive weak-topic drill pulls from full-mock weak skills 
   expect(state.lifeUKDrillQuestionCount).toBe(6);
   expect(state.lifeUKDrillPoolSize).toBeGreaterThan(0);
   expect(state.lifeUKDrillPoolSize).toBeLessThanOrEqual(6);
-  expect(state.lifeUKDrillSourcePoolCount).toBe(24);
+  expect(state.lifeUKDrillSourcePoolCount).toBe(48);
   expect(state.lifeUKDrillSources).toEqual(expect.arrayContaining(['Full-mock review']));
   expect(state.latestLifeUKDrillProgress).toMatchObject({
     activityType: 'life-uk-practice',
