@@ -132,6 +132,8 @@ for (const [id, path, fields] of [
     if (!registered.activity.includes('full timed mock')) throw new Error('Content pack registry life-uk-v1 missing full timed mock activity');
     if (!registered.activity.includes('adaptive weak-topic drill')) throw new Error('Content pack registry life-uk-v1 missing adaptive weak-topic drill activity');
     if (!registered.progressionSteps.includes('Run adaptive weak-topic drills from saved mock review data')) throw new Error('Content pack registry life-uk-v1 missing adaptive drill progression step');
+    if (!registered.activity.includes('topic spaced repetition')) throw new Error('Content pack registry life-uk-v1 missing topic spaced repetition activity');
+    if (!registered.progressionSteps.includes('Use the review queue to revisit due citizenship topics from saved mastery')) throw new Error('Content pack registry life-uk-v1 missing review queue progression step');
   } else {
     if (!registered.activity.includes('matching')) throw new Error(`Content pack registry ${id} missing matching activity`);
     if (!registered.activity.includes('comparison')) throw new Error(`Content pack registry ${id} missing comparison activity`);
@@ -289,7 +291,17 @@ for (const marker of [
   'life-uk-topic-breakdown',
   'lifeUKTopicBreakdownHtml',
   'lifeUKTopicBreakdownRows',
-  'Per-topic breakdown'
+  'Per-topic breakdown',
+  'life-uk-review-queue-area',
+  'life-uk-review-queue',
+  'lifeUKReviewQueueRows',
+  'lifeUKMergeTopicSRFromHistory',
+  'life-uk-review-queue',
+  'LIFE_UK_REVIEW_QUEUE_QUESTION_COUNT',
+  'startLifeUKReviewQueueDrill',
+  'renderLifeUKReviewQueue',
+  'topic spaced repetition',
+  'Review queue · topic spaced repetition'
 ]) {
   if (!html.includes(marker)) throw new Error(`Missing runtime HK Chinese content-pack marker: ${marker}`);
 }

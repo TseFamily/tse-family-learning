@@ -530,3 +530,53 @@ test('Life in the UK adaptive weak-topic drill pulls from full-mock weak skills 
   await expect(page.locator('.life-uk-drill-result .life-uk-topic-breakdown')).toBeVisible();
   await expect(page.locator('.life-uk-drill-result .life-uk-topic-breakdown')).toContainText('Per-topic breakdown');
 });
+
+test('Life in the UK review queue aggregates mastery and drills due topics', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.lifeUKPackId === 'life-uk-v1',
+    null,
+    { timeout: 10000 }
+  );
+
+  await page.evaluate(() => { Math.random = () => 0.999999; });
+  await page.getByRole('button', { name: 'Start 24-question full mock (45 min)' }).tap();
+  await expect(page.locator('#life-uk-mock-area')).toBeVisible();
+
+  const firstMockCard = page.locator('#life-uk-mock-grid .life-uk-mock-card').first();
+  await firstMockCard.getByRole('button', { name: 'The monarch' }).tap();
+  const secondMockCard = page.locator('#life-uk-mock-grid .life-uk-mock-card').nth(1);
+  await secondMockCard.getByRole('button', { name: 'House of Lords' }).tap();
+  await page.getByRole('button', { name: 'Finish mock early' }).tap();
+  await expect(page.locator('.life-uk-mock-result')).toBeVisible();
+
+  await expect(page.locator('.life-uk-review-queue-card')).toBeVisible();
+  await expect(page.locator('.life-uk-review-queue-card')).toContainText('Review queue');
+  await expect(page.locator('.life-uk-review-queue-start')).toBeVisible();
+
+  const stateBefore = await page.evaluate(() => window.__learningQuestTestState);
+  expect(stateBefore.lifeUKReviewQueueDueCount).toBeGreaterThan(0);
+  expect(stateBefore.lifeUKReviewQueueDueTopics.length).toBeGreaterThan(0);
+
+  await page.locator('.life-uk-review-queue-start').tap();
+  await expect(page.locator('#life-uk-review-queue-grid .life-uk-drill-card').first()).toBeVisible();
+
+  const reviewCards = page.locator('#life-uk-review-queue-grid .life-uk-drill-card');
+  const count = await reviewCards.count();
+  for (let i = 0; i < count; i += 1) {
+    await reviewCards.nth(i).locator('.life-uk-option').first().tap();
+  }
+
+  await expect(page.locator('#life-uk-review-queue-area .life-uk-drill-result h4')).toContainText(/Review queue drill complete/);
+  const state = await page.evaluate(() => window.__learningQuestTestState);
+  expect(state.latestLifeUKReviewQueueProgress).toMatchObject({
+    activityType: 'life-uk-practice',
+    practiceMode: 'life-uk-review-queue',
+    difficultyMode: 'topic-spaced-repetition'
+  });
+  expect(state.latestLifeUKReviewQueueProgress.skillResults).toBeDefined();
+  await expect(page.locator('#life-uk-review-queue-area .life-uk-drill-result .life-uk-topic-breakdown')).toContainText('Per-topic breakdown');
+});
+

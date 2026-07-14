@@ -115,9 +115,9 @@
       "domain": "Life in the UK",
       "language": "English",
       "learners": "Adult learners",
-      "activity": "Practice questions + expanded question bank + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill",
+      "activity": "Practice questions + expanded question bank + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill + topic spaced repetition review queue",
       "readiness": "Live slice",
-      "next": "Add topic-spaced repetition across the expanded question bank using per-topic breakdown as the prioritisation signal.",
+      "next": "Expand review-queue scheduling polish and mock score trend charts.",
       "schema": [
         "topic",
         "prompt",
@@ -137,7 +137,8 @@
         "Start with civic basics and everyday UK facts",
         "Practise weak citizenship topics from saved attempts",
         "Build toward a 24-question, 45-minute mock test from an expanded bank",
-        "Run adaptive weak-topic drills from saved mock review data"
+        "Run adaptive weak-topic drills from saved mock review data",
+        "Use the review queue to revisit due citizenship topics from saved mastery"
       ]
     }
   ]

@@ -256,3 +256,11 @@ Next slices:
 - Validation now enforces a 40+ question minimum, per-topic coverage of at least 4 questions per topic, and duplicate-prompt detection, so future content edits cannot silently regress bank coverage or variety.
 - Added `lifeUKFullMockSelectedQuestions` runtime state, updated registry/content-pack metadata (`expanded question bank`, `shuffled selection`), validation markers, and mobile smoke coverage (9/9 tests passing, including a fixed-shuffle assertion for full-mock and drill flows).
 - Next: add topic-spaced repetition across the expanded question bank using the per-topic breakdown as the prioritisation signal.
+
+## Run #32 Life in the UK topic-spaced-repetition review queue
+
+- Aggregates per-topic mastery across all saved `life-uk-practice` history entries (`skillResults`) and stores a browser-local spaced-repetition schedule per topic (`learningquest-life-uk-topic-sr-v1`).
+- Surfaces a **Review queue** card on the Life in the UK panel listing topic mastery and due dates, with a **Start due-topic review** drill that pulls questions from due topics.
+- Review sessions persist as `life-uk-practice` with `practiceMode: 'life-uk-review-queue'`, update the SR schedule after each session, and show per-topic breakdown on the result view.
+- Added validation markers, registry metadata (`topic spaced repetition`), and mobile smoke coverage.
+- Next: mock score trend chart or further Life in the UK content coverage.
