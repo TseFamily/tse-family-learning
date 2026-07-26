@@ -134,6 +134,8 @@ for (const [id, path, fields] of [
     if (!registered.progressionSteps.includes('Run adaptive weak-topic drills from saved mock review data')) throw new Error('Content pack registry life-uk-v1 missing adaptive drill progression step');
     if (!registered.activity.includes('topic spaced repetition')) throw new Error('Content pack registry life-uk-v1 missing topic spaced repetition activity');
     if (!registered.progressionSteps.includes('Use the review queue to revisit due citizenship topics from saved mastery')) throw new Error('Content pack registry life-uk-v1 missing review queue progression step');
+    if (!registered.activity.includes('mock score trend chart')) throw new Error('Content pack registry life-uk-v1 missing mock score trend chart activity');
+    if (!registered.progressionSteps.includes('Track full-mock score trends toward the 75% pass target')) throw new Error('Content pack registry life-uk-v1 missing mock score trend progression step');
   } else {
     if (!registered.activity.includes('matching')) throw new Error(`Content pack registry ${id} missing matching activity`);
     if (!registered.activity.includes('comparison')) throw new Error(`Content pack registry ${id} missing comparison activity`);
@@ -301,7 +303,16 @@ for (const marker of [
   'startLifeUKReviewQueueDrill',
   'renderLifeUKReviewQueue',
   'topic spaced repetition',
-  'Review queue · topic spaced repetition'
+  'Review queue · topic spaced repetition',
+  'life-uk-mock-score-trend-area',
+  'life-uk-mock-score-trend',
+  'lifeUKMockScoreTrendRows',
+  'lifeUKMockScoreTrendHtml',
+  'renderLifeUKMockScoreTrend',
+  'LIFE_UK_MOCK_SCORE_TREND_LIMIT',
+  'mock score trend chart',
+  'Mock score trend',
+  'Track full-mock score trends toward the 75% pass target'
 ]) {
   if (!html.includes(marker)) throw new Error(`Missing runtime HK Chinese content-pack marker: ${marker}`);
 }

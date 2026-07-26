@@ -263,4 +263,12 @@ Next slices:
 - Surfaces a **Review queue** card on the Life in the UK panel listing topic mastery and due dates, with a **Start due-topic review** drill that pulls questions from due topics.
 - Review sessions persist as `life-uk-practice` with `practiceMode: 'life-uk-review-queue'`, update the SR schedule after each session, and show per-topic breakdown on the result view.
 - Added validation markers, registry metadata (`topic spaced repetition`), and mobile smoke coverage.
-- Next: mock score trend chart or further Life in the UK content coverage.
+- Next: mock score trend chart (shipped as Run #33) or further Life in the UK content coverage.
+
+## Run #33 Life in the UK mock score progress trend chart
+
+- Surfaces a **Mock score trend** card under the full timed mock area, charting recent `life-uk-full-mock` scores from learner history toward the 75% pass target.
+- Full timed mocks now append to history (instead of replacing the previous full-mock entry) so multi-attempt trends, weak-topic drills, and review-queue mastery can use more evidence.
+- Shows latest / best / average plus delta vs previous attempt, with pass/fail colour bars and empty-state guidance before the first mock.
+- Added validation markers, registry metadata (`mock score trend chart`), and mobile smoke coverage.
+- Next: expand Life in the UK explanations and topic coverage, or polish review-queue scheduling.
