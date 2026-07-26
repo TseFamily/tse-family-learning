@@ -580,3 +580,90 @@ test('Life in the UK review queue aggregates mastery and drills due topics', asy
   await expect(page.locator('#life-uk-review-queue-area .life-uk-drill-result .life-uk-topic-breakdown')).toContainText('Per-topic breakdown');
 });
 
+test('Life in the UK mock score trend chart renders from saved full mocks', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.lifeUKPackId === 'life-uk-v1',
+    null,
+    { timeout: 10000 }
+  );
+
+  // Seed two prior full mocks so the chart has multi-attempt history, then finish one live mock.
+  await page.evaluate(() => {
+    const key = 'learningquest-history-v1-learner-1';
+    const seeded = [
+      {
+        learner: 'learner-1',
+        date: 'Jul 20',
+        completedAt: '2026-07-20T10:00:00.000Z',
+        correct: 12,
+        total: 24,
+        percent: 50,
+        focus: 'Life in the UK full timed mock',
+        subjects: { 'Life in the UK': { correct: 12, total: 24 } },
+        practiceMode: 'life-uk-full-mock',
+        difficultyMode: 'timed-mock',
+        activityType: 'life-uk-practice',
+        attempted: 24,
+        passMark: 75,
+        passed: false,
+        skillResults: { Government: { correct: 1, attempted: 2 } },
+        weakSkills: ['Government'],
+        timedMock: true,
+        timeExpired: false
+      },
+      {
+        learner: 'learner-1',
+        date: 'Jul 22',
+        completedAt: '2026-07-22T10:00:00.000Z',
+        correct: 16,
+        total: 24,
+        percent: 67,
+        focus: 'Life in the UK full timed mock',
+        subjects: { 'Life in the UK': { correct: 16, total: 24 } },
+        practiceMode: 'life-uk-full-mock',
+        difficultyMode: 'timed-mock',
+        activityType: 'life-uk-practice',
+        attempted: 24,
+        passMark: 75,
+        passed: false,
+        skillResults: { Parliament: { correct: 1, attempted: 2 } },
+        weakSkills: ['Parliament'],
+        timedMock: true,
+        timeExpired: false
+      }
+    ];
+    localStorage.setItem(key, JSON.stringify(seeded));
+  });
+  await page.reload();
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.lifeUKPackId === 'life-uk-v1',
+    null,
+    { timeout: 10000 }
+  );
+
+  await expect(page.locator('#life-uk-mock-score-trend-area .life-uk-mock-score-trend-card')).toBeVisible();
+  await expect(page.locator('#life-uk-mock-score-trend-area')).toContainText('Mock score trend');
+  await expect(page.locator('#life-uk-mock-score-trend-area')).toContainText('Pass target 75%');
+  await expect(page.locator('.life-uk-mock-score-trend-chart .life-uk-mock-score-trend-bar-wrap')).toHaveCount(2);
+
+  const stateBefore = await page.evaluate(() => window.__learningQuestTestState);
+  expect(stateBefore.lifeUKMockScoreTrendCount).toBe(2);
+  expect(stateBefore.lifeUKMockScoreTrendRows.map(row => row.percent)).toEqual([50, 67]);
+
+  await page.evaluate(() => { Math.random = () => 0.999999; });
+  await page.getByRole('button', { name: 'Start 24-question full mock (45 min)' }).tap();
+  await expect(page.locator('#life-uk-mock-area')).toBeVisible();
+  const firstMockCard = page.locator('#life-uk-mock-grid .life-uk-mock-card').first();
+  await firstMockCard.getByRole('button', { name: 'The monarch' }).tap();
+  await page.getByRole('button', { name: 'Finish mock early' }).tap();
+  await expect(page.locator('.life-uk-mock-result')).toBeVisible();
+
+  await expect(page.locator('.life-uk-mock-score-trend-chart .life-uk-mock-score-trend-bar-wrap')).toHaveCount(3);
+  const state = await page.evaluate(() => window.__learningQuestTestState);
+  expect(state.lifeUKMockScoreTrendCount).toBe(3);
+  expect(state.lifeUKMockScoreTrendRows[2].percent).toBeGreaterThanOrEqual(0);
+  await expect(page.locator('#life-uk-mock-score-trend-area')).toContainText(/pts vs previous|unchanged vs previous|first saved full mock/);
+});
