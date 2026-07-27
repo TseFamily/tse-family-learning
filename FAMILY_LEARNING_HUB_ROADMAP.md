@@ -272,3 +272,11 @@ Next slices:
 - Shows latest / best / average plus delta vs previous attempt, with pass/fail colour bars and empty-state guidance before the first mock.
 - Added validation markers, registry metadata (`mock score trend chart`), and mobile smoke coverage.
 - Next: expand Life in the UK explanations and topic coverage, or polish review-queue scheduling.
+
+
+## Run #34 Life in the UK richer explanations + expanded topic coverage
+
+- Strengthened teaching explanations across the existing Life in the UK bank so answers explain the civic fact, not just restate the correct option.
+- Expanded the bank from 48 to 60 questions (5 per official topic) with new coverage across Government, Parliament, Law, Rights, History, UK nations, Democracy, Society, Geography, Culture, Values, and Economy.
+- Updated registry/fallback metadata, validation (50+ questions, min explanation length, richer-explanations activity), and mobile smoke expectations for the larger bank.
+- Next: polish review-queue scheduling, or add more Life in the UK scenario-style practice.

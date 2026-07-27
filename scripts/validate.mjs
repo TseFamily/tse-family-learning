@@ -67,6 +67,7 @@ function validateLifeUKPackFile(path, expectedId, fields, label) {
   if (pack.id !== expectedId) throw new Error(`${label} pack id changed unexpectedly`);
   if (!pack.activity || !pack.activity.includes('Practice questions')) throw new Error(`${label} pack metadata must advertise practice questions`);
   if (!pack.activity || !pack.activity.includes('expanded question bank')) throw new Error(`${label} pack metadata must advertise expanded question bank`);
+  if (!pack.activity || !pack.activity.includes('richer explanations')) throw new Error(`${label} pack metadata must advertise richer explanations`);
   if (!pack.activity || !pack.activity.includes('starter mock mode')) throw new Error(`${label} pack metadata must advertise starter mock mode`);
   if (!pack.activity || !pack.activity.includes('weak-topic review')) throw new Error(`${label} pack metadata must advertise weak-topic review`);
   if (!pack.activity || !pack.activity.includes('full timed mock')) throw new Error(`${label} pack metadata must advertise a full timed mock`);
@@ -74,7 +75,7 @@ function validateLifeUKPackFile(path, expectedId, fields, label) {
   if (!pack.progressionSteps.includes('Run adaptive weak-topic drills from saved mock review data')) throw new Error(`${label} pack missing adaptive drill progression step`);
   if (!pack.mock || Number(pack.mock.passMarkPercent) !== 75) throw new Error(`${label} pack must declare a 75% pass mark`);
   if (!pack.mock || Number(pack.mock.timeLimitMinutes) !== 45) throw new Error(`${label} pack must declare the 45-minute mock target`);
-  if (!Array.isArray(pack.questions) || pack.questions.length < 40) throw new Error(`${label} pack needs at least 40 questions`);
+  if (!Array.isArray(pack.questions) || pack.questions.length < 50) throw new Error(`${label} pack needs at least 50 questions`);
   const topicCounts = {};
   const prompts = new Set();
   for (const [i, question] of pack.questions.entries()) {
@@ -89,6 +90,13 @@ function validateLifeUKPackFile(path, expectedId, fields, label) {
   }
   const undercoveredTopics = Object.entries(topicCounts).filter(([, count]) => count < 4);
   if (undercoveredTopics.length) throw new Error(`${label} topics need at least four questions: ${undercoveredTopics.map(([topic, count]) => `${topic} (${count})`).join(', ')}`);
+  const shortExplanations = pack.questions
+    .map((question, index) => ({ index: index + 1, topic: question.topic, length: String(question.explanation || '').trim().length, prompt: question.prompt }))
+    .filter(item => item.length < 70);
+  if (shortExplanations.length) {
+    throw new Error(`${label} explanations must teach the fact (min 70 chars): ${shortExplanations.slice(0, 5).map(item => `#${item.index} ${item.topic} (${item.length})`).join(', ')}`);
+  }
+  if (!pack.activity || !pack.activity.includes('richer explanations')) throw new Error(`${label} pack metadata must advertise richer explanations`);
   return pack;
 }
 
@@ -136,6 +144,8 @@ for (const [id, path, fields] of [
     if (!registered.progressionSteps.includes('Use the review queue to revisit due citizenship topics from saved mastery')) throw new Error('Content pack registry life-uk-v1 missing review queue progression step');
     if (!registered.activity.includes('mock score trend chart')) throw new Error('Content pack registry life-uk-v1 missing mock score trend chart activity');
     if (!registered.progressionSteps.includes('Track full-mock score trends toward the 75% pass target')) throw new Error('Content pack registry life-uk-v1 missing mock score trend progression step');
+    if (!registered.activity.includes('richer explanations')) throw new Error('Content pack registry life-uk-v1 missing richer explanations activity');
+    if (!registered.progressionSteps.includes('Study clearer explanations after each answer to lock in citizenship facts')) throw new Error('Content pack registry life-uk-v1 missing clearer-explanations progression step');
   } else {
     if (!registered.activity.includes('matching')) throw new Error(`Content pack registry ${id} missing matching activity`);
     if (!registered.activity.includes('comparison')) throw new Error(`Content pack registry ${id} missing comparison activity`);

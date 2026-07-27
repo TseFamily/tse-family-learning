@@ -4,9 +4,9 @@
   "domain": "Life in the UK",
   "language": "English",
   "learners": "Adult learners",
-  "activity": "Practice questions + expanded question bank + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill",
+  "activity": "Practice questions + expanded question bank + richer explanations + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill",
   "readiness": "Live slice",
-  "next": "Add topic-spaced repetition across the expanded question bank using per-topic breakdown as the prioritisation signal.",
+  "next": "Polish review-queue scheduling, or add more Life in the UK scenario-style practice.",
   "recommendedStages": [
     "adult"
   ],
@@ -16,15 +16,19 @@
   ],
   "progressionSteps": [
     "Start with civic basics and everyday UK facts",
+    "Study clearer explanations after each answer to lock in citizenship facts",
     "Practise weak citizenship topics from saved attempts",
     "Build toward a 24-question, 45-minute mock test from an expanded bank",
-    "Run adaptive weak-topic drills from saved mock review data"
+    "Run adaptive weak-topic drills from saved mock review data",
+    "Use the review queue to revisit due citizenship topics from saved mastery",
+    "Track full-mock score trends toward the 75% pass target"
   ],
   "mock": {
     "questionCount": 24,
     "timeLimitMinutes": 45,
     "passMarkPercent": 75,
-    "starterQuestionCount": 6
+    "starterQuestionCount": 6,
+    "bankQuestionCount": 60
   },
   "questions": [
     {
@@ -49,7 +53,7 @@
         "Civil Service"
       ],
       "answer": 0,
-      "explanation": "Members of Parliament are elected to the House of Commons."
+      "explanation": "Members of Parliament (MPs) are elected to the House of Commons, which is the elected chamber of Parliament."
     },
     {
       "topic": "Law",
@@ -73,7 +77,7 @@
         "Owning a car"
       ],
       "answer": 0,
-      "explanation": "Everyone living in the UK is expected to obey the law."
+      "explanation": "Everyone living in the UK is expected to obey the law, whether they are a British citizen or not."
     },
     {
       "topic": "History",
@@ -85,7 +89,7 @@
         "The start of the school year"
       ],
       "answer": 0,
-      "explanation": "Remembrance Day honours those who served and died in wars and conflicts."
+      "explanation": "Remembrance Day (11 November) honours those who served and died in wars and conflicts, especially the First and Second World Wars."
     },
     {
       "topic": "UK nations",
@@ -97,7 +101,7 @@
         "Manchester"
       ],
       "answer": 0,
-      "explanation": "Cardiff is the capital city of Wales."
+      "explanation": "Cardiff is the capital city of Wales and the seat of the Senedd (Welsh Parliament)."
     },
     {
       "topic": "Democracy",
@@ -109,7 +113,7 @@
         "25"
       ],
       "answer": 0,
-      "explanation": "Most citizens can vote in UK general elections from age 18."
+      "explanation": "Most British citizens can vote in UK general elections from age 18, provided they are registered to vote."
     },
     {
       "topic": "Society",
@@ -121,7 +125,7 @@
         "HMRC"
       ],
       "answer": 0,
-      "explanation": "The National Health Service provides healthcare funded mainly through taxation."
+      "explanation": "The National Health Service (NHS) provides healthcare that is mainly funded through taxation."
     },
     {
       "topic": "Geography",
@@ -133,7 +137,7 @@
         "Jersey"
       ],
       "answer": 0,
-      "explanation": "The UK is made up of England, Scotland, Wales, and Northern Ireland."
+      "explanation": "The United Kingdom is made up of four countries: England, Scotland, Wales, and Northern Ireland."
     },
     {
       "topic": "Culture",
@@ -145,7 +149,7 @@
         "Thistle"
       ],
       "answer": 0,
-      "explanation": "The poppy is used as a symbol of Remembrance."
+      "explanation": "The red poppy is the main symbol of Remembrance and is worn around Remembrance Day."
     },
     {
       "topic": "Government",
@@ -157,7 +161,7 @@
         "10 Downing Street"
       ],
       "answer": 0,
-      "explanation": "The UK Parliament meets at the Palace of Westminster in London."
+      "explanation": "The UK Parliament meets at the Palace of Westminster, often called the Houses of Parliament, in London."
     },
     {
       "topic": "Law",
@@ -169,7 +173,7 @@
         "Public inquiry"
       ],
       "answer": 0,
-      "explanation": "Serious criminal cases can be heard in the Crown Court with a jury."
+      "explanation": "Serious criminal cases can be heard in the Crown Court, where a jury of members of the public decides the verdict."
     },
     {
       "topic": "Values and principles",
@@ -193,7 +197,7 @@
         "Franc"
       ],
       "answer": 0,
-      "explanation": "The UK's currency is the pound sterling."
+      "explanation": "The currency of the UK is the pound sterling, often written as GBP or shown with the £ symbol."
     },
     {
       "topic": "History",
@@ -205,7 +209,7 @@
         "1707"
       ],
       "answer": 0,
-      "explanation": "The Norman invasion and the Battle of Hastings took place in 1066."
+      "explanation": "The Norman invasion of England, including the Battle of Hastings, took place in 1066."
     },
     {
       "topic": "Culture",
@@ -229,7 +233,7 @@
         "Slieve Donard"
       ],
       "answer": 0,
-      "explanation": "Ben Nevis, in Scotland, is the highest mountain in the UK."
+      "explanation": "Ben Nevis, in the Scottish Highlands, is the highest mountain in the United Kingdom."
     },
     {
       "topic": "History",
@@ -253,7 +257,7 @@
         "The Bill of Rights"
       ],
       "answer": 0,
-      "explanation": "The Beveridge Report of 1942 shaped the modern welfare state and the NHS."
+      "explanation": "The 1942 Beveridge Report recommended major social reforms and helped shape the modern welfare state, including the NHS."
     },
     {
       "topic": "Parliament",
@@ -265,7 +269,7 @@
         "Every 10 years"
       ],
       "answer": 0,
-      "explanation": "Under current law, a general election must be held at least every five years."
+      "explanation": "Under current UK law, a general election must be held at least every five years."
     },
     {
       "topic": "Culture",
@@ -277,7 +281,7 @@
         "St Patrick"
       ],
       "answer": 0,
-      "explanation": "St George is the patron saint of England."
+      "explanation": "St George is the patron saint of England; his day is celebrated on 23 April."
     },
     {
       "topic": "History",
@@ -301,7 +305,7 @@
         "16"
       ],
       "answer": 0,
-      "explanation": "Since 2006, the minimum age to stand as a Member of Parliament has been 18."
+      "explanation": "Since 2006, people aged 18 or over can stand for election as a Member of Parliament."
     },
     {
       "topic": "Values and principles",
@@ -313,7 +317,7 @@
         "A theocracy"
       ],
       "answer": 0,
-      "explanation": "The UK is a parliamentary democracy and a constitutional monarchy."
+      "explanation": "The UK is a parliamentary democracy and a constitutional monarchy: elected politicians run government, while the monarch is head of state."
     },
     {
       "topic": "Government",
@@ -337,7 +341,7 @@
         "The Old Bailey"
       ],
       "answer": 0,
-      "explanation": "The Prime Minister works and lives at 10 Downing Street in London."
+      "explanation": "10 Downing Street in London is the official residence and office of the UK Prime Minister."
     },
     {
       "topic": "Parliament",
@@ -349,7 +353,7 @@
         "Run the courts"
       ],
       "answer": 0,
-      "explanation": "MPs represent people in their constituencies, debate issues, and vote on laws."
+      "explanation": "MPs represent their constituencies, debate issues, scrutinise government, and vote on new laws."
     },
     {
       "topic": "Parliament",
@@ -361,7 +365,7 @@
         "Bank of England"
       ],
       "answer": 0,
-      "explanation": "The House of Lords reviews legislation and can suggest amendments."
+      "explanation": "The House of Lords reviews legislation from the Commons and can suggest amendments, but the Commons has the final say on most bills."
     },
     {
       "topic": "Law",
@@ -373,7 +377,7 @@
         "The police write all laws"
       ],
       "answer": 0,
-      "explanation": "The rule of law means laws apply to everyone and no one is above the law."
+      "explanation": "The rule of law means that laws apply equally to everyone, including government and public officials, and no one is above the law."
     },
     {
       "topic": "Law",
@@ -421,7 +425,7 @@
         "25"
       ],
       "answer": 0,
-      "explanation": "The usual minimum legal age to buy alcohol in the UK is 18."
+      "explanation": "In the UK, the usual minimum legal age to buy alcohol from shops, pubs, and bars is 18."
     },
     {
       "topic": "UK nations",
@@ -433,7 +437,7 @@
         "Belfast"
       ],
       "answer": 0,
-      "explanation": "Edinburgh is the capital city of Scotland."
+      "explanation": "Edinburgh is the capital city of Scotland and the location of the Scottish Parliament."
     },
     {
       "topic": "UK nations",
@@ -445,7 +449,7 @@
         "Cardiff"
       ],
       "answer": 0,
-      "explanation": "Belfast is the capital city of Northern Ireland."
+      "explanation": "Belfast is the capital city of Northern Ireland and the largest city in Northern Ireland."
     },
     {
       "topic": "UK nations",
@@ -457,7 +461,7 @@
         "Leeds"
       ],
       "answer": 0,
-      "explanation": "London is the capital city of England and of the UK."
+      "explanation": "London is the capital of England and of the United Kingdom as a whole."
     },
     {
       "topic": "Democracy",
@@ -469,7 +473,7 @@
         "A local tax bill"
       ],
       "answer": 0,
-      "explanation": "A referendum asks voters to vote directly on a specific question."
+      "explanation": "A referendum is a public vote in which people decide a specific question directly, rather than through elected representatives."
     },
     {
       "topic": "Democracy",
@@ -481,7 +485,7 @@
         "Cancel laws by email"
       ],
       "answer": 0,
-      "explanation": "Voting in elections is one of the main ways citizens take part in democracy."
+      "explanation": "Voting in elections is one of the main ways citizens take part in UK democracy."
     },
     {
       "topic": "Society",
@@ -493,7 +497,7 @@
         "Royal Mail"
       ],
       "answer": 0,
-      "explanation": "Citizens Advice offers free, confidential and independent advice."
+      "explanation": "Citizens Advice offers free, confidential, and independent advice on issues such as debt, housing, benefits, and employment."
     },
     {
       "topic": "Society",
@@ -505,7 +509,7 @@
         "Leaving all decisions to the police"
       ],
       "answer": 0,
-      "explanation": "Volunteering is a common way to support local communities and charities."
+      "explanation": "Volunteering is a common way people contribute to local communities, charities, and public services."
     },
     {
       "topic": "Geography",
@@ -517,7 +521,7 @@
         "River Clyde"
       ],
       "answer": 0,
-      "explanation": "The River Severn is the longest river in the UK."
+      "explanation": "The River Severn is the longest river in the United Kingdom, flowing through Wales and England."
     },
     {
       "topic": "Geography",
@@ -529,7 +533,7 @@
         "The Atlantic Ocean"
       ],
       "answer": 0,
-      "explanation": "The English Channel separates southern England from northern France."
+      "explanation": "The English Channel is the body of water that separates southern England from northern France."
     },
     {
       "topic": "Culture",
@@ -541,7 +545,7 @@
         "A legal ceremony"
       ],
       "answer": 0,
-      "explanation": "The Proms are a famous annual season of classical music concerts."
+      "explanation": "The Proms are a famous annual season of classical music concerts, best known for the Last Night of the Proms."
     },
     {
       "topic": "Values and principles",
@@ -589,7 +593,7 @@
         "A fee for using the NHS"
       ],
       "answer": 0,
-      "explanation": "The National Minimum Wage sets a legal minimum hourly rate for most workers."
+      "explanation": "The National Minimum Wage is the legal minimum hourly pay rate that most workers must receive."
     },
     {
       "topic": "Economy",
@@ -602,6 +606,150 @@
       ],
       "answer": 0,
       "explanation": "People usually need a National Insurance number for work, tax, and benefit records."
+    },
+    {
+      "topic": "Government",
+      "prompt": "What is the Cabinet in UK government?",
+      "options": [
+        "A group of senior ministers chosen by the Prime Minister",
+        "All elected local councillors",
+        "The jury in a Crown Court trial",
+        "The staff of the House of Lords"
+      ],
+      "answer": 0,
+      "explanation": "The Cabinet is made up of senior government ministers, usually chosen by the Prime Minister, who take major decisions together."
+    },
+    {
+      "topic": "Parliament",
+      "prompt": "What is a constituency?",
+      "options": [
+        "An area of the country that elects one MP",
+        "A type of court case",
+        "A tax paid by employers only",
+        "A seat in the House of Lords"
+      ],
+      "answer": 0,
+      "explanation": "A constituency is a geographical area that elects one Member of Parliament to the House of Commons."
+    },
+    {
+      "topic": "Law",
+      "prompt": "What should you do in a genuine emergency that needs the police, fire, or ambulance service?",
+      "options": [
+        "Call 999 or 112",
+        "Call 101 only",
+        "Write to your MP first",
+        "Wait for a court summons"
+      ],
+      "answer": 0,
+      "explanation": "In a genuine emergency, call 999 or 112 so the police, fire, or ambulance service can respond quickly."
+    },
+    {
+      "topic": "Rights and responsibilities",
+      "prompt": "Which of these is both a right and a responsibility in UK society?",
+      "options": [
+        "Looking after the environment and public spaces",
+        "Ignoring court summonses",
+        "Avoiding all taxes legally due",
+        "Refusing to register to vote when eligible"
+      ],
+      "answer": 0,
+      "explanation": "People in the UK have responsibilities as well as rights, including looking after the environment and treating public spaces with care."
+    },
+    {
+      "topic": "History",
+      "prompt": "Which conflict is particularly remembered each year on Remembrance Day?",
+      "options": [
+        "The First World War",
+        "The Wars of the Roses",
+        "The English Civil War",
+        "The Napoleonic Wars only"
+      ],
+      "answer": 0,
+      "explanation": "Remembrance Day is especially linked to the First World War, though it also honours those who died in later conflicts."
+    },
+    {
+      "topic": "UK nations",
+      "prompt": "Which body makes laws for Scotland on many devolved matters?",
+      "options": [
+        "The Scottish Parliament",
+        "The Mayor of London",
+        "The European Commission",
+        "The Crown Court"
+      ],
+      "answer": 0,
+      "explanation": "The Scottish Parliament in Edinburgh makes laws on many devolved matters such as education and health in Scotland."
+    },
+    {
+      "topic": "Democracy",
+      "prompt": "What is meant by a secret ballot?",
+      "options": [
+        "Votes are cast privately so others cannot see how someone voted",
+        "Only government ministers may vote",
+        "Results of elections are never published",
+        "People must tell their employer how they voted"
+      ],
+      "answer": 0,
+      "explanation": "A secret ballot means people vote in private, so no one else can see or pressure them about their choice."
+    },
+    {
+      "topic": "Society",
+      "prompt": "What is one important role of charities in the UK?",
+      "options": [
+        "Supporting people and communities, often with volunteer help",
+        "Setting Income Tax rates",
+        "Appointing the Prime Minister",
+        "Running general elections"
+      ],
+      "answer": 0,
+      "explanation": "Charities play a major role in UK society by supporting people and communities, often with the help of volunteers and donations."
+    },
+    {
+      "topic": "Geography",
+      "prompt": "Which capital city is furthest north?",
+      "options": [
+        "Edinburgh",
+        "London",
+        "Cardiff",
+        "Belfast"
+      ],
+      "answer": 0,
+      "explanation": "Among the four UK capital cities, Edinburgh is the furthest north, ahead of Belfast, Cardiff, and London."
+    },
+    {
+      "topic": "Culture",
+      "prompt": "Which of these is a famous annual British sporting event?",
+      "options": [
+        "Wimbledon",
+        "The Super Bowl",
+        "The Tour de France finish in Paris only",
+        "The Boston Marathon only"
+      ],
+      "answer": 0,
+      "explanation": "Wimbledon is a famous annual tennis championship held in London and is one of the best-known British sporting events."
+    },
+    {
+      "topic": "Values and principles",
+      "prompt": "What does individual liberty mean as a British value?",
+      "options": [
+        "People are free to make choices about their lives within the law",
+        "Only the government can choose a person's religion",
+        "People may ignore criminal laws they dislike",
+        "Only one political party may campaign"
+      ],
+      "answer": 0,
+      "explanation": "Individual liberty means people are free to make their own choices about work, belief, and lifestyle, as long as they stay within the law."
+    },
+    {
+      "topic": "Economy",
+      "prompt": "What is Income Tax mainly used for?",
+      "options": [
+        "Funding public services such as the NHS, schools, and the police",
+        "Paying only private company dividends",
+        "Funding foreign monarchies",
+        "Paying football transfer fees"
+      ],
+      "answer": 0,
+      "explanation": "Income Tax is a major source of government revenue used to fund public services such as healthcare, education, and policing."
     }
   ],
   "sourcePath": "content-packs/life-uk.json"
