@@ -24,7 +24,7 @@ test('mobile app shell opens without horizontal overflow and mission onboarding 
   await page.getByRole('button', { name: 'Get exam-ready' }).tap();
   await expect(page.locator('.curriculum-card.recommended .curriculum-title', { hasText: 'Life in the UK starter mock' })).toBeVisible();
   await expect(page.locator('.curriculum-card.recommended').getByText('Adult learning match for bite-sized recall.').first()).toBeVisible();
-  await expect(page.locator('.curriculum-card.recommended').getByText('Start with civic basics and everyday UK facts → Study clearer explanations after each answer to lock in citizenship facts → Practise weak citizenship topics from saved attempts → Build toward a 24-question, 45-minute mock test').first()).toBeVisible();
+  await expect(page.locator('.curriculum-card.recommended').getByText('Start with civic basics and everyday UK facts → Study clearer explanations after each answer to lock in citizenship facts → Practise weak citizenship topics from saved attempts → Build toward a 24-question, 45-minute mock test from an expanded bank').first()).toBeVisible();
   await page.getByRole('button', { name: 'Learn language' }).tap();
   await expect(page.locator('#flashcard-grid .flashcard-term', { hasText: '早晨' })).toBeVisible();
   await expect(page.locator('#flashcard-grid .flashcard-term', { hasText: '紅色' })).toBeVisible();

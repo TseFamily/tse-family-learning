@@ -16,10 +16,12 @@
   ],
   "progressionSteps": [
     "Start with civic basics and everyday UK facts",
-    "Practise weak citizenship topics from saved attempts",
     "Study clearer explanations after each answer to lock in citizenship facts",
+    "Practise weak citizenship topics from saved attempts",
     "Build toward a 24-question, 45-minute mock test from an expanded bank",
-    "Run adaptive weak-topic drills from saved mock review data"
+    "Run adaptive weak-topic drills from saved mock review data",
+    "Use the review queue to revisit due citizenship topics from saved mastery",
+    "Track full-mock score trends toward the 75% pass target"
   ],
   "mock": {
     "questionCount": 24,
