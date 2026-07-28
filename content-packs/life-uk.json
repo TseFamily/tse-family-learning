@@ -4,9 +4,9 @@
   "domain": "Life in the UK",
   "language": "English",
   "learners": "Adult learners",
-  "activity": "Practice questions + expanded question bank + richer explanations + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill",
+  "activity": "Practice questions + expanded question bank + richer explanations + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill + topic spaced repetition review queue + polished review-queue scheduling + mock score trend chart",
   "readiness": "Live slice",
-  "next": "Polish review-queue scheduling, or add more Life in the UK scenario-style practice.",
+  "next": "Add more Life in the UK scenario-style practice.",
   "recommendedStages": [
     "adult"
   ],
@@ -21,6 +21,7 @@
     "Build toward a 24-question, 45-minute mock test from an expanded bank",
     "Run adaptive weak-topic drills from saved mock review data",
     "Use the review queue to revisit due citizenship topics from saved mastery",
+    "Follow polished due/overdue review-queue scheduling for citizenship topics",
     "Track full-mock score trends toward the 75% pass target"
   ],
   "mock": {
@@ -197,7 +198,7 @@
         "Franc"
       ],
       "answer": 0,
-      "explanation": "The currency of the UK is the pound sterling, often written as GBP or shown with the £ symbol."
+      "explanation": "The currency of the UK is the pound sterling, often written as GBP or shown with the \u00a3 symbol."
     },
     {
       "topic": "History",
