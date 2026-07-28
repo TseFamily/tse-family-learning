@@ -280,3 +280,11 @@ Next slices:
 - Expanded the bank from 48 to 60 questions (5 per official topic) with new coverage across Government, Parliament, Law, Rights, History, UK nations, Democracy, Society, Geography, Culture, Values, and Economy.
 - Updated registry/fallback metadata, validation (50+ questions, min explanation length, richer-explanations activity), and mobile smoke expectations for the larger bank.
 - Next: polish review-queue scheduling, or add more Life in the UK scenario-style practice.
+
+
+## Run #35 Life in the UK polished review-queue scheduling
+
+- Polished the Life in the UK review queue so overdue, due-today, and weak topics rank ahead of upcoming strong topics.
+- Added schedule summary chips, relative due labels, capped spaced-repetition intervals, priority scoring, shuffled due-topic pooling, and an upcoming-topic preview path when nothing is due.
+- Updated registry/content-pack metadata, validation markers, and mobile smoke coverage for polished review-queue scheduling.
+- Next: add more Life in the UK scenario-style practice.

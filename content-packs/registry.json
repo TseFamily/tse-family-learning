@@ -1,14 +1,14 @@
 {
   "id": "learningquest-content-pack-registry-v1",
-  "updated": "2026-06-25",
+  "updated": "2026-07-28",
   "packs": [
     {
       "id": "hk-chinese-basics-v1",
       "path": "content-packs/hk-chinese-basics.json",
       "kind": "flashcards",
       "title": "Traditional HK Chinese basics",
-      "domain": "Chinese · Traditional HK",
-      "language": "繁體中文 + Cantonese",
+      "domain": "Chinese \u00b7 Traditional HK",
+      "language": "\u7e41\u9ad4\u4e2d\u6587 + Cantonese",
       "learners": "All learners",
       "activity": "Flashcards + matching + comparison + audio prompts + listen/repeat",
       "readiness": "Live slice",
@@ -42,8 +42,8 @@
       "path": "content-packs/mandarin-basics.json",
       "kind": "flashcards",
       "title": "Simplified Mandarin basics",
-      "domain": "Chinese · Simplified Mandarin",
-      "language": "简体中文 + Pinyin",
+      "domain": "Chinese \u00b7 Simplified Mandarin",
+      "language": "\u7b80\u4f53\u4e2d\u6587 + Pinyin",
       "learners": "All learners",
       "activity": "Flashcards + matching + comparison + audio prompts + listen/repeat",
       "readiness": "Live slice",
@@ -115,9 +115,9 @@
       "domain": "Life in the UK",
       "language": "English",
       "learners": "Adult learners",
-      "activity": "Practice questions + expanded question bank + richer explanations + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill + topic spaced repetition review queue + mock score trend chart",
+      "activity": "Practice questions + expanded question bank + richer explanations + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill + topic spaced repetition review queue + polished review-queue scheduling + mock score trend chart",
       "readiness": "Live slice",
-      "next": "Polish review-queue scheduling, or add more Life in the UK scenario-style practice.",
+      "next": "Add more Life in the UK scenario-style practice.",
       "schema": [
         "topic",
         "prompt",
@@ -140,6 +140,7 @@
         "Build toward a 24-question, 45-minute mock test from an expanded bank",
         "Run adaptive weak-topic drills from saved mock review data",
         "Use the review queue to revisit due citizenship topics from saved mastery",
+        "Follow polished due/overdue review-queue scheduling for citizenship topics",
         "Track full-mock score trends toward the 75% pass target"
       ]
     }

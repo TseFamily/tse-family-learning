@@ -142,6 +142,8 @@ for (const [id, path, fields] of [
     if (!registered.progressionSteps.includes('Run adaptive weak-topic drills from saved mock review data')) throw new Error('Content pack registry life-uk-v1 missing adaptive drill progression step');
     if (!registered.activity.includes('topic spaced repetition')) throw new Error('Content pack registry life-uk-v1 missing topic spaced repetition activity');
     if (!registered.progressionSteps.includes('Use the review queue to revisit due citizenship topics from saved mastery')) throw new Error('Content pack registry life-uk-v1 missing review queue progression step');
+    if (!registered.activity.includes('polished review-queue scheduling')) throw new Error('Content pack registry life-uk-v1 missing polished review-queue scheduling activity');
+    if (!registered.progressionSteps.includes('Follow polished due/overdue review-queue scheduling for citizenship topics')) throw new Error('Content pack registry life-uk-v1 missing polished review-queue scheduling progression step');
     if (!registered.activity.includes('mock score trend chart')) throw new Error('Content pack registry life-uk-v1 missing mock score trend chart activity');
     if (!registered.progressionSteps.includes('Track full-mock score trends toward the 75% pass target')) throw new Error('Content pack registry life-uk-v1 missing mock score trend progression step');
     if (!registered.activity.includes('richer explanations')) throw new Error('Content pack registry life-uk-v1 missing richer explanations activity');
@@ -308,12 +310,22 @@ for (const marker of [
   'life-uk-review-queue',
   'lifeUKReviewQueueRows',
   'lifeUKMergeTopicSRFromHistory',
+  'lifeUKReviewQueueScheduleSummary',
+  'lifeUKReviewQueuePriorityScore',
+  'lifeUKReviewQueueScheduleStatus',
+  'lifeUKReviewQueueRelativeDueLabel',
   'life-uk-review-queue',
   'LIFE_UK_REVIEW_QUEUE_QUESTION_COUNT',
+  'LIFE_UK_SR_MAX_INTERVAL_DAYS',
   'startLifeUKReviewQueueDrill',
   'renderLifeUKReviewQueue',
   'topic spaced repetition',
-  'Review queue · topic spaced repetition',
+  'polished review-queue scheduling',
+  'Review queue · polished topic scheduling',
+  'Priority now:',
+  'life-uk-review-queue-summary',
+  'life-uk-review-queue-chip',
+  'life-uk-review-queue-status-pill',
   'life-uk-mock-score-trend-area',
   'life-uk-mock-score-trend',
   'lifeUKMockScoreTrendRows',

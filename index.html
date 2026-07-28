@@ -453,6 +453,19 @@
     .life-uk-review-queue-meta.due { color: #be123c; }
     .life-uk-review-queue-actions { display: flex; gap: 8px; flex-wrap: wrap; }
     .life-uk-review-queue-empty { border: 1px dashed #93c5fd; background: #f8fbff; border-radius: 12px; padding: 12px; color: #1d4ed8; font-size: 0.86rem; font-weight: 800; line-height: 1.35; }
+    .life-uk-review-queue-summary { display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.78rem; font-weight: 800; color: #1d4ed8; }
+    .life-uk-review-queue-chip { border-radius: 999px; padding: 4px 10px; background: #dbeafe; color: #1e3a8a; border: 1px solid #93c5fd; }
+    .life-uk-review-queue-chip.overdue { background: #ffe4e6; color: #9f1239; border-color: #fda4af; }
+    .life-uk-review-queue-chip.due-today { background: #ffedd5; color: #9a3412; border-color: #fdba74; }
+    .life-uk-review-queue-chip.upcoming { background: #ecfdf5; color: #166534; border-color: #86efac; }
+    .life-uk-review-queue-status-pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 2px 8px; font-size: 0.68rem; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase; }
+    .life-uk-review-queue-status-pill.overdue { background: #ffe4e6; color: #9f1239; }
+    .life-uk-review-queue-status-pill.due-today { background: #ffedd5; color: #9a3412; }
+    .life-uk-review-queue-status-pill.weak-forced { background: #ede9fe; color: #5b21b6; }
+    .life-uk-review-queue-status-pill.upcoming { background: #dcfce7; color: #166534; }
+    .life-uk-review-queue-row-main { display: grid; gap: 2px; min-width: 0; }
+    .life-uk-review-queue-row-meta-stack { display: grid; gap: 2px; justify-items: end; text-align: right; }
+    .life-uk-review-queue-next { font-size: 0.8rem; color: #1e40af; font-weight: 800; line-height: 1.35; }
     .life-uk-mock-score-trend { margin-top: 8px; display: grid; gap: 10px; }
     .life-uk-mock-score-trend-card { border: 1px solid #93c5fd; background: linear-gradient(180deg, #eff6ff, #fff); border-radius: 14px; padding: 12px; display: grid; gap: 10px; }
     .life-uk-mock-score-trend-card h4 { margin: 0; color: #1e3a8a; font-size: 0.98rem; }
@@ -968,7 +981,7 @@
             <div class="matching-panel" id="mandarin-matching-panel"><h3>🔗 Simplified Mandarin matching practice</h3><p>Match Simplified characters to English meaning, then compare Pinyin and Traditional forms.</p><div class="matching-grid" id="mandarin-matching-grid"></div></div>
             <div class="comparison-panel" id="comparison-panel"><h3>🪞 Traditional/Simplified comparison drill</h3><p>Compare shared meanings across the runtime HK Chinese and Mandarin packs before moving into audio prompts.</p><div class="comparison-grid" id="comparison-grid"></div></div>
             <div class="maths-panel" id="maths-foundation-panel"><h3>🧮 Maths Foundation practice cards</h3><p>Number bonds, place value, skip counting, and times-table prompts are runtime-loaded from the content-pack registry.</p><div class="maths-grid" id="maths-foundation-grid"></div></div>
-            <div class="life-uk-panel" id="life-uk-panel"><h3>🇬🇧 Life in the UK starter mock</h3><p>Expanded citizenship questions with richer explanations are runtime-loaded from the content-pack registry, with a 75% pass target, a shuffled 24-question full timed mock, weak-topic review, a spaced-repetition review queue, and a mock score trend chart.</p><div class="life-uk-mock-actions" id="life-uk-mock-actions"><button class="btn btn-secondary life-uk-mock-start" type="button" onclick="startLifeUKFullMock()">⏱️ Start 24-question full mock (45 min)</button></div><div class="life-uk-mock-area" id="life-uk-mock-area"></div><div class="life-uk-mock-score-trend-area" id="life-uk-mock-score-trend-area"></div><div class="life-uk-drill-actions" id="life-uk-drill-actions"></div><div class="life-uk-drill-area" id="life-uk-drill-area"></div><div class="life-uk-review-queue-area" id="life-uk-review-queue-area"></div><div class="life-uk-grid" id="life-uk-grid"></div></div>
+            <div class="life-uk-panel" id="life-uk-panel"><h3>🇬🇧 Life in the UK starter mock</h3><p>Expanded citizenship questions with richer explanations are runtime-loaded from the content-pack registry, with a 75% pass target, a shuffled 24-question full timed mock, weak-topic review, a spaced-repetition review queue with polished due/overdue scheduling, and a mock score trend chart.</p><div class="life-uk-mock-actions" id="life-uk-mock-actions"><button class="btn btn-secondary life-uk-mock-start" type="button" onclick="startLifeUKFullMock()">⏱️ Start 24-question full mock (45 min)</button></div><div class="life-uk-mock-area" id="life-uk-mock-area"></div><div class="life-uk-mock-score-trend-area" id="life-uk-mock-score-trend-area"></div><div class="life-uk-drill-actions" id="life-uk-drill-actions"></div><div class="life-uk-drill-area" id="life-uk-drill-area"></div><div class="life-uk-review-queue-area" id="life-uk-review-queue-area"></div><div class="life-uk-grid" id="life-uk-grid"></div></div>
           </article>
 
           <article class="section-card rail" id="progress">
@@ -1081,7 +1094,7 @@
       { id: 'hk-chinese-basics-v1', path: 'content-packs/hk-chinese-basics.json', kind: 'flashcards', title: 'Traditional HK Chinese basics', domain: 'Chinese · Traditional HK', language: '繁體中文 + Cantonese', learners: 'All learners', activity: 'Flashcards + matching + comparison + audio prompts + listen/repeat', readiness: 'Live slice', next: 'Expand family words into colours, numbers, greetings, Jyutping, comparison drills, and audio prompts.', schema: ['traditional', 'jyutping', 'canto', 'english', 'prompt'], renderTarget: 'flashcard-grid', recommendedStages: ['early', 'primary', 'adult'], recommendedGoals: ['confidence', 'language', 'mastery'], progressionSteps: ['Start with family words and greetings', 'Practise colours, numbers, and Jyutping recall', 'Move into matching practice, comparison drills, audio prompts, and short household phrases'] },
       { id: 'mandarin-basics-v1', path: 'content-packs/mandarin-basics.json', kind: 'flashcards', title: 'Simplified Mandarin basics', domain: 'Chinese · Simplified Mandarin', language: '简体中文 + Pinyin', learners: 'All learners', activity: 'Flashcards + matching + comparison + audio prompts + listen/repeat', readiness: 'Live slice', next: 'Expand into matching practice, audio prompts, and Traditional/Simplified comparison drills.', schema: ['simplified', 'traditional', 'pinyin', 'english', 'prompt'], renderTarget: 'mandarin-flashcard-grid', recommendedStages: ['early', 'primary', 'adult'], recommendedGoals: ['language', 'confidence', 'mastery'], progressionSteps: ['Start with greetings and core family words', 'Compare Simplified, Traditional, and Pinyin forms', 'Use matching practice and comparison drills, then try audio prompts'] },
       { id: 'maths-foundation-v1', path: 'content-packs/maths-foundation.json', kind: 'practice-cards', title: 'Maths Foundation practice', domain: 'Maths Foundation', language: 'English', learners: 'Early and primary learners', activity: 'Practice cards + Number-line models + Adaptive answer entry + weak-skill rotation + mental maths + confidence drills', readiness: 'Live slice', next: 'Add adaptive number-line hints for more operations and learner-specific mixed review.', schema: ['topic', 'skill', 'prompt', 'answer', 'strategy'], renderTarget: 'maths-foundation-grid', recommendedStages: ['early', 'primary'], recommendedGoals: ['confidence', 'mastery'], progressionSteps: ['Start with number bonds to 10 and 20', 'Practise place value and skip counting', 'Move into times tables, fractions, and short word problems', 'Type answers and unlock strategy feedback', 'Review weak skills first with number-line support'] },
-      { id: 'life-uk-v1', path: 'content-packs/life-uk.json', kind: 'mock-questions', title: 'Life in the UK starter mock', domain: 'Life in the UK', language: 'English', learners: 'Adult learners', activity: 'Practice questions + expanded question bank + richer explanations + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill + topic spaced repetition review queue + mock score trend chart', readiness: 'Live slice', next: 'Polish review-queue scheduling, or add more Life in the UK scenario-style practice.', schema: ['topic', 'prompt', 'options', 'answer', 'explanation'], renderTarget: 'life-uk-grid', recommendedStages: ['adult'], recommendedGoals: ['exam-ready', 'mastery'], progressionSteps: ['Start with civic basics and everyday UK facts', 'Study clearer explanations after each answer to lock in citizenship facts', 'Practise weak citizenship topics from saved attempts', 'Build toward a 24-question, 45-minute mock test from an expanded bank', 'Run adaptive weak-topic drills from saved mock review data', 'Use the review queue to revisit due citizenship topics from saved mastery', 'Track full-mock score trends toward the 75% pass target'] }
+      { id: 'life-uk-v1', path: 'content-packs/life-uk.json', kind: 'mock-questions', title: 'Life in the UK starter mock', domain: 'Life in the UK', language: 'English', learners: 'Adult learners', activity: 'Practice questions + expanded question bank + richer explanations + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill + topic spaced repetition review queue + polished review-queue scheduling + mock score trend chart', readiness: 'Live slice', next: 'Add more Life in the UK scenario-style practice.', schema: ['topic', 'prompt', 'options', 'answer', 'explanation'], renderTarget: 'life-uk-grid', recommendedStages: ['adult'], recommendedGoals: ['exam-ready', 'mastery'], progressionSteps: ['Start with civic basics and everyday UK facts', 'Study clearer explanations after each answer to lock in citizenship facts', 'Practise weak citizenship topics from saved attempts', 'Build toward a 24-question, 45-minute mock test from an expanded bank', 'Run adaptive weak-topic drills from saved mock review data', 'Use the review queue to revisit due citizenship topics from saved mastery', 'Follow polished due/overdue review-queue scheduling for citizenship topics', 'Track full-mock score trends toward the 75% pass target'] }
     ];
     let contentPackRegistry = [...FALLBACK_CONTENT_PACK_REGISTRY];
     let contentPackRegistryError = null;
@@ -1113,6 +1126,8 @@
     const LIFE_UK_REVIEW_QUEUE_QUESTION_COUNT = 6;
     const LIFE_UK_SR_STORAGE_KEY = 'learningquest-life-uk-topic-sr-v1';
     const LIFE_UK_SR_INITIAL_INTERVAL_DAYS = 1;
+    const LIFE_UK_SR_MAX_INTERVAL_DAYS = 21;
+    const LIFE_UK_SR_DAY_MS = 24 * 60 * 60 * 1000;
     const audioPromptReplayCounts = {};
     const audioPromptSlowReplayCounts = {};
     const audioPromptRates = {};
@@ -3010,6 +3025,7 @@
         lastReviewedAt: null
       };
       const masteredThisSession = sessionAttempted > 0 && sessionPercent >= passMark;
+      const historyPercent = Number(prev.historyPercent || sessionPercent || 0);
       let intervalDays = prev.intervalDays || LIFE_UK_SR_INITIAL_INTERVAL_DAYS;
       let repetitions = Number(prev.repetitions || 0);
       let easeFactor = Number(prev.easeFactor || 2.5);
@@ -3019,9 +3035,13 @@
       if (masteredThisSession) {
         repetitions += 1;
         if (repetitions === 1) intervalDays = 1;
-        else if (repetitions === 2) intervalDays = 3;
+        else if (repetitions === 2) intervalDays = historyPercent >= 90 ? 4 : 3;
         else intervalDays = Math.max(1, Math.round(intervalDays * easeFactor));
-        easeFactor = Math.min(3, easeFactor + 0.1);
+        // Cap intervals for exam prep practicality and shrink when historical mastery is still soft.
+        if (historyPercent < passMark) intervalDays = Math.min(intervalDays, 2);
+        else if (historyPercent < 90) intervalDays = Math.min(intervalDays, 7);
+        intervalDays = Math.min(LIFE_UK_SR_MAX_INTERVAL_DAYS, intervalDays);
+        easeFactor = Math.min(3, easeFactor + (historyPercent >= 90 ? 0.12 : 0.08));
       } else {
         repetitions = 0;
         intervalDays = LIFE_UK_SR_INITIAL_INTERVAL_DAYS;
@@ -3038,7 +3058,11 @@
         lastReviewedAt: reviewedAt,
         lastSessionPercent: sessionPercent,
         lastSessionCorrect: sessionCorrect,
-        lastSessionAttempted: sessionAttempted
+        lastSessionAttempted: sessionAttempted,
+        historyPercent: prev.historyPercent,
+        historyCorrect: prev.historyCorrect,
+        historyAttempted: prev.historyAttempted,
+        scheduleVersion: 'polished-v1'
       };
     }
 
@@ -3100,6 +3124,48 @@
       return saveLifeUKTopicSR(store);
     }
 
+    function lifeUKStartOfLocalDay(ms = Date.now()) {
+      const d = new Date(ms);
+      d.setHours(0, 0, 0, 0);
+      return d.getTime();
+    }
+
+    function lifeUKReviewQueueScheduleStatus(row, now = Date.now()) {
+      const passMark = lifeUKTopicMasteryPassMark();
+      const dueAt = row.dueAt ? Date.parse(row.dueAt) : now;
+      const startToday = lifeUKStartOfLocalDay(now);
+      const endToday = startToday + LIFE_UK_SR_DAY_MS - 1;
+      const weakForced = Number(row.percent || 0) < passMark;
+      if (weakForced && dueAt > now) return 'weak-forced';
+      if (dueAt < startToday) return 'overdue';
+      if (dueAt <= endToday || dueAt <= now) return 'due-today';
+      return 'upcoming';
+    }
+
+    function lifeUKReviewQueueRelativeDueLabel(row, now = Date.now()) {
+      const status = lifeUKReviewQueueScheduleStatus(row, now);
+      const dueAt = row.dueAt ? Date.parse(row.dueAt) : now;
+      const dayDiff = Math.round((lifeUKStartOfLocalDay(dueAt) - lifeUKStartOfLocalDay(now)) / LIFE_UK_SR_DAY_MS);
+      if (status === 'overdue') {
+        const days = Math.max(1, Math.abs(dayDiff));
+        return days === 1 ? 'Overdue by 1 day' : `Overdue by ${days} days`;
+      }
+      if (status === 'weak-forced') return 'Weak topic · pull forward';
+      if (status === 'due-today') return 'Due today';
+      if (dayDiff === 1) return 'Due tomorrow';
+      if (dayDiff > 1) return `Due in ${dayDiff} days`;
+      return row.dueAt ? `Due ${new Date(row.dueAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}` : 'Scheduled';
+    }
+
+    function lifeUKReviewQueuePriorityScore(row, now = Date.now()) {
+      const status = lifeUKReviewQueueScheduleStatus(row, now);
+      const dueAt = row.dueAt ? Date.parse(row.dueAt) : now;
+      const overdueDays = Math.max(0, Math.floor((now - dueAt) / LIFE_UK_SR_DAY_MS));
+      const weakness = Math.max(0, 100 - Number(row.percent || 0));
+      const statusBoost = status === 'overdue' ? 400 : status === 'weak-forced' ? 320 : status === 'due-today' ? 240 : 40;
+      return statusBoost + weakness + Math.min(120, overdueDays * 12) + Math.max(0, 8 - Number(row.intervalDays || 1));
+    }
+
     function lifeUKReviewQueueRows() {
       const mastery = lifeUKAggregateTopicMasteryFromHistory();
       const store = lifeUKMergeTopicSRFromHistory();
@@ -3109,7 +3175,7 @@
         const hist = mastery[topic] || { correct: sr.historyCorrect || 0, attempted: sr.historyAttempted || 0, percent: sr.historyPercent || 0 };
         const dueAt = sr.dueAt ? Date.parse(sr.dueAt) : now;
         const due = dueAt <= now || hist.percent < passMark;
-        return {
+        const base = {
           topic,
           correct: hist.correct,
           attempted: hist.attempted,
@@ -3118,39 +3184,82 @@
           dueAt: sr.dueAt,
           intervalDays: sr.intervalDays || LIFE_UK_SR_INITIAL_INTERVAL_DAYS,
           repetitions: sr.repetitions || 0,
-          easeFactor: sr.easeFactor || 2.5
+          easeFactor: sr.easeFactor || 2.5,
+          lastReviewedAt: sr.lastReviewedAt || null
+        };
+        const status = lifeUKReviewQueueScheduleStatus(base, now);
+        return {
+          ...base,
+          status,
+          statusLabel: status === 'overdue' ? 'Overdue' : status === 'due-today' ? 'Due today' : status === 'weak-forced' ? 'Weak' : 'Upcoming',
+          relativeDueLabel: lifeUKReviewQueueRelativeDueLabel(base, now),
+          priorityScore: lifeUKReviewQueuePriorityScore(base, now)
         };
       });
       return rows
         .filter(row => row.attempted > 0)
-        .sort((a, b) => {
-          if (a.due !== b.due) return a.due ? -1 : 1;
-          return a.percent - b.percent || a.topic.localeCompare(b.topic);
-        });
+        .sort((a, b) => b.priorityScore - a.priorityScore || a.percent - b.percent || a.topic.localeCompare(b.topic));
+    }
+
+    function lifeUKReviewQueueScheduleSummary(rows = lifeUKReviewQueueRows()) {
+      const overdue = rows.filter(row => row.status === 'overdue').length;
+      const dueToday = rows.filter(row => row.status === 'due-today' || row.status === 'weak-forced').length;
+      const upcoming = rows.filter(row => row.status === 'upcoming').length;
+      const nextUpcoming = rows.find(row => row.status === 'upcoming') || null;
+      const topPriority = rows[0] || null;
+      return {
+        totalTopics: rows.length,
+        overdue,
+        dueToday,
+        upcoming,
+        dueCount: rows.filter(row => row.due).length,
+        nextTopic: topPriority ? topPriority.topic : null,
+        nextLabel: topPriority ? topPriority.relativeDueLabel : null,
+        nextUpcomingTopic: nextUpcoming ? nextUpcoming.topic : null,
+        nextUpcomingLabel: nextUpcoming ? nextUpcoming.relativeDueLabel : null
+      };
     }
 
     function lifeUKReviewQueueDueTopics(limit = 6) {
       return lifeUKReviewQueueRows().filter(row => row.due).slice(0, limit).map(row => row.topic);
     }
 
-    function lifeUKReviewQueuePool(topics = lifeUKReviewQueueDueTopics(LIFE_UK_REVIEW_QUEUE_QUESTION_COUNT)) {
+    function lifeUKReviewQueueUpcomingTopics(limit = 6) {
+      return lifeUKReviewQueueRows().filter(row => !row.due).slice(0, limit).map(row => row.topic);
+    }
+
+    function lifeUKShuffledTopicQuestions(topic) {
+      const questions = lifeUKQuestions.filter(question => question.topic === topic).slice();
+      for (let i = questions.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [questions[i], questions[j]] = [questions[j], questions[i]];
+      }
+      return questions;
+    }
+
+    function lifeUKReviewQueuePool(topics = lifeUKReviewQueueDueTopics(LIFE_UK_REVIEW_QUEUE_QUESTION_COUNT), options = {}) {
+      const soft = Boolean(options.soft);
       const pool = [];
       const seen = new Set();
-      for (const topic of topics) {
-        for (const question of lifeUKQuestions) {
-          if (question.topic !== topic) continue;
-          const key = `${topic}::${question.prompt}`;
-          if (seen.has(key)) continue;
-          seen.add(key);
-          pool.push({ ...question, reviewIndex: pool.length + 1, source: 'review-queue' });
-          if (pool.length >= LIFE_UK_REVIEW_QUEUE_QUESTION_COUNT) return pool;
-        }
-      }
-      if (!pool.length) {
-        for (const topic of topics) {
-          for (const question of lifeUKQuestions.filter(q => q.topic === topic).slice(0, 2)) {
-            pool.push({ ...question, reviewIndex: pool.length + 1, source: 'review-queue' });
-            if (pool.length >= LIFE_UK_REVIEW_QUEUE_QUESTION_COUNT) break;
+      const topicList = topics.slice();
+      // Round-robin across prioritised topics with shuffled question order so reviews stay fresh.
+      let progress = true;
+      while (pool.length < LIFE_UK_REVIEW_QUEUE_QUESTION_COUNT && progress) {
+        progress = false;
+        for (const topic of topicList) {
+          const candidates = lifeUKShuffledTopicQuestions(topic);
+          for (const question of candidates) {
+            const key = `${topic}::${question.prompt}`;
+            if (seen.has(key)) continue;
+            seen.add(key);
+            pool.push({
+              ...question,
+              reviewIndex: pool.length + 1,
+              source: soft ? 'review-queue-upcoming' : 'review-queue',
+              scheduleMode: soft ? 'upcoming-preview' : 'due-priority'
+            });
+            progress = true;
+            break;
           }
           if (pool.length >= LIFE_UK_REVIEW_QUEUE_QUESTION_COUNT) break;
         }
@@ -3158,9 +3267,12 @@
       return pool.slice(0, LIFE_UK_REVIEW_QUEUE_QUESTION_COUNT);
     }
 
-    function startLifeUKReviewQueueDrill() {
+    function startLifeUKReviewQueueDrill(options = {}) {
+      const soft = Boolean(options.soft);
+      const rows = lifeUKReviewQueueRows();
       const dueTopics = lifeUKReviewQueueDueTopics(LIFE_UK_REVIEW_QUEUE_QUESTION_COUNT);
-      const pool = lifeUKReviewQueuePool(dueTopics);
+      const focusTopics = dueTopics.length ? dueTopics : (soft ? lifeUKReviewQueueUpcomingTopics(LIFE_UK_REVIEW_QUEUE_QUESTION_COUNT) : []);
+      const pool = lifeUKReviewQueuePool(focusTopics, { soft: soft && !dueTopics.length });
       if (!pool.length) return;
       for (const key of Object.keys(lifeUKReviewQueueSelectedAnswers)) delete lifeUKReviewQueueSelectedAnswers[key];
       for (const key of Object.keys(lifeUKReviewQueueScores)) delete lifeUKReviewQueueScores[key];
@@ -3170,7 +3282,9 @@
         correct: 0,
         pool,
         focusTopics: Array.from(new Set(pool.map(q => q.topic))),
-        dueTopics,
+        dueTopics: dueTopics.slice(),
+        scheduleMode: dueTopics.length ? 'due-priority' : 'upcoming-preview',
+        scheduleSummary: lifeUKReviewQueueScheduleSummary(rows),
         finished: false
       };
       renderLifeUKReviewQueueDrill();
@@ -3267,10 +3381,14 @@
         correct,
         total,
         percent,
-        focus: 'Life in the UK spaced-repetition review queue',
+        focus: lifeUKReviewQueueState.scheduleMode === 'upcoming-preview'
+          ? 'Life in the UK upcoming-topic review preview'
+          : 'Life in the UK spaced-repetition review queue',
         subjects: { 'Life in the UK': { correct, total } },
         practiceMode: 'life-uk-review-queue',
-        difficultyMode: 'topic-spaced-repetition',
+        difficultyMode: lifeUKReviewQueueState.scheduleMode === 'upcoming-preview'
+          ? 'topic-spaced-repetition-upcoming'
+          : 'topic-spaced-repetition',
         activityType: 'life-uk-practice',
         attempted,
         passMark,
@@ -3278,6 +3396,7 @@
         skillResults,
         weakSkills,
         timedMock: false,
+        scheduleMode: lifeUKReviewQueueState.scheduleMode || 'due-priority',
         focusTopics: lifeUKReviewQueueState.focusTopics.slice(),
         dueTopics: lifeUKReviewQueueState.dueTopics.slice()
       };
@@ -3434,25 +3553,49 @@
         return;
       }
       const rows = lifeUKReviewQueueRows();
+      const summary = lifeUKReviewQueueScheduleSummary(rows);
       const dueRows = rows.filter(row => row.due);
       if (!rows.length) {
         area.innerHTML = '<div class="life-uk-review-queue-empty">Finish a starter mock or full timed mock to build your per-topic review queue.</div>';
         return;
       }
       const rowHtml = rows.slice(0, 8).map(row => {
-        const dueLabel = row.due ? 'Due now' : (row.dueAt ? `Due ${new Date(row.dueAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}` : 'Scheduled');
-        return `<div class="life-uk-review-queue-row"><span class="life-uk-review-queue-topic">${escapeHTML(row.topic)}</span><span class="life-uk-review-queue-meta ${row.due ? 'due' : ''}">${row.correct}/${row.attempted} · ${row.percent}% · ${dueLabel}</span></div>`;
+        return `<div class="life-uk-review-queue-row">
+            <div class="life-uk-review-queue-row-main">
+              <span class="life-uk-review-queue-topic">${escapeHTML(row.topic)}</span>
+              <span class="life-uk-review-queue-status-pill ${escapeHTML(row.status)}">${escapeHTML(row.statusLabel)}</span>
+            </div>
+            <div class="life-uk-review-queue-row-meta-stack">
+              <span class="life-uk-review-queue-meta ${row.due ? 'due' : ''}">${row.correct}/${row.attempted} · ${row.percent}%</span>
+              <span class="life-uk-review-queue-meta ${row.due ? 'due' : ''}">${escapeHTML(row.relativeDueLabel)} · every ${row.intervalDays}d</span>
+            </div>
+          </div>`;
       }).join('');
       const dueCount = dueRows.length;
-      const actionLabel = dueCount ? `📚 Start due-topic review (${dueCount} topic${dueCount === 1 ? '' : 's'})` : '📚 Review queue (nothing due yet)';
+      const primaryLabel = dueCount
+        ? `📚 Start due-topic review (${dueCount} topic${dueCount === 1 ? '' : 's'})`
+        : '📚 Review queue (nothing due yet)';
+      const softButton = dueCount
+        ? ''
+        : `<button class="btn btn-secondary life-uk-review-queue-upcoming" type="button" onclick="startLifeUKReviewQueueDrill({ soft: true })">👀 Preview next upcoming topics</button>`;
+      const nextLine = summary.nextTopic
+        ? `<div class="life-uk-review-queue-next">Priority now: <strong>${escapeHTML(summary.nextTopic)}</strong> · ${escapeHTML(summary.nextLabel || '')}</div>`
+        : '';
       area.innerHTML = `
         <div class="life-uk-review-queue">
           <div class="life-uk-review-queue-card">
-            <h4>📚 Review queue · topic spaced repetition</h4>
-            <div class="life-uk-drill-result-stat">Aggregates mastery across saved Life in the UK attempts and schedules the next review per topic.</div>
+            <h4>📚 Review queue · polished topic scheduling</h4>
+            <div class="life-uk-drill-result-stat">Ranks overdue, due-today, and weak topics first, then spaces strong topics with capped intervals.</div>
+            <div class="life-uk-review-queue-summary">
+              <span class="life-uk-review-queue-chip overdue">${summary.overdue} overdue</span>
+              <span class="life-uk-review-queue-chip due-today">${summary.dueToday} due/weak</span>
+              <span class="life-uk-review-queue-chip upcoming">${summary.upcoming} upcoming</span>
+            </div>
+            ${nextLine}
             <div>${rowHtml}</div>
             <div class="life-uk-review-queue-actions">
-              <button class="btn btn-secondary life-uk-review-queue-start" type="button" onclick="startLifeUKReviewQueueDrill()" ${dueCount ? '' : 'disabled'}>${actionLabel}</button>
+              <button class="btn btn-secondary life-uk-review-queue-start" type="button" onclick="startLifeUKReviewQueueDrill()" ${dueCount ? '' : 'disabled'}>${primaryLabel}</button>
+              ${softButton}
             </div>
           </div>
         </div>
@@ -3605,7 +3748,11 @@
         lifeUKReviewQueueRows: lifeUKReviewQueueRows(),
         lifeUKReviewQueueDueCount: lifeUKReviewQueueRows().filter(row => row.due).length,
         lifeUKReviewQueueDueTopics: lifeUKReviewQueueDueTopics(),
+        lifeUKReviewQueueUpcomingTopics: lifeUKReviewQueueUpcomingTopics(),
+        lifeUKReviewQueueScheduleSummary: lifeUKReviewQueueScheduleSummary(),
         lifeUKReviewQueueQuestionCount: LIFE_UK_REVIEW_QUEUE_QUESTION_COUNT,
+        lifeUKReviewQueueMaxIntervalDays: LIFE_UK_SR_MAX_INTERVAL_DAYS,
+        lifeUKReviewQueueScheduleVersion: 'polished-v1',
         lifeUKTopicSRKey: lifeUKTopicSRKey(),
         latestLifeUKReviewQueueProgress: history.find(item => item.activityType === 'life-uk-practice' && item.practiceMode === 'life-uk-review-queue') || null,
         matchingPracticeScores: { hkChinese: matchingPracticeScore('hkChinese', hkChineseFlashcards.length ? Math.min(4, hkChineseFlashcards.length) : 0), mandarin: matchingPracticeScore('mandarin', mandarinFlashcards.length ? Math.min(4, mandarinFlashcards.length) : 0) },

@@ -554,11 +554,16 @@ test('Life in the UK review queue aggregates mastery and drills due topics', asy
 
   await expect(page.locator('.life-uk-review-queue-card')).toBeVisible();
   await expect(page.locator('.life-uk-review-queue-card')).toContainText('Review queue');
+  await expect(page.locator('.life-uk-review-queue-card')).toContainText('polished topic scheduling');
+  await expect(page.locator('.life-uk-review-queue-summary')).toBeVisible();
   await expect(page.locator('.life-uk-review-queue-start')).toBeVisible();
 
   const stateBefore = await page.evaluate(() => window.__learningQuestTestState);
   expect(stateBefore.lifeUKReviewQueueDueCount).toBeGreaterThan(0);
   expect(stateBefore.lifeUKReviewQueueDueTopics.length).toBeGreaterThan(0);
+  expect(stateBefore.lifeUKReviewQueueScheduleSummary.dueCount).toBeGreaterThan(0);
+  expect(stateBefore.lifeUKReviewQueueScheduleVersion).toBe('polished-v1');
+  expect(stateBefore.lifeUKReviewQueueMaxIntervalDays).toBe(21);
 
   await page.locator('.life-uk-review-queue-start').tap();
   await expect(page.locator('#life-uk-review-queue-grid .life-uk-drill-card').first()).toBeVisible();
@@ -666,4 +671,120 @@ test('Life in the UK mock score trend chart renders from saved full mocks', asyn
   expect(state.lifeUKMockScoreTrendCount).toBe(3);
   expect(state.lifeUKMockScoreTrendRows[2].percent).toBeGreaterThanOrEqual(0);
   await expect(page.locator('#life-uk-mock-score-trend-area')).toContainText(/pts vs previous|unchanged vs previous|first saved full mock/);
+});
+
+test('Life in the UK review-queue schedule polish prioritises overdue and weak topics', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.lifeUKPackId === 'life-uk-v1',
+    null,
+    { timeout: 10000 }
+  );
+
+  await page.evaluate(() => {
+    const historyKey = 'learningquest-history-v1-learner-1';
+    const srKey = 'learningquest-life-uk-topic-sr-v1-learner-1';
+    const history = [
+      {
+        learner: 'learner-1',
+        date: 'Jul 20',
+        completedAt: '2026-07-20T10:00:00.000Z',
+        correct: 10,
+        total: 24,
+        percent: 42,
+        focus: 'Life in the UK full timed mock',
+        subjects: { 'Life in the UK': { correct: 10, total: 24 } },
+        practiceMode: 'life-uk-full-mock',
+        difficultyMode: 'timed-mock',
+        activityType: 'life-uk-practice',
+        attempted: 24,
+        passMark: 75,
+        passed: false,
+        skillResults: {
+          Government: { correct: 0, attempted: 2 },
+          History: { correct: 2, attempted: 2 },
+          Law: { correct: 1, attempted: 2 },
+          Parliament: { correct: 2, attempted: 2 }
+        },
+        weakSkills: ['Government', 'Law'],
+        timedMock: true,
+        timeExpired: false
+      }
+    ];
+    const now = Date.now();
+    const day = 24 * 60 * 60 * 1000;
+    const sr = {
+      Government: {
+        topic: 'Government',
+        easeFactor: 2.1,
+        intervalDays: 1,
+        repetitions: 0,
+        dueAt: new Date(now - 3 * day).toISOString(),
+        lastReviewedAt: new Date(now - 4 * day).toISOString(),
+        historyCorrect: 0,
+        historyAttempted: 2,
+        historyPercent: 0
+      },
+      History: {
+        topic: 'History',
+        easeFactor: 2.6,
+        intervalDays: 7,
+        repetitions: 2,
+        dueAt: new Date(now + 5 * day).toISOString(),
+        lastReviewedAt: new Date(now - 2 * day).toISOString(),
+        historyCorrect: 2,
+        historyAttempted: 2,
+        historyPercent: 100
+      },
+      Law: {
+        topic: 'Law',
+        easeFactor: 2.3,
+        intervalDays: 3,
+        repetitions: 1,
+        dueAt: new Date(now + 2 * day).toISOString(),
+        lastReviewedAt: new Date(now - 1 * day).toISOString(),
+        historyCorrect: 1,
+        historyAttempted: 2,
+        historyPercent: 50
+      },
+      Parliament: {
+        topic: 'Parliament',
+        easeFactor: 2.5,
+        intervalDays: 4,
+        repetitions: 2,
+        dueAt: new Date(now + 1 * day).toISOString(),
+        lastReviewedAt: new Date(now - 1 * day).toISOString(),
+        historyCorrect: 2,
+        historyAttempted: 2,
+        historyPercent: 100
+      }
+    };
+    localStorage.setItem(historyKey, JSON.stringify(history));
+    localStorage.setItem(srKey, JSON.stringify(sr));
+  });
+
+  await page.reload();
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.lifeUKReviewQueueScheduleVersion === 'polished-v1',
+    null,
+    { timeout: 10000 }
+  );
+
+  await expect(page.locator('.life-uk-review-queue-card')).toContainText('polished topic scheduling');
+  await expect(page.locator('.life-uk-review-queue-summary')).toContainText('overdue');
+  await expect(page.locator('.life-uk-review-queue-card')).toContainText('Priority now:');
+
+  const state = await page.evaluate(() => window.__learningQuestTestState);
+  expect(state.lifeUKReviewQueueDueTopics[0]).toBe('Government');
+  expect(state.lifeUKReviewQueueDueTopics).toContain('Law');
+  expect(state.lifeUKReviewQueueScheduleSummary.overdue).toBeGreaterThan(0);
+  expect(state.lifeUKReviewQueueScheduleSummary.dueCount).toBeGreaterThan(0);
+  expect(state.lifeUKReviewQueueRows[0].status).toMatch(/overdue|weak-forced|due-today/);
+  expect(state.lifeUKReviewQueueRows.some(row => row.topic === 'Government' && row.due)).toBeTruthy();
+
+  await page.locator('.life-uk-review-queue-start').tap();
+  await expect(page.locator('#life-uk-review-queue-grid .life-uk-drill-card').first()).toBeVisible();
+  await expect(page.locator('#life-uk-review-queue-grid')).toContainText('Government');
 });
