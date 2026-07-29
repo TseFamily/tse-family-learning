@@ -97,7 +97,7 @@ test('mobile app shell opens without horizontal overflow and mission onboarding 
   expect(state.mandarinPackId).toBe('mandarin-basics-v1');
   expect(state.mathsFoundationPackId).toBe('maths-foundation-v1');
   expect(state.lifeUKPackId).toBe('life-uk-v1');
-  expect(state.lifeUKQuestionCount).toBe(60);
+  expect(state.lifeUKQuestionCount).toBe(72);
   expect(state.lifeUKPracticeCount).toBe(6);
   expect(state.lifeUKPassMark).toBe(75);
   expect(state.lifeUKTopics).toEqual(expect.arrayContaining(['Government', 'Parliament', 'Law']));
@@ -445,7 +445,7 @@ test('Life in the UK full timed mock renders, scores answers, and records progre
 
   const state = await page.evaluate(() => window.__learningQuestTestState);
   expect(state.lifeUKFullMockReady).toBe(true);
-  expect(state.lifeUKFullMockAvailableQuestions).toBe(60);
+  expect(state.lifeUKFullMockAvailableQuestions).toBe(72);
   expect(state.lifeUKFullMockSelectedQuestions).toBe(24);
   expect(state.lifeUKFullMockQuestionCount).toBe(24);
   expect(state.lifeUKFullMockTimeLimitSeconds).toBe(45 * 60);
@@ -516,7 +516,7 @@ test('Life in the UK adaptive weak-topic drill pulls from full-mock weak skills 
   expect(state.lifeUKDrillQuestionCount).toBe(6);
   expect(state.lifeUKDrillPoolSize).toBeGreaterThan(0);
   expect(state.lifeUKDrillPoolSize).toBeLessThanOrEqual(6);
-  expect(state.lifeUKDrillSourcePoolCount).toBe(60);
+  expect(state.lifeUKDrillSourcePoolCount).toBe(72);
   expect(state.lifeUKDrillSources).toEqual(expect.arrayContaining(['Full-mock review']));
   expect(state.latestLifeUKDrillProgress).toMatchObject({
     activityType: 'life-uk-practice',
@@ -788,3 +788,45 @@ test('Life in the UK review-queue schedule polish prioritises overdue and weak t
   await expect(page.locator('#life-uk-review-queue-grid .life-uk-drill-card').first()).toBeVisible();
   await expect(page.locator('#life-uk-review-queue-grid')).toContainText('Government');
 });
+
+test('Life in the UK scenario-style practice renders situations, scores answers, and persists progress', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.lifeUKPackId === 'life-uk-v1',
+    null,
+    { timeout: 10000 }
+  );
+
+  const before = await page.evaluate(() => window.__learningQuestTestState);
+  expect(before.lifeUKScenarioAvailableCount).toBeGreaterThanOrEqual(12);
+  expect(before.lifeUKScenarioQuestionCount).toBe(6);
+
+  await expect(page.locator('#life-uk-scenario-actions .life-uk-scenario-start')).toBeVisible();
+  await page.locator('.life-uk-scenario-start').tap();
+  await expect(page.locator('#life-uk-scenario-grid .life-uk-scenario-card').first()).toBeVisible();
+  await expect(page.locator('#life-uk-scenario-grid .life-uk-scenario-story').first()).toBeVisible();
+
+  const cards = page.locator('#life-uk-scenario-grid .life-uk-scenario-card');
+  const count = await cards.count();
+  expect(count).toBe(6);
+
+  for (let i = 0; i < count; i += 1) {
+    const card = cards.nth(i);
+    const buttons = card.locator('button.life-uk-option');
+    await buttons.first().tap();
+  }
+
+  await expect(page.locator('.life-uk-scenario-result')).toBeVisible();
+  await expect(page.locator('.life-uk-scenario-result')).toContainText('Scenario practice complete');
+
+  const state = await page.evaluate(() => window.__learningQuestTestState);
+  expect(state.lifeUKScenarioState?.finished).toBeTruthy();
+  expect(state.latestLifeUKScenarioProgress?.practiceMode).toBe('life-uk-scenario-practice');
+  expect(state.latestLifeUKScenarioProgress?.activityType).toBe('life-uk-practice');
+  expect(state.latestLifeUKScenarioProgress?.scenarioStyle).toBeTruthy();
+  expect(state.latestLifeUKScenarioProgress?.total).toBe(6);
+  expect(Object.keys(state.latestLifeUKScenarioProgress?.skillResults || {}).length).toBeGreaterThan(0);
+});
+
