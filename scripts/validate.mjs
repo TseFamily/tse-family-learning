@@ -97,6 +97,14 @@ function validateLifeUKPackFile(path, expectedId, fields, label) {
     throw new Error(`${label} explanations must teach the fact (min 70 chars): ${shortExplanations.slice(0, 5).map(item => `#${item.index} ${item.topic} (${item.length})`).join(', ')}`);
   }
   if (!pack.activity || !pack.activity.includes('richer explanations')) throw new Error(`${label} pack metadata must advertise richer explanations`);
+  if (!pack.activity || !pack.activity.includes('scenario-style practice')) throw new Error(`${label} pack metadata must advertise scenario-style practice`);
+  if (!pack.progressionSteps.includes('Practise real-life citizenship scenarios drawn from everyday UK situations')) throw new Error(`${label} pack missing scenario-style progression step`);
+  const scenarioQuestions = pack.questions.filter(question => question && (question.style === 'scenario' || question.scenario));
+  if (scenarioQuestions.length < 12) throw new Error(`${label} pack needs at least 12 scenario-style questions`);
+  for (const [i, question] of scenarioQuestions.entries()) {
+    if (!question.scenario || String(question.scenario).trim().length < 24) throw new Error(`${label} scenario question ${i + 1} needs a situation stem`);
+    if (question.style && question.style !== 'scenario') throw new Error(`${label} scenario question ${i + 1} has unexpected style`);
+  }
   return pack;
 }
 
@@ -148,6 +156,8 @@ for (const [id, path, fields] of [
     if (!registered.progressionSteps.includes('Track full-mock score trends toward the 75% pass target')) throw new Error('Content pack registry life-uk-v1 missing mock score trend progression step');
     if (!registered.activity.includes('richer explanations')) throw new Error('Content pack registry life-uk-v1 missing richer explanations activity');
     if (!registered.progressionSteps.includes('Study clearer explanations after each answer to lock in citizenship facts')) throw new Error('Content pack registry life-uk-v1 missing clearer-explanations progression step');
+    if (!registered.activity.includes('scenario-style practice')) throw new Error('Content pack registry life-uk-v1 missing scenario-style practice activity');
+    if (!registered.progressionSteps.includes('Practise real-life citizenship scenarios drawn from everyday UK situations')) throw new Error('Content pack registry life-uk-v1 missing scenario-style progression step');
   } else {
     if (!registered.activity.includes('matching')) throw new Error(`Content pack registry ${id} missing matching activity`);
     if (!registered.activity.includes('comparison')) throw new Error(`Content pack registry ${id} missing comparison activity`);
@@ -334,7 +344,25 @@ for (const marker of [
   'LIFE_UK_MOCK_SCORE_TREND_LIMIT',
   'mock score trend chart',
   'Mock score trend',
-  'Track full-mock score trends toward the 75% pass target'
+  'Track full-mock score trends toward the 75% pass target',
+  'scenario-style practice',
+  'life-uk-scenario-area',
+  'life-uk-scenario-actions',
+  'life-uk-scenario-start',
+  'life-uk-scenario-grid',
+  'life-uk-scenario-card',
+  'life-uk-scenario-story',
+  'startLifeUKScenarioPractice',
+  'renderLifeUKScenarioPractice',
+  'recordLifeUKScenarioAnswer',
+  'finishLifeUKScenarioPractice',
+  'saveLifeUKScenarioProgress',
+  'lifeUKScenarioQuestions',
+  'lifeUKScenarioState',
+  'LIFE_UK_SCENARIO_QUESTION_COUNT',
+  'life-uk-scenario-practice',
+  'Practise real-life citizenship scenarios drawn from everyday UK situations',
+  'Start scenario-style practice'
 ]) {
   if (!html.includes(marker)) throw new Error(`Missing runtime HK Chinese content-pack marker: ${marker}`);
 }

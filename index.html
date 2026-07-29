@@ -466,6 +466,18 @@
     .life-uk-review-queue-row-main { display: grid; gap: 2px; min-width: 0; }
     .life-uk-review-queue-row-meta-stack { display: grid; gap: 2px; justify-items: end; text-align: right; }
     .life-uk-review-queue-next { font-size: 0.8rem; color: #1e40af; font-weight: 800; line-height: 1.35; }
+    .life-uk-scenario-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0 6px; }
+    .life-uk-scenario-start { font-size: 0.92rem; }
+    .life-uk-scenario-area { margin-top: 8px; display: grid; gap: 12px; }
+    .life-uk-scenario-status { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: #f5f3ff; border: 1px solid #c4b5fd; border-radius: 12px; padding: 8px 12px; font-size: 0.85rem; font-weight: 800; color: #5b21b6; }
+    .life-uk-scenario-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+    .life-uk-scenario-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .life-uk-scenario-card { border: 1px solid #c4b5fd; background: linear-gradient(180deg, #f5f3ff, #fff); border-radius: 16px; padding: 12px; display: grid; gap: 8px; align-content: start; }
+    .life-uk-scenario-story { border-left: 3px solid #8b5cf6; padding-left: 10px; color: #5b21b6; font-size: 0.86rem; font-weight: 700; line-height: 1.35; background: #faf5ff; border-radius: 0 10px 10px 0; padding-top: 6px; padding-bottom: 6px; padding-right: 8px; }
+    .life-uk-scenario-result { border: 1px solid #c4b5fd; background: #faf5ff; border-radius: 16px; padding: 14px; display: grid; gap: 8px; }
+    .life-uk-scenario-result h4 { margin: 0; color: #5b21b6; font-size: 1.05rem; }
+    .life-uk-scenario-result-stat { font-size: 0.85rem; color: #6d28d9; font-weight: 800; }
+    .life-uk-scenario-empty { border: 1px dashed #c4b5fd; background: #faf5ff; border-radius: 12px; padding: 14px; color: #6d28d9; font-size: 0.88rem; font-weight: 800; line-height: 1.4; }
     .life-uk-mock-score-trend { margin-top: 8px; display: grid; gap: 10px; }
     .life-uk-mock-score-trend-card { border: 1px solid #93c5fd; background: linear-gradient(180deg, #eff6ff, #fff); border-radius: 14px; padding: 12px; display: grid; gap: 10px; }
     .life-uk-mock-score-trend-card h4 { margin: 0; color: #1e3a8a; font-size: 0.98rem; }
@@ -560,7 +572,7 @@
       .question-text { font-size: 1.1rem; }
       .option { padding: 13px 14px; font-size: 0.97rem; }
       .stats-grid, .badge-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .domain-grid, .curriculum-grid, .mission-metrics, .flashcard-grid, .matching-grid, .comparison-grid, .comparison-forms, .maths-grid, .life-uk-grid, .life-uk-drill-grid { grid-template-columns: 1fr; }
+      .domain-grid, .curriculum-grid, .mission-metrics, .flashcard-grid, .matching-grid, .comparison-grid, .comparison-forms, .maths-grid, .life-uk-grid, .life-uk-drill-grid, .life-uk-scenario-grid { grid-template-columns: 1fr; }
       .family-row, .leaderboard-row { grid-template-columns: 1fr; text-align: left; }
       .family-stat, .family-focus, .family-action, .leaderboard-score { text-align: left; justify-items: start; }
     }
@@ -664,7 +676,7 @@
       .section-card.wide { grid-column: 1 / -1; }
       .domain-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .curriculum-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .flashcard-grid, .matching-grid, .comparison-grid, .maths-grid, .life-uk-grid, .life-uk-drill-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .flashcard-grid, .matching-grid, .comparison-grid, .maths-grid, .life-uk-grid, .life-uk-drill-grid, .life-uk-scenario-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .start-cta-sticky { bottom: 20px; max-width: 420px; margin-left: auto; }
     }
     @media (min-width: 1080px) {
@@ -981,7 +993,7 @@
             <div class="matching-panel" id="mandarin-matching-panel"><h3>🔗 Simplified Mandarin matching practice</h3><p>Match Simplified characters to English meaning, then compare Pinyin and Traditional forms.</p><div class="matching-grid" id="mandarin-matching-grid"></div></div>
             <div class="comparison-panel" id="comparison-panel"><h3>🪞 Traditional/Simplified comparison drill</h3><p>Compare shared meanings across the runtime HK Chinese and Mandarin packs before moving into audio prompts.</p><div class="comparison-grid" id="comparison-grid"></div></div>
             <div class="maths-panel" id="maths-foundation-panel"><h3>🧮 Maths Foundation practice cards</h3><p>Number bonds, place value, skip counting, and times-table prompts are runtime-loaded from the content-pack registry.</p><div class="maths-grid" id="maths-foundation-grid"></div></div>
-            <div class="life-uk-panel" id="life-uk-panel"><h3>🇬🇧 Life in the UK starter mock</h3><p>Expanded citizenship questions with richer explanations are runtime-loaded from the content-pack registry, with a 75% pass target, a shuffled 24-question full timed mock, weak-topic review, a spaced-repetition review queue with polished due/overdue scheduling, and a mock score trend chart.</p><div class="life-uk-mock-actions" id="life-uk-mock-actions"><button class="btn btn-secondary life-uk-mock-start" type="button" onclick="startLifeUKFullMock()">⏱️ Start 24-question full mock (45 min)</button></div><div class="life-uk-mock-area" id="life-uk-mock-area"></div><div class="life-uk-mock-score-trend-area" id="life-uk-mock-score-trend-area"></div><div class="life-uk-drill-actions" id="life-uk-drill-actions"></div><div class="life-uk-drill-area" id="life-uk-drill-area"></div><div class="life-uk-review-queue-area" id="life-uk-review-queue-area"></div><div class="life-uk-grid" id="life-uk-grid"></div></div>
+            <div class="life-uk-panel" id="life-uk-panel"><h3>🇬🇧 Life in the UK starter mock</h3><p>Expanded citizenship questions with richer explanations are runtime-loaded from the content-pack registry, with a 75% pass target, a shuffled 24-question full timed mock, weak-topic review, a spaced-repetition review queue with polished due/overdue scheduling, a mock score trend chart, and scenario-style practice for everyday UK situations.</p><div class="life-uk-mock-actions" id="life-uk-mock-actions"><button class="btn btn-secondary life-uk-mock-start" type="button" onclick="startLifeUKFullMock()">⏱️ Start 24-question full mock (45 min)</button></div><div class="life-uk-mock-area" id="life-uk-mock-area"></div><div class="life-uk-mock-score-trend-area" id="life-uk-mock-score-trend-area"></div><div class="life-uk-drill-actions" id="life-uk-drill-actions"></div><div class="life-uk-drill-area" id="life-uk-drill-area"></div><div class="life-uk-review-queue-area" id="life-uk-review-queue-area"></div><div class="life-uk-scenario-actions" id="life-uk-scenario-actions"><button class="btn btn-secondary life-uk-scenario-start" type="button" onclick="startLifeUKScenarioPractice()">🎭 Start scenario-style practice</button></div><div class="life-uk-scenario-area" id="life-uk-scenario-area"></div><div class="life-uk-grid" id="life-uk-grid"></div></div>
           </article>
 
           <article class="section-card rail" id="progress">
@@ -1094,7 +1106,7 @@
       { id: 'hk-chinese-basics-v1', path: 'content-packs/hk-chinese-basics.json', kind: 'flashcards', title: 'Traditional HK Chinese basics', domain: 'Chinese · Traditional HK', language: '繁體中文 + Cantonese', learners: 'All learners', activity: 'Flashcards + matching + comparison + audio prompts + listen/repeat', readiness: 'Live slice', next: 'Expand family words into colours, numbers, greetings, Jyutping, comparison drills, and audio prompts.', schema: ['traditional', 'jyutping', 'canto', 'english', 'prompt'], renderTarget: 'flashcard-grid', recommendedStages: ['early', 'primary', 'adult'], recommendedGoals: ['confidence', 'language', 'mastery'], progressionSteps: ['Start with family words and greetings', 'Practise colours, numbers, and Jyutping recall', 'Move into matching practice, comparison drills, audio prompts, and short household phrases'] },
       { id: 'mandarin-basics-v1', path: 'content-packs/mandarin-basics.json', kind: 'flashcards', title: 'Simplified Mandarin basics', domain: 'Chinese · Simplified Mandarin', language: '简体中文 + Pinyin', learners: 'All learners', activity: 'Flashcards + matching + comparison + audio prompts + listen/repeat', readiness: 'Live slice', next: 'Expand into matching practice, audio prompts, and Traditional/Simplified comparison drills.', schema: ['simplified', 'traditional', 'pinyin', 'english', 'prompt'], renderTarget: 'mandarin-flashcard-grid', recommendedStages: ['early', 'primary', 'adult'], recommendedGoals: ['language', 'confidence', 'mastery'], progressionSteps: ['Start with greetings and core family words', 'Compare Simplified, Traditional, and Pinyin forms', 'Use matching practice and comparison drills, then try audio prompts'] },
       { id: 'maths-foundation-v1', path: 'content-packs/maths-foundation.json', kind: 'practice-cards', title: 'Maths Foundation practice', domain: 'Maths Foundation', language: 'English', learners: 'Early and primary learners', activity: 'Practice cards + Number-line models + Adaptive answer entry + weak-skill rotation + mental maths + confidence drills', readiness: 'Live slice', next: 'Add adaptive number-line hints for more operations and learner-specific mixed review.', schema: ['topic', 'skill', 'prompt', 'answer', 'strategy'], renderTarget: 'maths-foundation-grid', recommendedStages: ['early', 'primary'], recommendedGoals: ['confidence', 'mastery'], progressionSteps: ['Start with number bonds to 10 and 20', 'Practise place value and skip counting', 'Move into times tables, fractions, and short word problems', 'Type answers and unlock strategy feedback', 'Review weak skills first with number-line support'] },
-      { id: 'life-uk-v1', path: 'content-packs/life-uk.json', kind: 'mock-questions', title: 'Life in the UK starter mock', domain: 'Life in the UK', language: 'English', learners: 'Adult learners', activity: 'Practice questions + expanded question bank + richer explanations + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill + topic spaced repetition review queue + polished review-queue scheduling + mock score trend chart', readiness: 'Live slice', next: 'Add more Life in the UK scenario-style practice.', schema: ['topic', 'prompt', 'options', 'answer', 'explanation'], renderTarget: 'life-uk-grid', recommendedStages: ['adult'], recommendedGoals: ['exam-ready', 'mastery'], progressionSteps: ['Start with civic basics and everyday UK facts', 'Study clearer explanations after each answer to lock in citizenship facts', 'Practise weak citizenship topics from saved attempts', 'Build toward a 24-question, 45-minute mock test from an expanded bank', 'Run adaptive weak-topic drills from saved mock review data', 'Use the review queue to revisit due citizenship topics from saved mastery', 'Follow polished due/overdue review-queue scheduling for citizenship topics', 'Track full-mock score trends toward the 75% pass target'] }
+      { id: 'life-uk-v1', path: 'content-packs/life-uk.json', kind: 'mock-questions', title: 'Life in the UK starter mock', domain: 'Life in the UK', language: 'English', learners: 'Adult learners', activity: 'Practice questions + expanded question bank + richer explanations + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill + topic spaced repetition review queue + polished review-queue scheduling + mock score trend chart + scenario-style practice', readiness: 'Live slice', next: 'Add more Life in the UK audio or mixed revision packs.', schema: ['topic', 'prompt', 'options', 'answer', 'explanation'], renderTarget: 'life-uk-grid', recommendedStages: ['adult'], recommendedGoals: ['exam-ready', 'mastery'], progressionSteps: ['Start with civic basics and everyday UK facts', 'Study clearer explanations after each answer to lock in citizenship facts', 'Practise weak citizenship topics from saved attempts', 'Build toward a 24-question, 45-minute mock test from an expanded bank', 'Run adaptive weak-topic drills from saved mock review data', 'Use the review queue to revisit due citizenship topics from saved mastery', 'Follow polished due/overdue review-queue scheduling for citizenship topics', 'Track full-mock score trends toward the 75% pass target', 'Practise real-life citizenship scenarios drawn from everyday UK situations'] }
     ];
     let contentPackRegistry = [...FALLBACK_CONTENT_PACK_REGISTRY];
     let contentPackRegistryError = null;
@@ -1120,6 +1132,10 @@
     const lifeUKDrillScores = {};
     let lifeUKDrillState = null;
     let lifeUKReviewQueueState = null;
+    let lifeUKScenarioState = null;
+    const lifeUKScenarioSelectedAnswers = {};
+    const lifeUKScenarioScores = {};
+    const LIFE_UK_SCENARIO_QUESTION_COUNT = 6;
     const lifeUKReviewQueueSelectedAnswers = {};
     const lifeUKReviewQueueScores = {};
     const LIFE_UK_DRILL_QUESTION_COUNT = 6;
@@ -1980,6 +1996,7 @@
       renderLifeUKDrill();
       renderLifeUKReviewQueue();
       renderLifeUKMockScoreTrend();
+      renderLifeUKScenarioPractice();
       updateRecommendedCurriculumTestState();
     }
 
@@ -3755,6 +3772,11 @@
         lifeUKReviewQueueScheduleVersion: 'polished-v1',
         lifeUKTopicSRKey: lifeUKTopicSRKey(),
         latestLifeUKReviewQueueProgress: history.find(item => item.activityType === 'life-uk-practice' && item.practiceMode === 'life-uk-review-queue') || null,
+        lifeUKScenarioQuestionCount: LIFE_UK_SCENARIO_QUESTION_COUNT,
+        lifeUKScenarioAvailableCount: lifeUKQuestions.filter(question => question && (question.style === 'scenario' || question.scenario)).length,
+        lifeUKScenarioState: lifeUKScenarioState ? { total: lifeUKScenarioState.total, answered: lifeUKScenarioState.answered, correct: lifeUKScenarioState.correct, finished: lifeUKScenarioState.finished, focusTopics: lifeUKScenarioState.focusTopics.slice() } : null,
+        lifeUKScenarioPoolSize: lifeUKScenarioState ? lifeUKScenarioState.pool.length : 0,
+        latestLifeUKScenarioProgress: history.find(item => item.activityType === 'life-uk-practice' && item.practiceMode === 'life-uk-scenario-practice') || null,
         matchingPracticeScores: { hkChinese: matchingPracticeScore('hkChinese', hkChineseFlashcards.length ? Math.min(4, hkChineseFlashcards.length) : 0), mandarin: matchingPracticeScore('mandarin', mandarinFlashcards.length ? Math.min(4, mandarinFlashcards.length) : 0) },
         mathsFoundationPracticeScores: mathsFoundationPracticeScore(mathsPracticeCards.length || MATHS_FOUNDATION_PRACTICE_LIMIT),
         comparisonDrillPairs: comparisonDrillCards().map(card => ({ traditional: card.traditional, simplified: card.simplified, english: card.english, changed: card.changed })),
@@ -3808,6 +3830,223 @@
         `;
       }).join('');
       updateRecommendedCurriculumTestState();
+    }
+
+
+    function lifeUKScenarioQuestions(sourceQuestions = lifeUKQuestions) {
+      const scenarios = sourceQuestions.filter(question => question && (question.style === 'scenario' || question.scenario));
+      const pool = scenarios.length ? scenarios : sourceQuestions;
+      return lifeUKShuffledQuestions(pool).slice(0, LIFE_UK_SCENARIO_QUESTION_COUNT).map((question, index) => ({
+        ...question,
+        scenarioIndex: index + 1,
+        scenario: question.scenario || `Imagine this real-life UK situation about ${question.topic}.`
+      }));
+    }
+
+    function startLifeUKScenarioPractice() {
+      const pool = lifeUKScenarioQuestions();
+      if (!pool.length) return;
+      for (const key of Object.keys(lifeUKScenarioSelectedAnswers)) delete lifeUKScenarioSelectedAnswers[key];
+      for (const key of Object.keys(lifeUKScenarioScores)) delete lifeUKScenarioScores[key];
+      const focusTopics = Array.from(new Set(pool.map(question => question.topic)));
+      lifeUKScenarioState = {
+        total: pool.length,
+        answered: 0,
+        correct: 0,
+        pool,
+        focusTopics,
+        finished: false
+      };
+      renderLifeUKScenarioPractice();
+      const area = document.getElementById('life-uk-scenario-area');
+      if (area) area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function cancelLifeUKScenarioPractice() {
+      lifeUKScenarioState = null;
+      for (const key of Object.keys(lifeUKScenarioSelectedAnswers)) delete lifeUKScenarioSelectedAnswers[key];
+      for (const key of Object.keys(lifeUKScenarioScores)) delete lifeUKScenarioScores[key];
+      const area = document.getElementById('life-uk-scenario-area');
+      if (area) area.innerHTML = '';
+      updateRecommendedCurriculumTestState(null, null, null);
+    }
+
+    function recordLifeUKScenarioAnswer(questionIndex, answerIndex) {
+      if (!lifeUKScenarioState || lifeUKScenarioState.finished) return;
+      const question = lifeUKScenarioState.pool.find(item => item.scenarioIndex === Number(questionIndex));
+      if (!question) return;
+      const alreadyAnswered = lifeUKScenarioSelectedAnswers[question.scenarioIndex] !== undefined;
+      lifeUKScenarioSelectedAnswers[question.scenarioIndex] = Number(answerIndex);
+      const correct = Number(answerIndex) === Number(question.answer);
+      lifeUKScenarioScores[question.scenarioIndex] = correct;
+      if (!alreadyAnswered) {
+        lifeUKScenarioState.answered += 1;
+        if (correct) lifeUKScenarioState.correct += 1;
+      } else {
+        lifeUKScenarioState.correct = lifeUKScenarioState.pool.filter(item => lifeUKScenarioScores[item.scenarioIndex] === true).length;
+      }
+      const grid = document.getElementById('life-uk-scenario-grid');
+      if (grid) {
+        grid.innerHTML = lifeUKScenarioState.pool.map(item => lifeUKScenarioCardHtml(item)).join('');
+      }
+      renderLifeUKScenarioStatus();
+      if (lifeUKScenarioState.answered >= lifeUKScenarioState.total) {
+        finishLifeUKScenarioPractice();
+      }
+    }
+
+    function finishLifeUKScenarioPractice() {
+      if (!lifeUKScenarioState || lifeUKScenarioState.finished) return;
+      lifeUKScenarioState.finished = true;
+      const saved = saveLifeUKScenarioProgress();
+      lifeUKScenarioState.result = saved;
+      renderLifeUKScenarioPractice();
+      updateRecommendedCurriculumTestState(null, null, saved);
+    }
+
+    function saveLifeUKScenarioProgress() {
+      if (!lifeUKScenarioState) return null;
+      const total = lifeUKScenarioState.total;
+      const correct = lifeUKScenarioState.correct;
+      const attempted = lifeUKScenarioState.answered;
+      const percent = total ? Math.round((correct / total) * 100) : 0;
+      const passMark = Number(lifeUKPack?.mock?.passMarkPercent || 75);
+      const skillResults = {};
+      for (const question of lifeUKScenarioState.pool) {
+        const ans = lifeUKScenarioSelectedAnswers[question.scenarioIndex];
+        if (ans === undefined) continue;
+        skillResults[question.topic] = skillResults[question.topic] || { correct: 0, attempted: 0 };
+        skillResults[question.topic].attempted += 1;
+        if (Number(ans) === Number(question.answer)) skillResults[question.topic].correct += 1;
+      }
+      const weakSkills = Object.entries(skillResults)
+        .filter(([, r]) => r.attempted && r.correct < r.attempted)
+        .map(([topic]) => topic);
+      const learner = activeLearner();
+      const entry = {
+        learner: learner.id,
+        date: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+        completedAt: new Date().toISOString(),
+        correct,
+        total,
+        percent,
+        focus: 'Life in the UK scenario-style practice',
+        subjects: { 'Life in the UK': { correct, total } },
+        practiceMode: 'life-uk-scenario-practice',
+        difficultyMode: 'scenario-style',
+        activityType: 'life-uk-practice',
+        attempted,
+        passMark,
+        passed: attempted >= total && percent >= passMark,
+        skillResults,
+        weakSkills,
+        timedMock: false,
+        scenarioStyle: true,
+        focusTopics: lifeUKScenarioState.focusTopics.slice()
+      };
+      const history = upsertHistoryEntry(entry, item => item.activityType === 'life-uk-practice' && item.practiceMode === 'life-uk-scenario-practice');
+      renderHistory(history);
+      lifeUKSyncTopicSRFromSkillResults(entry.skillResults, entry.completedAt);
+      renderLifeUKReviewQueue();
+      return entry;
+    }
+
+    function lifeUKScenarioCardHtml(question) {
+      const selectedAnswer = lifeUKScenarioSelectedAnswers[question.scenarioIndex];
+      const answered = selectedAnswer !== undefined;
+      const story = question.scenario || `Imagine this real-life UK situation about ${question.topic}.`;
+      return `
+        <article class="life-uk-scenario-card" data-life-uk-scenario-question-index="${question.scenarioIndex}">
+          <div class="life-uk-topic">${escapeHTML(question.topic)} · Scenario</div>
+          <div class="life-uk-scenario-story">${escapeHTML(story)}</div>
+          <div class="life-uk-question">${escapeHTML(question.prompt)}</div>
+          <div class="life-uk-options">
+            ${question.options.map((option, optionIndex) => {
+              const selected = answered && optionIndex === Number(selectedAnswer);
+              const correct = answered && optionIndex === Number(question.answer);
+              const wrong = selected && !correct;
+              return `<button class="life-uk-option ${correct ? 'correct' : ''} ${wrong ? 'incorrect' : ''}" type="button" onclick="recordLifeUKScenarioAnswer(${question.scenarioIndex}, ${optionIndex})" ${answered ? 'disabled' : ''}>${escapeHTML(option)}</button>`;
+            }).join('')}
+          </div>
+          <div class="life-uk-feedback ${answered && Number(selectedAnswer) !== Number(question.answer) ? 'incorrect' : ''}">${answered ? (Number(selectedAnswer) === Number(question.answer) ? '✅ Correct — scenario banked.' : 'Review the explanation — scenario practice flags this topic.') : 'Read the situation, then pick the best answer.'}</div>
+          <div class="life-uk-explanation">${answered ? `Explanation: ${escapeHTML(question.explanation)}` : 'Explanation unlocks after you answer.'}</div>
+        </article>
+      `;
+    }
+
+    function renderLifeUKScenarioStatus() {
+      if (!lifeUKScenarioState || lifeUKScenarioState.finished) return;
+      const area = document.getElementById('life-uk-scenario-area');
+      if (!area) return;
+      const status = area.querySelector('.life-uk-scenario-status');
+      if (!status) return;
+      const spans = status.querySelectorAll('span:not(.life-uk-scenario-controls)');
+      if (spans[0]) spans[0].textContent = `Scenario Q${lifeUKScenarioState.answered}/${lifeUKScenarioState.total}`;
+      if (spans[1]) spans[1].textContent = `Correct ${lifeUKScenarioState.correct}`;
+      if (spans[2]) spans[2].textContent = `Topics: ${lifeUKScenarioState.focusTopics.join(', ')}`;
+    }
+
+    function renderLifeUKScenarioPractice() {
+      const area = document.getElementById('life-uk-scenario-area');
+      if (!area) return;
+      if (!lifeUKQuestions.length) {
+        area.innerHTML = `
+          <div class="life-uk-scenario-empty">${lifeUKPackError ? 'Scenario practice is unavailable while the pack recovers.' : 'Loading scenario-style citizenship practice…'}</div>`;
+        return;
+      }
+      if (!lifeUKScenarioState) {
+        const available = lifeUKQuestions.filter(question => question && (question.style === 'scenario' || question.scenario)).length;
+        area.innerHTML = `
+          <div class="life-uk-scenario-empty">Scenario-style practice turns civic facts into everyday UK situations${available ? ` · ${available} scenario prompts ready` : ''}.</div>`;
+        updateRecommendedCurriculumTestState(null, null, null);
+        return;
+      }
+      if (!lifeUKScenarioState.finished) {
+        area.innerHTML = `
+          <div class="life-uk-scenario-status">
+            <span>Scenario Q${lifeUKScenarioState.answered}/${lifeUKScenarioState.total}</span>
+            <span>Correct ${lifeUKScenarioState.correct}</span>
+            <span>Topics: ${escapeHTML(lifeUKScenarioState.focusTopics.join(', '))}</span>
+            <span class="life-uk-scenario-controls">
+              <button class="btn btn-secondary" type="button" onclick="cancelLifeUKScenarioPractice()">Cancel scenarios</button>
+            </span>
+          </div>
+          <div class="life-uk-scenario-grid" id="life-uk-scenario-grid">
+            ${lifeUKScenarioState.pool.map(question => lifeUKScenarioCardHtml(question)).join('')}
+          </div>
+        `;
+        updateRecommendedCurriculumTestState(null, null, null);
+        return;
+      }
+      const result = lifeUKScenarioState.result || {};
+      const passMark = Number(result.passMark || lifeUKPack?.mock?.passMarkPercent || 75);
+      const passed = Boolean(result.passed);
+      const reviewList = lifeUKScenarioState.pool.map(question => {
+        const selected = lifeUKScenarioSelectedAnswers[question.scenarioIndex];
+        const correct = Number(selected) === Number(question.answer);
+        return `
+          <div class="life-uk-mock-review-item ${correct ? '' : 'life-uk-mock-review-incorrect'}">
+            <div class="life-uk-mock-review-q">${escapeHTML(question.topic)} · ${escapeHTML(question.prompt)}</div>
+            <div class="life-uk-scenario-story">${escapeHTML(question.scenario || '')}</div>
+            <div class="life-uk-mock-review-ans">${correct ? '✅' : '❌'} Your answer: ${selected === undefined ? '—' : escapeHTML(question.options[selected])} · Correct: ${escapeHTML(question.options[question.answer])}</div>
+            <div class="life-uk-explanation">Explanation: ${escapeHTML(question.explanation)}</div>
+          </div>
+        `;
+      }).join('');
+      area.innerHTML = `
+        <div class="life-uk-scenario-result">
+          <h4>🎭 Scenario practice complete</h4>
+          <div class="life-uk-scenario-result-stat ${passed ? 'life-uk-mock-result-pass' : 'life-uk-mock-result-fail'}">${result.correct || 0}/${result.total || lifeUKScenarioState.total} correct · ${result.percent || 0}% · ${passMark}% pass target · ${passed ? 'Passed' : 'Keep practising'}</div>
+          <div class="life-uk-scenario-result-stat">Topics: ${escapeHTML((result.focusTopics || lifeUKScenarioState.focusTopics || []).join(', ') || '—')}</div>
+          ${lifeUKTopicBreakdownHtml(result.skillResults || {})}
+          <div class="life-uk-mock-review">${reviewList}</div>
+          <div class="life-uk-scenario-controls">
+            <button class="btn btn-secondary" type="button" onclick="startLifeUKScenarioPractice()">Restart scenarios</button>
+            <button class="btn btn-secondary" type="button" onclick="cancelLifeUKScenarioPractice()">Close</button>
+          </div>
+        </div>
+      `;
+      updateRecommendedCurriculumTestState(null, null, result);
     }
 
     function renderLifeUKPractice() {
@@ -4056,6 +4295,7 @@
         renderLifeUKDrill();
         renderLifeUKReviewQueue();
         renderLifeUKMockScoreTrend();
+        renderLifeUKScenarioPractice();
         updateRecommendedCurriculumTestState();
       }
     }
@@ -4200,6 +4440,7 @@
     renderLifeUKDrill();
     renderLifeUKReviewQueue();
     renderLifeUKMockScoreTrend();
+    renderLifeUKScenarioPractice();
     loadContentPackRegistry()
       .then(() => Promise.all([
         fetch('questions.json?v=' + Date.now()).then(r => r.json()),

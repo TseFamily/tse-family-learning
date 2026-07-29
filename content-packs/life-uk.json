@@ -4,9 +4,9 @@
   "domain": "Life in the UK",
   "language": "English",
   "learners": "Adult learners",
-  "activity": "Practice questions + expanded question bank + richer explanations + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill + topic spaced repetition review queue + polished review-queue scheduling + mock score trend chart",
+  "activity": "Practice questions + expanded question bank + richer explanations + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill + topic spaced repetition review queue + polished review-queue scheduling + mock score trend chart + scenario-style practice",
   "readiness": "Live slice",
-  "next": "Add more Life in the UK scenario-style practice.",
+  "next": "Add more Life in the UK audio or mixed revision packs.",
   "recommendedStages": [
     "adult"
   ],
@@ -22,14 +22,15 @@
     "Run adaptive weak-topic drills from saved mock review data",
     "Use the review queue to revisit due citizenship topics from saved mastery",
     "Follow polished due/overdue review-queue scheduling for citizenship topics",
-    "Track full-mock score trends toward the 75% pass target"
+    "Track full-mock score trends toward the 75% pass target",
+    "Practise real-life citizenship scenarios drawn from everyday UK situations"
   ],
   "mock": {
     "questionCount": 24,
     "timeLimitMinutes": 45,
     "passMarkPercent": 75,
     "starterQuestionCount": 6,
-    "bankQuestionCount": 60
+    "bankQuestionCount": 72
   },
   "questions": [
     {
@@ -198,7 +199,7 @@
         "Franc"
       ],
       "answer": 0,
-      "explanation": "The currency of the UK is the pound sterling, often written as GBP or shown with the \u00a3 symbol."
+      "explanation": "The currency of the UK is the pound sterling, often written as GBP or shown with the £ symbol."
     },
     {
       "topic": "History",
@@ -751,6 +752,174 @@
       ],
       "answer": 0,
       "explanation": "Income Tax is a major source of government revenue used to fund public services such as healthcare, education, and policing."
+    },
+    {
+      "topic": "Government",
+      "style": "scenario",
+      "scenario": "After a general election, no single party has an overall majority and negotiations begin.",
+      "prompt": "After a general election produces a hung Parliament, who is usually invited first to try to form a government?",
+      "options": [
+        "The leader of the largest party in the House of Commons",
+        "The Lord Speaker",
+        "The Mayor of London",
+        "The Chief Justice of the Supreme Court"
+      ],
+      "answer": 0,
+      "explanation": "In a hung Parliament the monarch normally invites the leader best placed to command Commons confidence, which is usually the largest party's leader, to form a government or coalition."
+    },
+    {
+      "topic": "Parliament",
+      "style": "scenario",
+      "scenario": "A major new tax bill has passed the House of Commons and is sent to the House of Lords.",
+      "prompt": "A finance bill has passed the Commons. What is the usual role of the House of Lords on money bills?",
+      "options": [
+        "It can delay but not permanently block them",
+        "It rewrites the tax rates",
+        "It must approve them by a two-thirds vote",
+        "It sends them to the Supreme Court for final approval"
+      ],
+      "answer": 0,
+      "explanation": "By convention and statute the Lords may scrutinise and briefly delay money bills, but the elected Commons has primacy over taxation and supply."
+    },
+    {
+      "topic": "Law",
+      "style": "scenario",
+      "scenario": "You receive a jury summons for a Crown Court trial in England.",
+      "prompt": "You are called for jury service. In England, Wales and Northern Ireland, who is normally eligible to sit on a jury?",
+      "options": [
+        "Most adults aged 18 to 75 who are on the electoral register",
+        "Only solicitors and barristers",
+        "Only people who own property",
+        "Only people who have lived in the UK for 20 years"
+      ],
+      "answer": 0,
+      "explanation": "Jury service is a civic duty for most adults aged 18–75 who are registered electors, subject to limited disqualifications and excusals set out in law."
+    },
+    {
+      "topic": "Rights and responsibilities",
+      "style": "scenario",
+      "scenario": "A friend says they can ignore a court order because they disagree with it.",
+      "prompt": "Your friend says they can ignore a court order they dislike. What is the correct position under UK law?",
+      "options": [
+        "Court orders must be obeyed; ignoring them can be a serious offence",
+        "Court orders are optional advice",
+        "Only police officers must obey court orders",
+        "Court orders apply only to businesses"
+      ],
+      "answer": 0,
+      "explanation": "Obeying the law and court orders is a core responsibility. Ignoring a court order can lead to contempt of court, fines, or imprisonment."
+    },
+    {
+      "topic": "History",
+      "style": "scenario",
+      "scenario": "A museum display explains why Magna Carta still matters to modern rights.",
+      "prompt": "At a museum, a guide asks why Magna Carta (1215) is still important. Which answer is best?",
+      "options": [
+        "It established that even the monarch is subject to the law",
+        "It created the modern National Health Service",
+        "It abolished the House of Lords",
+        "It introduced universal free university education"
+      ],
+      "answer": 0,
+      "explanation": "Magna Carta limited royal power and affirmed that rulers are under the law—an early foundation for later constitutional and legal rights in the UK."
+    },
+    {
+      "topic": "UK nations",
+      "style": "scenario",
+      "scenario": "You are explaining devolution to a relative who is moving to Cardiff.",
+      "prompt": "Your relative is moving to Cardiff. Which body makes many day-to-day laws for Wales?",
+      "options": [
+        "The Senedd (Welsh Parliament)",
+        "The Scottish Parliament only",
+        "The Northern Ireland Assembly only",
+        "The European Parliament"
+      ],
+      "answer": 0,
+      "explanation": "Wales has a devolved legislature, the Senedd (Welsh Parliament), which can make laws in many devolved areas such as health and education while the UK Parliament retains reserved powers."
+    },
+    {
+      "topic": "Democracy",
+      "style": "scenario",
+      "scenario": "It is polling day and you are deciding how UK general elections work.",
+      "prompt": "On general election day, which voting system is used to elect MPs to the House of Commons?",
+      "options": [
+        "First-past-the-post in single-member constituencies",
+        "A national list proportional system only",
+        "Direct presidential election",
+        "Appointment by local mayors"
+      ],
+      "answer": 0,
+      "explanation": "UK general elections use first-past-the-post: each constituency elects one MP, and the candidate with the most votes in that seat wins."
+    },
+    {
+      "topic": "Society",
+      "style": "scenario",
+      "scenario": "A neighbour is new to the UK and asks about free healthcare at the point of use.",
+      "prompt": "Your neighbour asks who mainly funds the National Health Service so care is free at the point of use.",
+      "options": [
+        "General taxation",
+        "Compulsory private insurance for every resident",
+        "Church donations only",
+        "Local lottery tickets only"
+      ],
+      "answer": 0,
+      "explanation": "The NHS is mainly funded from general taxation so most care is free at the point of use, reflecting a key feature of UK public services and social solidarity."
+    },
+    {
+      "topic": "Geography",
+      "style": "scenario",
+      "scenario": "You are planning a ferry trip from mainland Britain to Northern Ireland.",
+      "prompt": "Planning a ferry to Northern Ireland, which body of water do you normally cross from Great Britain?",
+      "options": [
+        "The Irish Sea",
+        "The English Channel",
+        "The North Sea only",
+        "The Bristol Channel only"
+      ],
+      "answer": 0,
+      "explanation": "Northern Ireland is part of the UK on the island of Ireland; ferries from Great Britain typically cross the Irish Sea (for example via ports such as Cairnryan or Holyhead routes to Ireland)."
+    },
+    {
+      "topic": "Culture",
+      "style": "scenario",
+      "scenario": "A community centre is organising a St Andrew’s Day celebration.",
+      "prompt": "A community centre celebrates St Andrew’s Day. Which nation is this patron saint day most associated with?",
+      "options": [
+        "Scotland",
+        "England",
+        "Wales",
+        "Northern Ireland"
+      ],
+      "answer": 0,
+      "explanation": "St Andrew is the patron saint of Scotland, and St Andrew’s Day on 30 November is a major Scottish national celebration."
+    },
+    {
+      "topic": "Values and principles",
+      "style": "scenario",
+      "scenario": "At a citizenship class, people discuss what living in the UK expects of everyone.",
+      "prompt": "In a citizenship class, which principle is a fundamental British value that everyone living in the UK is expected to respect?",
+      "options": [
+        "The rule of law and equal treatment under the law",
+        "That only one religion may be practised",
+        "That elections are optional for democracy",
+        "That courts may be ignored if you disagree"
+      ],
+      "answer": 0,
+      "explanation": "Fundamental British values include democracy, the rule of law, individual liberty, and mutual respect and tolerance—everyone is equal under the law."
+    },
+    {
+      "topic": "Economy",
+      "style": "scenario",
+      "scenario": "You start a part-time job and your first payslip shows deductions.",
+      "prompt": "Your first UK payslip shows Income Tax and National Insurance. What is National Insurance mainly used to help fund?",
+      "options": [
+        "State benefits and services such as the State Pension and NHS contributions",
+        "Only private gym memberships",
+        "Only local parking schemes",
+        "Only overseas holidays for civil servants"
+      ],
+      "answer": 0,
+      "explanation": "National Insurance contributions help fund state benefits and services, including the State Pension and contributions toward the NHS and other social security provision."
     }
   ],
   "sourcePath": "content-packs/life-uk.json"

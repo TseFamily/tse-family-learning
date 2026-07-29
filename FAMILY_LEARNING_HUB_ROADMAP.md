@@ -288,3 +288,10 @@ Next slices:
 - Added schedule summary chips, relative due labels, capped spaced-repetition intervals, priority scoring, shuffled due-topic pooling, and an upcoming-topic preview path when nothing is due.
 - Updated registry/content-pack metadata, validation markers, and mobile smoke coverage for polished review-queue scheduling.
 - Next: add more Life in the UK scenario-style practice.
+
+## Run #36 Life in the UK scenario-style practice
+
+- Added 12 scenario-style citizenship questions (one per official topic) with a short real-life situation stem plus the usual four-option MCQ and teaching explanation, growing the bank from 60 to 72 questions.
+- New **Start scenario-style practice** mode draws a shuffled 6-question scenario set, shows the situation story on each card, scores answers, and persists `life-uk-practice` with `practiceMode: 'life-uk-scenario-practice'` plus topic mastery/SR updates.
+- Registry, fallback pack metadata, validation markers, and mobile smoke coverage now advertise scenario-style practice; next focus is audio or mixed revision packs.
+
