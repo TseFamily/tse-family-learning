@@ -545,6 +545,7 @@
     .family-action { display: grid; gap: 5px; justify-items: end; text-align: right; }
     .family-action-title { color: var(--text); font-size: 0.82rem; font-weight: 900; }
     .family-action-detail { color: var(--subtext); font-size: 0.76rem; line-height: 1.35; }
+    .family-action-evidence { color: var(--subtext); font-size: 0.74rem; line-height: 1.35; }
     .leaderboard-list { display: flex; flex-direction: column; gap: 8px; }
     .leaderboard-row { display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: center; background: #fff; border: 1px solid #ede9fe; border-radius: 12px; padding: 10px 12px; }
     .leaderboard-rank { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 999px; background: #eef2ff; color: var(--primary); font-weight: 900; }
@@ -1005,8 +1006,8 @@
               <div><div class="section-kicker">Progress</div><h2>Coach command rail</h2><p>Progress insights stay visible without overwhelming the first mobile screen.</p></div>
               <div class="section-icon">📈</div>
             </div>
-            <div class="parent-panel" id="parent-panel" style="display:none"><h3>🧑‍🏫 Coach overview</h3><p>Quick view across all learner profiles saved on this browser.</p><div class="family-list" id="family-list"></div></div>
-            <div class="leaderboard-panel" id="leaderboard-panel" style="display:none"><h3>🏁 Learner leaderboard</h3><p>Ranks saved learner profiles on this browser by average score, then practice XP.</p><div class="leaderboard-list" id="leaderboard-list"></div></div>
+            <div class="parent-panel" id="parent-panel" style="display:none"><h3>🧑‍🏫 Coach overview</h3><p id="family-coach-note">Same-browser overview of generic learner profiles that have saved history on this device. Anyone with this browser can switch profiles. This is not authentication, parental authorization, or isolation from other people with browser access. Progress stays local and is not uploaded automatically.</p><div class="family-list" id="family-list"></div></div>
+            <div class="leaderboard-panel" id="leaderboard-panel" style="display:none"><h3>📊 Local learner comparison</h3><p id="family-comparison-note">Compares only histories saved for generic profiles on this browser. Order uses each profile's saved average score. This is not a cloud ranking or public leaderboard.</p><div class="leaderboard-list" id="leaderboard-list"></div></div>
             <div class="subject-panel" id="subject-panel" style="display:none"><h3>🎯 Subject dashboard</h3><p>Shows this learner's recent strengths and focus areas from saved quiz history.</p><div class="subject-list" id="subject-list"></div></div>
             <div class="history-panel" id="history-panel" style="display:none"><h3>📈 Recent progress</h3><div class="history-list" id="history-list"></div></div>
             <div class="data-panel" id="data-panel" style="display:none"><h3>💾 Progress backup</h3><p>Export appears after a saved round; import works anytime for the selected learner.</p><div class="data-actions"><button class="btn btn-secondary" onclick="exportProgress()">Export</button><button class="btn btn-secondary" onclick="document.getElementById('import-progress').click()">Import</button><input class="file-input" id="import-progress" type="file" accept="application/json,.json" onchange="importProgress(event)" /></div></div>
@@ -1752,135 +1753,189 @@
       return latestWeakSkillInsight(history)?.skills || [];
     }
 
-    function parentNextStepAction(history) {
+    function parentNextStepAction(history, learner = { name: 'this local profile' }) {
+      const profileName = learner && learner.name ? learner.name : 'this local profile';
       const stats = historyStats(history);
       const weakSkillInsight = latestWeakSkillInsight(history);
       const weakSkills = weakSkillInsight?.skills || [];
       const weakest = subjectStatRows(history)[0];
       if (!history.length) {
+        const evidence = `No saved history for ${profileName} on this browser.`;
         return {
           subject: 'Mixed',
           title: 'Capture a baseline',
-          detail: 'Run one short mixed practice so coach actions can use evidence.',
+          detail: evidence,
+          evidence,
           cta: 'Start mixed practice',
           priority: 'baseline'
         };
       }
       if (weakSkills.length) {
+        const skill = weakSkills[0];
+        const evidence = `Saved local history for ${profileName} flagged ${skill}.`;
         return {
           subject: weakSkillInsight?.subject || weakest?.subject || 'Maths Foundation',
-          title: `Review ${weakSkills[0]}`,
-          detail: `Recent practice flagged ${weakSkills[0]} for coach follow-up.`,
+          title: `Review ${skill}`,
+          detail: evidence,
+          evidence,
           cta: 'Open review cards',
           priority: 'weak-skill'
         };
       }
       if (weakest && weakest.percent < 60) {
+        const evidence = `Saved local history for ${profileName}: ${weakest.subject} is at ${weakest.percent}% across ${weakest.total} saved question${weakest.total === 1 ? '' : 's'}.`;
         return {
           subject: weakest.subject,
           title: `Rebuild ${weakest.subject}`,
-          detail: `${weakest.percent}% across ${weakest.total} saved question${weakest.total === 1 ? '' : 's'} — schedule a focused mini-set next.`,
+          detail: evidence,
+          evidence,
           cta: subjectQuestionCount(weakest.subject) ? 'Open focused practice' : 'Open curriculum cards',
           priority: 'focus'
         };
       }
       if (weakest && weakest.percent < 80) {
+        const evidence = `Saved local history for ${profileName}: ${weakest.subject} is at ${weakest.percent}% across ${weakest.total} saved question${weakest.total === 1 ? '' : 's'}.`;
         return {
           subject: weakest.subject,
           title: `Consolidate ${weakest.subject}`,
-          detail: `${weakest.percent}% is close — review mistakes, then repeat a short set.`,
+          detail: evidence,
+          evidence,
           cta: subjectQuestionCount(weakest.subject) ? 'Open quick practice' : 'Open curriculum cards',
           priority: 'consolidate'
         };
       }
+      const evidence = `Saved local history for ${profileName}: average ${stats.average}% across ${stats.attempts} saved attempt${stats.attempts === 1 ? '' : 's'}.`;
       return {
         subject: weakest?.subject || 'Mixed',
         title: 'Stretch with mixed review',
-        detail: `Average ${stats.average}% with ${stats.streak} day streak — keep strengths warm and add one stretch item.`,
+        detail: evidence,
+        evidence,
         cta: 'Open mixed practice',
         priority: 'stretch'
       };
     }
 
+    function familyLearnerRows() {
+      return LEARNERS.map(learner => {
+        const history = loadHistoryFor(learner.id);
+        const stats = historyStats(history);
+        const latest = history[0] || null;
+        const action = parentNextStepAction(history, learner);
+        return {
+          learner,
+          history,
+          stats,
+          latest,
+          focus: history.length ? weakestSubjectLabel(history) : 'No saved history',
+          action,
+          savedAttempts: history.length,
+          savedAverage: history.length ? stats.average : null,
+          savedBest: history.length ? stats.best : null,
+          latestFocus: latest && latest.focus ? latest.focus : null,
+          latestDate: latest && latest.date ? latest.date : null
+        };
+      }).filter(row => row.history.length);
+    }
+
+    function learnerRowsWithHistory() {
+      return familyLearnerRows();
+    }
+
+    function familyComparisonRows() {
+      return familyLearnerRows().slice().sort((a, b) => {
+        const avg = (Number(b.savedAverage) || 0) - (Number(a.savedAverage) || 0);
+        if (avg) return avg;
+        const attempts = (Number(b.savedAttempts) || 0) - (Number(a.savedAttempts) || 0);
+        if (attempts) return attempts;
+        const best = (Number(b.savedBest) || 0) - (Number(a.savedBest) || 0);
+        if (best) return best;
+        return String(a.learner.name).localeCompare(String(b.learner.name));
+      });
+    }
+
     function parentCoachActions() {
-      return learnerRowsWithHistory().map(row => ({
+      return familyLearnerRows().map(row => ({
         learner: row.learner.name,
         learnerId: row.learner.id,
         focus: row.focus,
-        ...parentNextStepAction(row.history)
+        savedAttempts: row.savedAttempts,
+        savedAverage: row.savedAverage,
+        savedBest: row.savedBest,
+        ...row.action
       }));
     }
 
+    function recordFamilyCoachFollowUp(payload) {
+      window.__learningQuestTestState = {
+        ...(window.__learningQuestTestState || {}),
+        familyCoachFollowUp: payload
+      };
+    }
+
     function startCoachAction(learnerId, subject) {
+      if (!LEARNERS.some(learner => learner.id === learnerId)) return;
+      const previousLearnerId = activeLearnerId();
       selectLearner(learnerId);
-      if (subject && subjectQuestionCount(subject)) {
+      const switchedTo = activeLearnerId();
+      const switchedBeforeOpen = switchedTo === learnerId;
+      let openedPractice = null;
+      if (switchedBeforeOpen) {
         startRecommendedPractice(subject);
-        return;
+        openedPractice = window.__learningQuestTestState?.openedRecommendedPractice || null;
       }
-      const target = subject === 'Maths Foundation' ? document.getElementById('maths-foundation-grid') : document.getElementById('curriculum-grid');
-      target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      recordFamilyCoachFollowUp({
+        requestedLearnerId: learnerId,
+        previousLearnerId,
+        switchedTo,
+        switchedBeforeOpen,
+        subject: subject || null,
+        openedPractice
+      });
     }
 
     function renderParentOverview() {
       const panel = document.getElementById('parent-panel');
       const list = document.getElementById('family-list');
-      const rows = LEARNERS.map(learner => {
-        const history = loadHistoryFor(learner.id);
-        const stats = historyStats(history);
-        const latest = history[0];
-        const focus = weakestSubjectLabel(history);
-        const action = parentNextStepAction(history);
-        return { learner, history, stats, latest, focus, action };
-      }).filter(row => row.history.length);
+      const rows = familyLearnerRows();
       if (!rows.length) {
         panel.style.display = 'none';
         return;
       }
       panel.style.display = 'block';
       list.innerHTML = rows.map(row => `
-        <div class="family-row">
+        <div class="family-row" data-learner-id="${escapeHTML(row.learner.id)}">
           <div>
             <div class="family-name">${row.learner.emoji} ${escapeHTML(row.learner.name)}</div>
-            <div class="family-meta">${row.stats.attempts} attempt${row.stats.attempts === 1 ? '' : 's'} · ${escapeHTML(row.latest.date || 'Recent')}</div>
+            <div class="family-meta">${row.savedAttempts} saved attempt${row.savedAttempts === 1 ? '' : 's'} · ${escapeHTML(row.latestDate || 'Recent')}</div>
           </div>
-          <div class="family-stat">Avg ${row.stats.average}%<div class="family-meta">Best ${row.stats.best}% · L${row.stats.level}</div></div>
+          <div class="family-stat">Avg ${row.savedAverage}%<div class="family-meta">Best ${row.savedBest}% from local history</div></div>
           <div class="family-focus">Focus:<br>${escapeHTML(row.focus)}</div>
           <div class="family-action">
             <div class="family-action-title">Next: ${escapeHTML(row.action.title)}</div>
-            <div class="family-action-detail">${escapeHTML(row.action.detail)}</div>
-            <button class="btn btn-secondary" onclick='startCoachAction(${JSON.stringify(row.learner.id)}, ${JSON.stringify(row.action.subject)})'>${escapeHTML(row.action.cta)}</button>
+            <div class="family-action-evidence">Evidence: ${escapeHTML(row.action.evidence)}</div>
+            <button class="btn btn-secondary" type="button" onclick='startCoachAction(${JSON.stringify(row.learner.id)}, ${JSON.stringify(row.action.subject)})'>${escapeHTML(row.action.cta)}</button>
           </div>
         </div>
       `).join('');
     }
 
-    function learnerRowsWithHistory() {
-      return LEARNERS.map(learner => {
-        const history = loadHistoryFor(learner.id);
-        const stats = historyStats(history);
-        const latest = history[0];
-        return { learner, history, stats, latest, focus: weakestSubjectLabel(history) };
-      }).filter(row => row.history.length);
-    }
-
     function renderFamilyLeaderboard() {
       const panel = document.getElementById('leaderboard-panel');
       const list = document.getElementById('leaderboard-list');
-      const rows = learnerRowsWithHistory()
-        .sort((a, b) => b.stats.average - a.stats.average || b.stats.xp - a.stats.xp || b.stats.best - a.stats.best);
+      const rows = familyComparisonRows();
       if (!rows.length) {
         panel.style.display = 'none';
         return;
       }
       panel.style.display = 'block';
       list.innerHTML = rows.map((row, index) => `
-        <div class="leaderboard-row">
+        <div class="leaderboard-row" data-learner-id="${escapeHTML(row.learner.id)}">
           <div class="leaderboard-rank">${index + 1}</div>
           <div>
             <div class="leaderboard-name">${row.learner.emoji} ${escapeHTML(row.learner.name)}</div>
-            <div class="leaderboard-detail">${row.stats.attempts} attempt${row.stats.attempts === 1 ? '' : 's'} · best ${row.stats.best}% · ${row.stats.streak} day streak</div>
+            <div class="leaderboard-detail">${row.savedAttempts} saved attempt${row.savedAttempts === 1 ? '' : 's'} · latest ${escapeHTML(row.latestFocus || 'practice')} · ${escapeHTML(row.latestDate || 'Recent')}</div>
           </div>
-          <div class="leaderboard-score">${row.stats.average}% avg<span>${row.stats.xp} XP · Level ${row.stats.level}</span></div>
+          <div class="leaderboard-score">${row.savedAverage}% saved avg<span>Best ${row.savedBest}% from local history</span></div>
         </div>
       `).join('');
     }
@@ -4069,6 +4124,26 @@
           } : null;
         })(),
         parentCoachActions: parentCoachActions(),
+        familyCoachOverview: familyLearnerRows().map(row => ({
+          learner: row.learner.name,
+          learnerId: row.learner.id,
+          title: row.action.title,
+          subject: row.action.subject,
+          evidence: row.action.evidence,
+          savedAttempts: row.savedAttempts,
+          savedAverage: row.savedAverage
+        })),
+        familyComparison: familyComparisonRows().map(row => ({
+          learner: row.learner.name,
+          learnerId: row.learner.id,
+          savedAttempts: row.savedAttempts,
+          savedAverage: row.savedAverage,
+          savedBest: row.savedBest,
+          latestFocus: row.latestFocus,
+          evidence: row.action.evidence,
+          subject: row.action.subject
+        })),
+        familyCoachFollowUp: window.__learningQuestTestState?.familyCoachFollowUp || null,
         matchingPracticeCounts: { hkChinese: hkChineseFlashcards.length ? Math.min(4, hkChineseFlashcards.length) : 0, mandarin: mandarinFlashcards.length ? Math.min(4, mandarinFlashcards.length) : 0 },
         mathsFoundationCardCount: mathsFoundationCards.length,
         mathsFoundationPracticeCount: mathsPracticeCards.length,
