@@ -362,7 +362,14 @@ for (const marker of [
   'LIFE_UK_SCENARIO_QUESTION_COUNT',
   'life-uk-scenario-practice',
   'Practise real-life citizenship scenarios drawn from everyday UK situations',
-  'Start scenario-style practice'
+  'Start scenario-style practice',
+  'submitSelectedAnswer',
+  'quizAdvance',
+  'matchingCardAnswer',
+  'question-bank-practice',
+  'Submit answer',
+  'updateQuestionBankTestState',
+  'quizAnswersLocked'
 ]) {
   if (!html.includes(marker)) throw new Error(`Missing runtime HK Chinese content-pack marker: ${marker}`);
 }

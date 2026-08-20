@@ -137,6 +137,7 @@
     }
     .option:hover:not(.locked) { border-color: var(--primary); background: #ede9fe; transform: translateX(4px); }
     .option.selected { border-color: var(--primary); background: #ede9fe; }
+    .option.locked { cursor: default; pointer-events: none; }
     .option.correct { border-color: var(--success); background: #f0fdf4; }
     .option.wrong { border-color: var(--danger); background: #fef2f2; }
     .option-letter {
@@ -1029,8 +1030,8 @@
     <div class="options" id="options-container"></div>
     <div class="explanation" id="explanation"></div>
     <div class="btn-row">
-      <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" disabled>
-        Next →
+      <button class="btn btn-primary" id="next-btn" onclick="quizAdvance()" disabled>
+        Submit answer
       </button>
     </div>
   </div>
@@ -1063,6 +1064,7 @@
     let timerInterval = null;
     let timeLeft = 0;
     let answered = false;
+    let selectedOptionIndex = null;
     const HISTORY_KEY = 'learningquest-history-v1';
     const LEARNER_KEY = 'learningquest-active-learner-v1';
     const APP_PROFILE = {
@@ -1946,7 +1948,9 @@
         subjects: cleanSubjects(item.subjects),
         practiceMode: item.practiceMode ? String(item.practiceMode) : undefined,
         difficultyMode: item.difficultyMode ? String(item.difficultyMode) : undefined,
+        skillMode: item.skillMode ? String(item.skillMode) : undefined,
         activityType: item.activityType ? String(item.activityType) : undefined,
+        timed: item.timed === undefined ? undefined : Boolean(item.timed),
         attempted: item.attempted === undefined ? undefined : Math.max(0, Number(item.attempted || 0)),
         matchingPackKey: item.matchingPackKey ? String(item.matchingPackKey) : undefined,
         rotationMode: item.rotationMode ? String(item.rotationMode) : undefined,
@@ -2255,7 +2259,17 @@
       return entry;
     }
 
-    function recordMatchingAnswer(packKey, cardIndex, selectedAnswer, expectedAnswer) {
+    function matchingCardAnswer(packKey, cardIndex) {
+      const cards = packKey === 'mandarin' ? mandarinFlashcards : hkChineseFlashcards;
+      const termField = packKey === 'mandarin' ? 'simplified' : 'traditional';
+      const soundField = packKey === 'mandarin' ? 'pinyin' : 'jyutping';
+      const matchCards = matchingPracticeCards(cards, termField, soundField);
+      return matchCards.find(card => card.index === Number(cardIndex))?.answer;
+    }
+
+    function recordMatchingAnswer(packKey, cardIndex, selectedAnswer) {
+      const expectedAnswer = matchingCardAnswer(packKey, cardIndex);
+      if (expectedAnswer === undefined) return;
       matchingPracticeScores[packKey][cardIndex] = selectedAnswer === expectedAnswer;
       const total = packKey === 'mandarin'
         ? Math.min(4, mandarinFlashcards.length)
@@ -2289,7 +2303,7 @@
             <div class="matching-term">${escapeHTML(card.term)}</div>
             <div class="matching-options" role="group" aria-label="Meaning options for ${escapeHTML(card.term)}">
               ${options.map(option => `
-                <button type="button" class="matching-option ${answered && option === card.answer ? 'correct' : ''} ${answered && option !== card.answer && recorded === false ? 'incorrect' : ''}" data-answer="${escapeHTML(option)}" data-expected="${escapeHTML(card.answer)}" onclick="recordMatchingAnswer('${packKey}', ${card.index}, this.dataset.answer, this.dataset.expected)" ${answered ? 'disabled' : ''}>${escapeHTML(option)}</button>
+                <button type="button" class="matching-option ${answered && option === card.answer ? 'correct' : ''} ${answered && option !== card.answer && recorded === false ? 'incorrect' : ''}" data-answer="${escapeHTML(option)}" onclick="recordMatchingAnswer('${packKey}', ${card.index}, this.dataset.answer)" ${answered ? 'disabled' : ''}>${escapeHTML(option)}</button>
               `).join('')}
             </div>
             <div class="matching-feedback">${answered ? (recorded ? '✅ Matched' : `↪ Correct answer: ${escapeHTML(card.answer)}`) : 'Tap the meaning that matches this term.'}</div>
@@ -4398,6 +4412,7 @@
           ? `Ready for ${count} questions? You've got ${Math.round(quizData.meta.timeLimit/60)} minutes. Good luck! ⭐`
           : `Ready for ${count} ${focusLabel} questions? Focus mode keeps the same timer and saves progress. ⭐`;
       }
+      updateQuestionBankTestState();
     }
 
     function dailyChallengeIndex(total) {
@@ -4472,6 +4487,8 @@
       if (!questions.length) return;
       current = 0;
       answers = [];
+      answered = false;
+      selectedOptionIndex = null;
       document.getElementById('start-screen').style.display = 'none';
       document.getElementById('quiz-screen').style.display = 'block';
       timeLeft = quizData.meta.timeLimit;
@@ -4484,7 +4501,11 @@
       timerInterval = setInterval(() => {
         timeLeft--;
         updateTimerDisplay();
-        if (timeLeft <= 0) { clearInterval(timerInterval); showResults(); }
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          if (!answered && selectedOptionIndex !== null) submitSelectedAnswer();
+          showResults();
+        }
       }, 1000);
     }
 
@@ -4496,8 +4517,26 @@
       el.className = 'timer' + (timeLeft <= 30 ? ' urgent' : '');
     }
 
+    function updateQuestionBankTestState(lastQuestionBankProgress = null) {
+      const history = loadHistory();
+      const q = questions[current];
+      window.__learningQuestTestState = {
+        ...(window.__learningQuestTestState || {}),
+        practiceQuestionBankCount: allQuestions.length,
+        practiceActiveCount: questions.length,
+        practiceFilters: { subject: selectedSubject, difficulty: selectedDifficulty, skill: selectedSkill },
+        quizAnswersLocked: answered,
+        quizSelectedOption: selectedOptionIndex,
+        quizCurrentIndex: current,
+        quizCurrentQuestionId: q && q.id !== undefined ? q.id : null,
+        quizTimed: Boolean(quizData && quizData.meta && quizData.meta.timeLimit),
+        latestQuestionBankProgress: lastQuestionBankProgress || history.find(item => item.activityType === 'question-bank-practice') || null
+      };
+    }
+
     function showQuestion() {
       answered = false;
+      selectedOptionIndex = null;
       const q = questions[current];
       const total = questions.length;
 
@@ -4513,7 +4552,7 @@
       const letters = ['A', 'B', 'C', 'D', 'E'];
       const container = document.getElementById('options-container');
       container.innerHTML = q.options.map((opt, i) => `
-        <div class="option" id="opt-${i}" onclick="selectOption(${i})">
+        <div class="option" id="opt-${i}" data-option-index="${i}" onclick="selectOption(${i})">
           <div class="option-letter">${letters[i]}</div>
           <div>${escapeHTML(opt)}</div>
         </div>
@@ -4522,33 +4561,54 @@
       document.getElementById('explanation').className = 'explanation';
       document.getElementById('explanation').innerHTML = '';
       document.getElementById('next-btn').disabled = true;
-      document.getElementById('next-btn').textContent = current === total - 1 ? '🏁 Finish' : 'Next →';
+      document.getElementById('next-btn').textContent = 'Submit answer';
+      updateQuestionBankTestState();
     }
 
     function selectOption(idx) {
       if (answered) return;
+      selectedOptionIndex = idx;
+      document.querySelectorAll('#options-container .option').forEach((el, i) => {
+        el.classList.toggle('selected', i === idx);
+        el.classList.remove('correct', 'wrong', 'locked');
+      });
+      const btn = document.getElementById('next-btn');
+      btn.disabled = false;
+      btn.textContent = 'Submit answer';
+      updateQuestionBankTestState();
+    }
+
+    function submitSelectedAnswer() {
+      if (answered) return;
+      if (selectedOptionIndex === null || selectedOptionIndex === undefined) return;
       answered = true;
       const q = questions[current];
+      const idx = selectedOptionIndex;
       answers[current] = idx;
 
-      // Lock all options
-      document.querySelectorAll('.option').forEach(el => el.classList.add('locked'));
-
-      // Mark correct/wrong
+      document.querySelectorAll('#options-container .option').forEach(el => el.classList.add('locked'));
       document.getElementById(`opt-${q.answer}`).classList.add('correct');
       if (idx !== q.answer) {
         document.getElementById(`opt-${idx}`).classList.add('wrong');
-      } else {
-        document.getElementById(`opt-${idx}`).classList.add('correct');
       }
 
-      // Show explanation
       const expEl = document.getElementById('explanation');
       const isCorrect = idx === q.answer;
       expEl.className = `explanation show ${isCorrect ? 'correct-exp' : 'wrong-exp'}`;
       expEl.innerHTML = (isCorrect ? '✅ <strong>Correct!</strong> ' : '❌ <strong>Not quite.</strong> ') + escapeHTML(q.explanation);
 
-      document.getElementById('next-btn').disabled = false;
+      const btn = document.getElementById('next-btn');
+      btn.disabled = false;
+      btn.textContent = current === questions.length - 1 ? '🏁 Finish' : 'Next →';
+      updateQuestionBankTestState();
+    }
+
+    function quizAdvance() {
+      if (!answered) {
+        submitSelectedAnswer();
+        return;
+      }
+      nextQuestion();
     }
 
     function nextQuestion() {
@@ -4608,13 +4668,18 @@
         date: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
         completedAt: new Date().toISOString(),
         correct, total, percent: pct, focus: plan.focus, subjects,
-        practiceMode: selectedSubject, difficultyMode: selectedDifficulty
+        practiceMode: selectedSubject,
+        difficultyMode: selectedDifficulty,
+        skillMode: selectedSkill,
+        activityType: 'question-bank-practice',
+        timed: true
       });
       renderStats(updatedHistory);
       renderBadges(updatedHistory);
       renderSubjectDashboard(updatedHistory);
       renderNextStepRecommendation(updatedHistory);
       renderParentOverview();
+      updateQuestionBankTestState(updatedHistory[0]);
 
       // Review list
       document.getElementById('review-list').innerHTML =

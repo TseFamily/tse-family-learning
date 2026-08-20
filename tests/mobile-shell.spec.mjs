@@ -1,5 +1,66 @@
 import { expect, test } from '@playwright/test';
 
+async function waitForQuestionBank(page) {
+  await page.waitForFunction(
+    () => Number(window.__learningQuestTestState?.practiceQuestionBankCount || 0) >= 20,
+    null,
+    { timeout: 10000 }
+  );
+}
+
+async function loadQuestionBank(page) {
+  return page.evaluate(async () => {
+    const response = await fetch('/questions.json');
+    return response.json();
+  });
+}
+
+function filteredBank(bank, subject, difficulty, skill) {
+  return bank.questions.filter(question => {
+    const subjectMatch = subject === 'Mixed' || question.subject === subject;
+    const difficultyMatch = difficulty === 'All' || question.difficulty === difficulty;
+    const skillMatch = skill === 'All' || question.skill === skill;
+    return subjectMatch && difficultyMatch && skillMatch;
+  });
+}
+
+async function completeLockedQuestion(page, question, { probeUnlock = false } = {}) {
+  await expect(page.locator('#question-text')).toHaveText(question.question);
+  const options = page.locator('#options-container .option');
+  await expect(options).toHaveCount(question.options.length);
+  await expect(page.locator('#explanation')).not.toHaveClass(/show/);
+  await expect(page.getByRole('button', { name: 'Submit answer' })).toBeDisabled();
+  expect(await options.evaluateAll(els => els.every(el => !el.classList.contains('locked') && !el.classList.contains('correct') && !el.classList.contains('wrong')))).toBeTruthy();
+  expect(await options.evaluateAll(els => els.every(el => !el.hasAttribute('data-expected') && el.getAttribute('data-correct') == null))).toBeTruthy();
+
+  const wrongIndex = question.options.findIndex((_, index) => index !== question.answer);
+  if (probeUnlock && wrongIndex >= 0) {
+    await options.nth(wrongIndex).tap();
+    await expect(options.nth(wrongIndex)).toHaveClass(/selected/);
+    await expect(page.locator('#explanation')).not.toHaveClass(/show/);
+    expect(await page.evaluate(() => window.__learningQuestTestState.quizAnswersLocked)).toBeFalsy();
+    await expect(page.getByRole('button', { name: 'Submit answer' })).toBeEnabled();
+  }
+
+  await options.nth(question.answer).tap();
+  await expect(options.nth(question.answer)).toHaveClass(/selected/);
+  await expect(page.locator('#explanation')).not.toHaveClass(/show/);
+  expect(await options.evaluateAll(els => els.every(el => !el.classList.contains('correct') && !el.classList.contains('wrong') && !el.classList.contains('locked')))).toBeTruthy();
+  await page.getByRole('button', { name: 'Submit answer' }).tap();
+
+  await expect(page.locator('#explanation')).toHaveClass(/show/);
+  await expect(page.locator('#explanation')).toContainText(question.explanation);
+  await expect(page.locator(`#opt-${question.answer}`)).toHaveClass(/correct/);
+  await expect(page.locator(`#opt-${question.answer}`)).toHaveClass(/locked/);
+  expect(await page.evaluate(() => window.__learningQuestTestState.quizAnswersLocked)).toBeTruthy();
+
+  const submitted = question.answer;
+  await page.evaluate(index => selectOption(index), submitted === 0 ? 1 : 0);
+  expect(await page.evaluate(() => window.__learningQuestTestState.quizSelectedOption)).toBe(submitted);
+  expect(await page.evaluate(() => window.__learningQuestTestState.quizAnswersLocked)).toBeTruthy();
+}
+
+
 test('mobile app shell opens without horizontal overflow and mission onboarding works', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByText('LearningQuest').first()).toBeVisible();
@@ -830,3 +891,130 @@ test('Life in the UK scenario-style practice renders situations, scores answers,
   expect(Object.keys(state.latestLifeUKScenarioProgress?.skillResults || {}).length).toBeGreaterThan(0);
 });
 
+
+
+test('required question bank supports filtered timed MCQs with locked answers, explanations, results, and review', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await waitForQuestionBank(page);
+
+  const bank = await loadQuestionBank(page);
+  expect(bank.questions.length).toBe(28);
+  await expect(page.locator('#practice-options').getByRole('button', { name: 'Mixed (28)' })).toBeVisible();
+  await expect(page.locator('#practice-note')).toHaveText('Mixed practice uses all 28 questions.');
+
+  await page.locator('#practice-options').getByRole('button', { name: 'Phonics (5)' }).tap();
+  await page.locator('#difficulty-options').getByRole('button', { name: 'Foundation (12)' }).tap();
+  await page.locator('#skill-options').getByRole('button', { name: 'Sound patterns (5)' }).tap();
+  await expect(page.locator('#practice-note')).toHaveText('Phonics · Foundation · Sound patterns practice uses 3 focused questions.');
+
+  const expectedQuestions = filteredBank(bank, 'Phonics', 'Foundation', 'Sound patterns');
+  expect(expectedQuestions).toHaveLength(3);
+  const state = await page.evaluate(() => window.__learningQuestTestState);
+  expect(state.practiceFilters).toEqual({ subject: 'Phonics', difficulty: 'Foundation', skill: 'Sound patterns' });
+  expect(state.practiceActiveCount).toBe(3);
+  expect(state.quizTimed).toBeTruthy();
+
+  await page.getByRole('button', { name: 'Start this mission' }).tap();
+  await expect(page.locator('#quiz-screen')).toBeVisible();
+  await expect(page.locator('#timer')).toHaveText(/^\d{2}:\d{2}$/);
+  await expect(page.locator('#q-counter')).toHaveText('Question 1 of 3');
+
+  for (let index = 0; index < expectedQuestions.length; index += 1) {
+    await completeLockedQuestion(page, expectedQuestions[index], { probeUnlock: index === 0 });
+    const last = index === expectedQuestions.length - 1;
+    await page.getByRole('button', { name: last ? 'Finish' : 'Next →' }).tap();
+  }
+
+  await expect(page.locator('#results-screen')).toBeVisible();
+  await expect(page.locator('#score-num')).toHaveText('3');
+  await expect(page.locator('#score-total')).toHaveText('3');
+  await expect(page.locator('#review-list')).toContainText('Question Review');
+  for (const question of expectedQuestions) {
+    await expect(page.locator('#review-list')).toContainText(question.question);
+    await expect(page.locator('#review-list')).toContainText(question.options[question.answer]);
+  }
+
+  const resultState = await page.evaluate(() => window.__learningQuestTestState);
+  expect(resultState.latestQuestionBankProgress).toMatchObject({
+    activityType: 'question-bank-practice',
+    practiceMode: 'Phonics',
+    difficultyMode: 'Foundation',
+    skillMode: 'Sound patterns',
+    timed: true,
+    correct: 3,
+    total: 3,
+    percent: 100
+  });
+  const history = await page.evaluate(() => JSON.parse(localStorage.getItem('learningquest-history-v1-learner-1')));
+  expect(history[0]).toMatchObject({
+    activityType: 'question-bank-practice',
+    practiceMode: 'Phonics',
+    difficultyMode: 'Foundation',
+    skillMode: 'Sound patterns',
+    timed: true,
+    correct: 3,
+    total: 3
+  });
+});
+
+test('matching practice does not expose answers before submit', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#hk-matching-grid .matching-card').first()).toBeVisible();
+  const firstCard = page.locator('#hk-matching-grid .matching-card').first();
+  await expect(firstCard.getByText('Tap the meaning that matches this term.')).toBeVisible();
+  const leaked = await firstCard.locator('.matching-option').evaluateAll(els => els.map(el => ({
+    expected: el.getAttribute('data-expected'),
+    correct: el.getAttribute('data-correct')
+  })));
+  expect(leaked.every(item => item.expected == null && item.correct == null)).toBeTruthy();
+  await expect(firstCard).not.toContainText('Correct answer:');
+  await expect(firstCard.locator('.matching-option.correct')).toHaveCount(0);
+
+  await firstCard.getByRole('button', { name: 'Dad / father' }).tap();
+  await expect(firstCard.getByText('✅ Matched')).toBeVisible();
+  await expect(firstCard.locator('.matching-option').first()).toBeDisabled();
+});
+
+test('browser speech and placeholder cards do not count as completed practice', async ({ page }) => {
+  await page.route('**/content-packs/hk-chinese-basics.json*', route => route.fulfill({ status: 503, body: 'pack unavailable' }));
+  await page.goto('/');
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await page.waitForFunction(() => window.__learningQuestTestState?.hkChinesePackError, null, { timeout: 10000 });
+  await expect(page.locator('#flashcard-grid .flashcard-placeholder').getByText('Question practice remains available')).toBeVisible();
+  await expect(page.locator('#mandarin-flashcard-grid .flashcard').first().getByRole('button', { name: 'Hear Mandarin' })).toBeVisible();
+
+  await page.locator('#mandarin-flashcard-grid .flashcard').first().getByRole('button', { name: 'Hear Mandarin' }).tap();
+  await expect(page.locator('#mandarin-flashcard-grid .flashcard').first().locator('.audio-status')).toContainText(/Replay ready|Audio support unavailable/);
+
+  const history = await page.evaluate(() => JSON.parse(localStorage.getItem('learningquest-history-v1-learner-1') || '[]'));
+  expect(history).toEqual([]);
+  const state = await page.evaluate(() => window.__learningQuestTestState);
+  expect(state.latestQuestionBankProgress || null).toBeNull();
+  expect(state.latestAudioPrompt?.supported === true || state.latestAudioPrompt?.supported === false).toBeTruthy();
+});
+
+test('question bank practice still completes when an optional pack is missing', async ({ page }) => {
+  await page.route('**/content-packs/hk-chinese-basics.json*', route => route.fulfill({ status: 503, body: 'pack unavailable' }));
+  await page.goto('/');
+  await waitForQuestionBank(page);
+  await expect(page.locator('#flashcard-grid .flashcard-placeholder').getByText('Question practice remains available')).toBeVisible();
+  await expect(page.locator('#mandarin-flashcard-grid .flashcard-term', { hasText: '早上好' })).toBeVisible();
+
+  const bank = await loadQuestionBank(page);
+  await page.locator('#practice-options').getByRole('button', { name: 'Phonics (5)' }).tap();
+  await page.locator('#difficulty-options').getByRole('button', { name: 'Foundation (12)' }).tap();
+  await page.locator('#skill-options').getByRole('button', { name: 'Sound patterns (5)' }).tap();
+  const expectedQuestions = filteredBank(bank, 'Phonics', 'Foundation', 'Sound patterns');
+  await page.getByRole('button', { name: 'Start this mission' }).tap();
+  await expect(page.locator('#quiz-screen')).toBeVisible();
+  for (let index = 0; index < expectedQuestions.length; index += 1) {
+    await completeLockedQuestion(page, expectedQuestions[index]);
+    const last = index === expectedQuestions.length - 1;
+    await page.getByRole('button', { name: last ? 'Finish' : 'Next →' }).tap();
+  }
+  await expect(page.locator('#results-screen')).toBeVisible();
+  await expect(page.locator('#score-num')).toHaveText('3');
+  const history = await page.evaluate(() => JSON.parse(localStorage.getItem('learningquest-history-v1-learner-1')));
+  expect(history[0]).toMatchObject({ activityType: 'question-bank-practice', total: 3, correct: 3 });
+});
