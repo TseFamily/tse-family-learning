@@ -85,18 +85,18 @@ test('mobile app shell opens without horizontal overflow and mission onboarding 
   await expect(page.getByText('Exam mode: Exam prep')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Start this mission' })).toBeVisible();
   await expect(page.locator('.curriculum-card.recommended .curriculum-title', { hasText: '11+ starter bank' })).toBeVisible();
-  await expect(page.locator('.curriculum-card.recommended').getByText('Best match for exam prep from the live question bank.').first()).toBeVisible();
+  await expect(page.locator('.curriculum-card.recommended').getByText('Baseline from Exam prep · Get exam-ready and available pack metadata (11+ starter bank). No saved practice yet.').first()).toBeVisible();
   await expect(page.locator('.curriculum-card.recommended').getByText('Start with a mixed diagnostic round → Focus quick practice on weak skills → Return to timed exam-prep missions').first()).toBeVisible();
 
   await page.getByRole('button', { name: 'Adult' }).tap();
   await page.getByRole('button', { name: 'Learn language' }).tap();
   await expect(page.getByText('Listen & recall: Adult')).toBeVisible();
   await expect(page.locator('.curriculum-card.recommended .curriculum-title', { hasText: 'Simplified Mandarin basics' })).toBeVisible();
-  await expect(page.locator('.curriculum-card.recommended').getByText('Adult language goal match from the runtime content-pack registry.').first()).toBeVisible();
+  await expect(page.locator('.curriculum-card.recommended').getByText('Baseline from Adult · Learn language and available pack metadata (Simplified Mandarin basics). No saved practice yet.').first()).toBeVisible();
   await expect(page.locator('.curriculum-card.recommended').getByText('Start with greetings and core family words → Compare Simplified, Traditional, and Pinyin forms → Use matching practice and comparison drills, then try audio prompts').first()).toBeVisible();
   await page.getByRole('button', { name: 'Get exam-ready' }).tap();
   await expect(page.locator('.curriculum-card.recommended .curriculum-title', { hasText: 'Life in the UK starter mock' })).toBeVisible();
-  await expect(page.locator('.curriculum-card.recommended').getByText('Adult learning match for bite-sized recall.').first()).toBeVisible();
+  await expect(page.locator('.curriculum-card.recommended').getByText('Baseline from Adult · Get exam-ready and available pack metadata (Life in the UK starter mock). No saved practice yet.').first()).toBeVisible();
   await expect(page.locator('.curriculum-card.recommended').getByText('Start with civic basics and everyday UK facts → Study clearer explanations after each answer to lock in citizenship facts → Practise weak citizenship topics from saved attempts → Build toward a 24-question, 45-minute mock test from an expanded bank').first()).toBeVisible();
   await page.getByRole('button', { name: 'Learn language' }).tap();
   await expect(page.locator('#flashcard-grid .flashcard-term', { hasText: '早晨' })).toBeVisible();
@@ -1303,4 +1303,135 @@ test('progress import restores onto the active learner without moving another pr
   const switched = await readLearnerHistories(page);
   expect(switched.learner1).toEqual([]);
   expect(switched.learner2).toHaveLength(8);
+});
+
+test('guidance turns stage, packs, and saved evidence into the next available practice', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await waitForQuestionBank(page);
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.mathsFoundationPackId === 'maths-foundation-v1'
+      && window.__learningQuestTestState?.lifeUKPackId === 'life-uk-v1',
+    null,
+    { timeout: 10000 }
+  );
+
+  await expect(page.locator('#next-step-panel')).toBeVisible();
+  await expect(page.locator('#next-step-panel .next-step-kind')).toHaveText('Baseline');
+  await expect(page.locator('#next-step-panel')).toContainText('No saved practice for this learner');
+  await expect(page.locator('#next-step-panel')).toContainText('Evidence:');
+  await expect(page.locator('#next-step-panel')).not.toContainText(/\bXP\b|streak|pass target|French first phrases/i);
+  await expect(page.locator('.curriculum-card.recommended').getByText('Baseline').first()).toBeVisible();
+  await expect(page.locator('.curriculum-card.recommended .curriculum-title', { hasText: 'French first phrases' })).toHaveCount(0);
+
+  const emptyState = await page.evaluate(() => window.__learningQuestTestState);
+  expect(emptyState.nextStepRecommendation.kind).toBe('baseline');
+  expect(emptyState.nextStepRecommendation.evidence).toMatch(/No saved practice/);
+  expect(emptyState.recommendedCurriculumTitles).toContain('Maths Foundation practice');
+  expect(emptyState.recommendedCurriculumTitles).not.toContain('French first phrases');
+  expect(emptyState.recommendedGuidanceKinds.every(kind => kind === 'baseline')).toBeTruthy();
+  expect(emptyState.recommendedEvidence.join(' ')).toMatch(/No saved practice yet/);
+
+  await page.locator('#next-step-panel').getByRole('button', { name: /Open Maths Foundation practice/ }).tap();
+  const openedBaseline = await page.evaluate(() => window.__learningQuestTestState.openedRecommendedPractice);
+  expect(openedBaseline).toMatchObject({ type: 'maths-foundation' });
+  await expect(page.locator('#maths-foundation-grid')).toHaveClass(/guidance-focus/);
+
+  const makeTwentyCard = page.locator('#maths-foundation-grid .maths-card', { hasText: 'What number goes with 13 to make 20?' });
+  await makeTwentyCard.getByRole('textbox', { name: 'Answer for What number goes with 13 to make 20?' }).fill('6');
+  await makeTwentyCard.getByRole('button', { name: 'Check answer' }).tap();
+  await expect(page.locator('#history-panel').getByText('Maths Foundation answer practice')).toBeVisible();
+  await expect(page.locator('#next-step-panel .next-step-kind')).toHaveCount(0);
+  await expect(page.locator('#next-step-panel .next-step-title')).toHaveText('Review Make 20');
+  await expect(page.locator('#next-step-panel')).toContainText('Saved Maths Foundation practice flagged Make 20');
+  await expect(page.locator('#next-step-panel')).not.toContainText(/\bXP\b|streak|pass target/i);
+
+  const weakState = await page.evaluate(() => window.__learningQuestTestState);
+  expect(weakState.nextStepRecommendation).toMatchObject({
+    kind: 'weak-skill',
+    title: 'Review Make 20',
+    actionType: 'maths-foundation'
+  });
+  expect(weakState.recommendedCurriculumTitles).toContain('Maths Foundation practice');
+  expect(weakState.historyAwareCurriculumInsights.join(' ')).toContain('Make 20');
+  expect(weakState.recommendedCurriculumTitles).not.toContain('French first phrases');
+
+  await page.locator('#next-step-panel').getByRole('button', { name: /Open Maths Foundation practice/ }).tap();
+  const openedWeak = await page.evaluate(() => window.__learningQuestTestState.openedRecommendedPractice);
+  expect(openedWeak).toMatchObject({ type: 'maths-foundation' });
+  await expect(page.locator('#maths-foundation-grid .maths-card').first().getByText('Weak-skill rotation: revisiting this skill from recent learner history.')).toBeVisible();
+
+  const lifeUKCard = page.locator('#life-uk-grid .life-uk-card').first();
+  await lifeUKCard.getByRole('button', { name: 'The Speaker' }).tap();
+  await expect(page.locator('#history-panel').getByText('Life in the UK starter mock')).toBeVisible();
+  await expect(page.locator('#next-step-panel .next-step-title')).toHaveText('Review Government');
+  await expect(page.locator('#next-step-panel')).toContainText('Saved Life in the UK practice flagged Government');
+
+  await page.locator('#next-step-panel').getByRole('button', { name: /Open Life in the UK/ }).tap();
+  const openedLife = await page.evaluate(() => window.__learningQuestTestState.openedRecommendedPractice);
+  expect(openedLife.type).toBe('life-uk-drill');
+  await expect(page.locator('#life-uk-drill-area')).toBeVisible();
+  await expect(page.locator('#next-step-panel')).not.toContainText(/pass target|\bXP\b|streak/i);
+});
+
+test('guidance does not recommend a planned or unavailable pack', async ({ page }) => {
+  await page.route('**/content-packs/hk-chinese-basics.json*', route => route.fulfill({ status: 503, body: 'pack unavailable' }));
+  await page.goto('/');
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await page.getByRole('button', { name: 'Adult' }).tap();
+  await page.getByRole('button', { name: 'Learn language' }).tap();
+  await page.waitForFunction(() => window.__learningQuestTestState?.hkChinesePackError, null, { timeout: 10000 });
+  await page.waitForFunction(() => window.__learningQuestTestState?.mandarinPackId === 'mandarin-basics-v1', null, { timeout: 10000 });
+
+  const state = await page.evaluate(() => window.__learningQuestTestState);
+  expect(state.recommendedCurriculumTitles).toContain('Simplified Mandarin basics');
+  expect(state.recommendedCurriculumTitles).not.toContain('French first phrases');
+  expect(state.recommendedCurriculumTitles).not.toContain('Traditional HK Chinese basics');
+  expect(state.nextStepRecommendation.kind).toBe('baseline');
+  expect(state.nextStepRecommendation.packTitle).toBe('Simplified Mandarin basics');
+  expect(state.nextStepRecommendation.evidence).toMatch(/Learn language/);
+  await expect(page.locator('.curriculum-card.recommended .curriculum-title', { hasText: 'French first phrases' })).toHaveCount(0);
+  await expect(page.locator('.curriculum-card.recommended .curriculum-title', { hasText: 'Traditional HK Chinese basics' })).toHaveCount(0);
+  await expect(page.locator('#next-step-panel')).toContainText('Evidence:');
+  await expect(page.locator('#next-step-panel')).toContainText('Simplified Mandarin basics');
+  await expect(page.locator('#next-step-panel')).not.toContainText('French first phrases');
+});
+
+test('saved 11+ results open the matching available question practice', async ({ page }) => {
+  await page.goto('/');
+  await waitForQuestionBank(page);
+  await page.evaluate(() => {
+    localStorage.setItem('learningquest-history-v1-learner-1', JSON.stringify([{
+      date: 'Seed',
+      completedAt: '2026-08-20T10:00:00.000Z',
+      correct: 1,
+      total: 5,
+      percent: 20,
+      focus: 'Phonics',
+      subjects: { Phonics: { correct: 1, total: 5 } },
+      activityType: 'question-bank-practice',
+      practiceMode: 'Phonics',
+      attempted: 5
+    }]));
+  });
+  await page.reload();
+  await waitForQuestionBank(page);
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.nextStepRecommendation?.kind === 'weak-subject',
+    null,
+    { timeout: 10000 }
+  );
+
+  await expect(page.locator('#next-step-panel .next-step-title')).toHaveText('Practise Phonics next');
+  await expect(page.locator('#next-step-panel')).toContainText('Phonics is at 20%');
+  await expect(page.locator('#next-step-panel')).toContainText('available 11+ bank');
+  await expect(page.locator('.curriculum-card.recommended')).toContainText('Phonics is at 20% in saved 11+ practice.');
+  await page.locator('#next-step-panel').getByRole('button', { name: /Open Phonics practice/ }).tap();
+  const opened = await page.evaluate(() => window.__learningQuestTestState.openedRecommendedPractice);
+  expect(opened).toMatchObject({ type: 'question-bank', subject: 'Phonics' });
+  await expect(page.locator('#practice-options').getByRole('button', { name: /Phonics/ })).toHaveClass(/active/);
+  await expect(page.locator('#practice-panel')).toHaveClass(/guidance-focus/);
+  const state = await page.evaluate(() => window.__learningQuestTestState);
+  expect(state.recommendedCurriculumTitles).not.toContain('French first phrases');
+  expect(state.nextStepRecommendation.evidence).not.toMatch(/XP|streak|pass target/i);
 });
