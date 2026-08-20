@@ -142,7 +142,7 @@ test('mobile app shell opens without horizontal overflow and mission onboarding 
   await expect(makeTenCard.getByText('Count up from 6: 7, 8, 9, 10. That is 4 steps.')).toBeVisible();
   await expect(page.locator('#history-panel').getByText('Maths Foundation answer practice')).toBeVisible();
   await expect(page.locator('#parent-panel').getByText('Next: Review Government')).toBeVisible();
-  await expect(page.locator('#parent-panel').getByText('Recent practice flagged Government for coach follow-up.')).toBeVisible();
+  await expect(page.locator('#parent-panel').getByText('Saved local history for Learner 1 flagged Government.')).toBeVisible();
   const twoTimesCard = page.locator('#maths-foundation-grid .maths-card', { hasText: 'What is 2 × 6?' });
   await twoTimesCard.getByRole('textbox', { name: 'Answer for What is 2 × 6?' }).fill('12');
   await twoTimesCard.getByRole('button', { name: 'Check answer' }).tap();
@@ -257,7 +257,7 @@ test('mobile app shell opens without horizontal overflow and mission onboarding 
   await expect(makeTwentyCard.getByText('Try again')).toBeVisible();
   await expect(page.locator('#maths-foundation-grid .maths-card').first().getByText('Weak-skill rotation: revisiting this skill from recent learner history.')).toBeVisible();
   await expect(page.locator('#parent-panel').getByText('Next: Review Make 20')).toBeVisible();
-  await expect(page.locator('#parent-panel').getByText('Recent practice flagged Make 20 for coach follow-up.')).toBeVisible();
+  await expect(page.locator('#parent-panel').getByText('Saved local history for Learner 1 flagged Make 20.')).toBeVisible();
   const rotationState = await page.evaluate(() => window.__learningQuestTestState);
   expect(rotationState.mathsFoundationWeakSkills).toContain('Make 20');
   expect(rotationState.mathsFoundationRotationMode).toBe('Weak-skill rotation active');
@@ -1481,4 +1481,166 @@ test('saved 11+ results open the matching available question practice', async ({
   expect(state.nextStepRecommendation.evidence).not.toMatch(/XP|streak|pass target/i);
   expect(state.nextStepRecommendation.evidence).not.toMatch(/No saved practice yet/i);
   expect(state.recommendedEvidence.join(' ')).not.toMatch(/No saved practice yet/i);
+});
+
+test('family coaching view stays empty until a generic profile has saved history', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await waitForQuestionBank(page);
+  await page.waitForFunction(
+    () => Array.isArray(window.__learningQuestTestState?.familyCoachOverview)
+      && Array.isArray(window.__learningQuestTestState?.familyComparison),
+    null,
+    { timeout: 10000 }
+  );
+  await expect(page.locator('#parent-panel')).toBeHidden();
+  await expect(page.locator('#leaderboard-panel')).toBeHidden();
+  const state = await page.evaluate(() => window.__learningQuestTestState);
+  expect(state.parentCoachActions).toEqual([]);
+  expect(state.familyCoachOverview).toEqual([]);
+  expect(state.familyComparison).toEqual([]);
+});
+
+test('family coaching overview, comparison, and follow-up use only saved local histories', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await waitForQuestionBank(page);
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.mathsFoundationPackId === 'maths-foundation-v1'
+      && window.__learningQuestTestState?.lifeUKPackId === 'life-uk-v1'
+      && Number(window.__learningQuestTestState?.practiceQuestionBankCount || 0) >= 20,
+    null,
+    { timeout: 10000 }
+  );
+
+  await page.evaluate(() => {
+    localStorage.setItem('learningquest-active-learner-v1', 'learner-1');
+    localStorage.setItem('learningquest-history-v1-learner-1', JSON.stringify([{
+      date: 'Seed 1',
+      completedAt: '2026-08-20T10:00:00.000Z',
+      correct: 1,
+      total: 5,
+      percent: 20,
+      focus: 'Phonics',
+      subjects: { Phonics: { correct: 1, total: 5 } },
+      activityType: 'question-bank-practice',
+      practiceMode: 'Phonics',
+      attempted: 5,
+      privateName: 'Silas'
+    }]));
+    localStorage.setItem('learningquest-history-v1-learner-2', JSON.stringify([{
+      date: 'Seed 2',
+      completedAt: '2026-08-20T11:00:00.000Z',
+      correct: 0,
+      total: 6,
+      percent: 0,
+      focus: 'Maths Foundation answer practice',
+      subjects: { 'Maths Foundation': { correct: 0, total: 6 } },
+      activityType: 'maths-foundation-practice',
+      practiceMode: 'maths-foundation-answer-entry',
+      attempted: 1,
+      skillResults: { 'Make 20': { correct: 0, attempted: 1 } },
+      weakSkills: ['Make 20'],
+      rotationMode: 'maths-foundation-weak-skill-rotation',
+      privateName: 'Sylvie'
+    }]));
+    localStorage.removeItem('learningquest-history-v1-learner-3');
+    localStorage.removeItem('learningquest-history-v1-coach-demo');
+    localStorage.removeItem('learningquest-history-v1');
+  });
+  await page.reload();
+  await waitForQuestionBank(page);
+  await page.waitForFunction(
+    () => Array.isArray(window.__learningQuestTestState?.parentCoachActions)
+      && window.__learningQuestTestState.parentCoachActions.length === 2,
+    null,
+    { timeout: 10000 }
+  );
+
+  const overview = page.locator('#parent-panel');
+  const comparison = page.locator('#leaderboard-panel');
+  await expect(overview).toBeVisible();
+  await expect(comparison).toBeVisible();
+  await expect(overview).toContainText('Same-browser overview');
+  await expect(overview).toContainText('not authentication, parental authorization, or isolation');
+  await expect(overview).toContainText('not uploaded automatically');
+  await expect(comparison.getByRole('heading', { name: 'Local learner comparison' })).toBeVisible();
+  await expect(comparison).toContainText('not a cloud ranking or public leaderboard');
+  await expect(overview).not.toContainText(/\bXP\b|sign in|password|parental lock|cloud ranking/i);
+  await expect(comparison).not.toContainText(/\bXP\b|sign in|password|parental lock|day streak/i);
+  await expect(overview).not.toContainText('Silas');
+  await expect(overview).not.toContainText('Sylvie');
+  await expect(overview).not.toContainText('Learner 3');
+  await expect(overview).not.toContainText('Coach Demo');
+  await expect(comparison).not.toContainText('Learner 3');
+  await expect(comparison).not.toContainText('Coach Demo');
+
+  const learner1Row = overview.locator('.family-row[data-learner-id="learner-1"]');
+  const learner2Row = overview.locator('.family-row[data-learner-id="learner-2"]');
+  await expect(learner1Row).toContainText('Learner 1');
+  await expect(learner1Row).toContainText('Next: Rebuild Phonics');
+  await expect(learner1Row).toContainText('Saved local history for Learner 1: Phonics is at 20%');
+  await expect(learner1Row).not.toContainText('Make 20');
+  await expect(learner2Row).toContainText('Learner 2');
+  await expect(learner2Row).toContainText('Next: Review Make 20');
+  await expect(learner2Row).toContainText('Saved local history for Learner 2 flagged Make 20.');
+  await expect(learner2Row).not.toContainText('Phonics');
+
+  const comparison1 = comparison.locator('.leaderboard-row[data-learner-id="learner-1"]');
+  const comparison2 = comparison.locator('.leaderboard-row[data-learner-id="learner-2"]');
+  await expect(comparison1).toContainText('20% saved avg');
+  await expect(comparison1).toContainText('Phonics');
+  await expect(comparison1).not.toContainText('Make 20');
+  await expect(comparison2).toContainText('0% saved avg');
+  await expect(comparison2).toContainText('Maths Foundation');
+  await expect(comparison2).not.toContainText('Phonics');
+
+  const state = await page.evaluate(() => window.__learningQuestTestState);
+  expect(state.parentCoachActions.map(row => row.learnerId).sort()).toEqual(['learner-1', 'learner-2']);
+  expect(state.familyComparison.map(row => row.learnerId)).toEqual(['learner-1', 'learner-2']);
+  expect(state.familyComparison[0]).toMatchObject({ learnerId: 'learner-1', savedAverage: 20, savedAttempts: 1, latestFocus: 'Phonics' });
+  expect(state.familyComparison[1]).toMatchObject({ learnerId: 'learner-2', savedAverage: 0, savedAttempts: 1, latestFocus: 'Maths Foundation answer practice' });
+  expect(state.familyComparison.every(row => row.xp === undefined && row.streak === undefined && row.level === undefined)).toBeTruthy();
+  expect(state.parentCoachActions).toEqual(expect.arrayContaining([
+    expect.objectContaining({
+      learner: 'Learner 1',
+      learnerId: 'learner-1',
+      title: 'Rebuild Phonics',
+      subject: 'Phonics',
+      evidence: expect.stringContaining('Phonics is at 20%')
+    }),
+    expect.objectContaining({
+      learner: 'Learner 2',
+      learnerId: 'learner-2',
+      title: 'Review Make 20',
+      subject: 'Maths Foundation',
+      priority: 'weak-skill',
+      evidence: expect.stringContaining('Learner 2 flagged Make 20')
+    })
+  ]));
+
+  await learner2Row.getByRole('button', { name: 'Open review cards' }).tap();
+  await expect(page.locator('#learner-note')).toContainText('Learner 2');
+  await expect(page.locator('#maths-foundation-grid')).toHaveClass(/guidance-focus/);
+  await expect(page.locator('#maths-foundation-grid .maths-card').first().getByText('Weak-skill rotation: revisiting this skill from recent learner history.')).toBeVisible();
+
+  const follow = await page.evaluate(() => window.__learningQuestTestState.familyCoachFollowUp);
+  expect(follow).toMatchObject({
+    requestedLearnerId: 'learner-2',
+    previousLearnerId: 'learner-1',
+    switchedTo: 'learner-2',
+    switchedBeforeOpen: true,
+    subject: 'Maths Foundation'
+  });
+  expect(follow.openedPractice).toMatchObject({ type: 'maths-foundation' });
+
+  const histories = await readLearnerHistories(page);
+  expect(histories.active).toBe('learner-2');
+  expect(histories.learner1).toHaveLength(1);
+  expect(histories.learner1[0]).toMatchObject({ focus: 'Phonics', percent: 20 });
+  expect(histories.learner1[0].privateName).toBeUndefined();
+  expect(histories.learner2).toHaveLength(1);
+  expect(histories.learner2[0]).toMatchObject({ weakSkills: ['Make 20'] });
+  expect(histories.learner3).toEqual([]);
+  expect(histories.coach).toEqual([]);
 });
