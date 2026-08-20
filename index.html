@@ -370,6 +370,9 @@
     .curriculum-status { color: var(--primary); font-size: 0.73rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
     .curriculum-status.recommended { color: #1d4ed8; }
     .curriculum-insight { border-left: 3px solid #93c5fd; padding-left: 9px; }
+    .curriculum-card .btn, .next-step-card .btn { width: 100%; }
+    .next-step-kind { font-size: 0.72rem; font-weight: 900; letter-spacing: 0.05em; text-transform: uppercase; color: #1d4ed8; }
+    .guidance-focus { box-shadow: 0 0 0 3px #93c5fd; }
     .flashcard-panel, .matching-panel, .comparison-panel, .maths-panel, .life-uk-panel { margin-top: 14px; }
     .matching-grid, .comparison-grid, .maths-grid, .life-uk-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
     .matching-card { border: 1px solid #bbf7d0; background: linear-gradient(180deg, #f0fdf4, #fff); border-radius: 16px; padding: 12px; display: grid; gap: 8px; }
@@ -1282,23 +1285,88 @@
       return Array.isArray(items) && items.includes(value);
     }
 
-    function recommendationCopy(stageId, goalId) {
-      if (stageId === 'exam') return 'Best match for exam prep from the live question bank.';
-      if (stageId === 'primary') return goalId === 'language'
-        ? 'Primary language goal match from the runtime content-pack registry.'
-        : 'Primary learner match for building quick confidence.';
-      if (stageId === 'adult') return goalId === 'language'
-        ? 'Adult language goal match from the runtime content-pack registry.'
-        : 'Adult learning match for bite-sized recall.';
-      return goalId === 'language'
-        ? 'Early language goal match from the runtime content-pack registry.'
-        : 'Early learner match for playful recognition practice.';
+    let guidanceActions = {};
+
+    function stageGoalLabel(state = onboardingState()) {
+      const resolved = { stage: 'primary', goal: 'confidence', ...state };
+      const stage = LEARNER_STAGES.find(item => item.id === resolved.stage)?.label || resolved.stage;
+      const goal = LEARNING_GOALS.find(item => item.id === resolved.goal)?.label || resolved.goal;
+      return `${stage} · ${goal}`;
     }
 
-    function packRecommendationScore(pack, state) {
+    function recommendationCopy(stageId, goalId, pack = null, emptyHistory = true) {
+      const setup = stageGoalLabel({ stage: stageId, goal: goalId });
+      const packTitle = pack?.title ? ` (${pack.title})` : '';
+      if (!emptyHistory) {
+        return `Available pack metadata match for ${setup}${packTitle}.`;
+      }
+      return `Baseline from ${setup} and available pack metadata${packTitle}. No saved practice yet.`;
+    }
+
+    function packIsAvailable(pack) {
+      if (!pack) return false;
+      if (pack.readiness === 'Planned' || pack.readiness === 'Pack unavailable' || pack.readiness === 'Loading pack') return false;
+      if (pack.readiness !== 'Live' && pack.readiness !== 'Live slice') return false;
+      return Boolean(packPracticeSurface(pack));
+    }
+
+    function packPracticeSurface(pack) {
+      const domain = pack?.domain || '';
+      if (domain === '11+ School Prep') return allQuestions.length > 0;
+      if (domain === 'Maths Foundation') return mathsFoundationCards.length > 0;
+      if (domain === 'Life in the UK') return lifeUKQuestions.length > 0;
+      if (domain === 'Chinese · Traditional HK') return hkChineseFlashcards.length > 0;
+      if (domain === 'Chinese · Simplified Mandarin') return mandarinFlashcards.length > 0;
+      return false;
+    }
+
+    function practiceTargetForSubject(subject) {
+      if (subject === 'Maths Foundation') {
+        return mathsFoundationCards.length ? { type: 'maths-foundation', label: 'Maths Foundation practice' } : null;
+      }
+      if (subject === 'Life in the UK') {
+        if (!lifeUKQuestions.length) return null;
+        return lifeUKWeakTopics().length
+          ? { type: 'life-uk-drill', label: 'Life in the UK weak-topic practice' }
+          : { type: 'life-uk', label: 'Life in the UK practice' };
+      }
+      if (subject === 'Chinese · Traditional HK') {
+        return hkChineseFlashcards.length ? { type: 'matching', packKey: 'hkChinese', label: 'Traditional HK Chinese matching' } : null;
+      }
+      if (subject === 'Chinese · Simplified Mandarin') {
+        return mandarinFlashcards.length ? { type: 'matching', packKey: 'mandarin', label: 'Simplified Mandarin matching' } : null;
+      }
+      if (subject && subject !== 'Mixed' && subjectQuestionCount(subject)) {
+        return { type: 'question-bank', subject, label: `${subject} practice` };
+      }
+      if ((subject === 'Mixed' || subject === '11+ School Prep') && allQuestions.length) {
+        return { type: 'question-bank', subject: 'Mixed', label: '11+ starter bank' };
+      }
+      return null;
+    }
+
+    function packPracticeTarget(pack, history = loadHistory()) {
+      const domain = pack?.domain || '';
+      if (domain === '11+ School Prep') {
+        if (!allQuestions.length) return null;
+        const weakest = subjectStatRows(history).filter(row => subjectQuestionCount(row.subject) > 0)[0];
+        const subject = weakest && weakest.percent < 80 ? weakest.subject : 'Mixed';
+        return {
+          type: 'question-bank',
+          subject,
+          label: subject === 'Mixed' ? '11+ starter bank' : `${subject} practice`
+        };
+      }
+      return practiceTargetForSubject(domain);
+    }
+
+    function packRecommendationScore(pack, state, historyInsight = { score: 0 }) {
+      if (!packIsAvailable(pack)) return 0;
       const stageMatch = arrayIncludes(state.stage, pack.recommendedStages);
       const goalMatch = arrayIncludes(state.goal, pack.recommendedGoals);
-      const liveBonus = pack.readiness === 'Live' || pack.readiness === 'Live slice' ? 1 : 0;
+      const hasEvidence = Number(historyInsight.score || 0) > 0;
+      if (!stageMatch && !goalMatch && !hasEvidence) return 0;
+      const liveBonus = 1;
       const primaryPracticeBonus = pack.kind === 'practice-cards' && stageMatch && goalMatch && ['early', 'primary'].includes(state.stage) ? 1 : 0;
       return (stageMatch ? 2 : 0) + (goalMatch ? 3 : 0) + liveBonus + primaryPracticeBonus;
     }
@@ -1359,7 +1427,7 @@
           return { score: 8, reason: `Life in the UK practice flagged ${weakTopics.slice(0, 2).join(', ')} for review.` };
         }
         if (percent !== null && percent < 75) {
-          return { score: 7, reason: `Life in the UK is at ${percent}% against the 75% pass target.` };
+          return { score: 7, reason: `Life in the UK is at ${percent}% in saved learner history.` };
         }
         if (percent !== null) return { score: 3, reason: `Life in the UK has saved mock-practice history at ${percent}%.` };
       }
@@ -1367,30 +1435,54 @@
     }
 
     function progressionPathText(pack) {
-      const steps = Array.isArray(pack.progressionSteps) && pack.progressionSteps.length
+      const steps = (Array.isArray(pack.progressionSteps) && pack.progressionSteps.length
         ? pack.progressionSteps
-        : ['Try the live activity', 'Review feedback and weak topics', 'Move to the next recommended pack'];
+        : ['Try the live activity', 'Review feedback and weak topics', 'Move to the next recommended pack'])
+        .filter(step => !/pass target|\bXP\b|streak|planned pack/i.test(String(step)));
       return steps.slice(0, 4).join(' → ');
     }
 
     function recommendCurriculumPacks(packs) {
       const state = { stage: 'primary', goal: 'confidence', ...onboardingState() };
       const history = loadHistory();
+      const emptyHistory = !history.length;
       const scored = packs.map((pack, index) => {
         const historyInsight = packHistoryInsight(pack, history);
-        return { pack, index, historyInsight, score: packRecommendationScore(pack, state) + historyInsight.score };
+        const score = packRecommendationScore(pack, state, historyInsight) + historyInsight.score;
+        return { pack, index, historyInsight, score };
       }).sort((a, b) => b.score - a.score || b.historyInsight.score - a.historyInsight.score || a.index - b.index);
-      const recommendedIndexes = new Set(scored.filter(item => item.score > 0).slice(0, 2).map(item => item.index));
+      const recommendedIndexes = new Set(
+        scored.filter(item => item.score > 0 && packIsAvailable(item.pack)).slice(0, 2).map(item => item.index)
+      );
       return packs.map((pack, index) => {
         const scoredItem = scored.find(item => item.index === index);
-        if (!recommendedIndexes.has(index)) return pack;
         const historyInsight = scoredItem?.historyInsight || { score: 0, reason: '' };
+        const action = packPracticeTarget(pack, history);
+        const guidanceActionId = pack.id || pack.title;
+        if (action) guidanceActions[guidanceActionId] = action;
+        if (!recommendedIndexes.has(index)) {
+          return {
+            ...pack,
+            id: guidanceActionId,
+            catalogIndex: index,
+            recommended: false,
+            recommendationScore: scoredItem?.score || 0,
+            practiceAction: action || null
+          };
+        }
+        const guidanceKind = emptyHistory ? 'baseline' : (historyInsight.reason ? 'saved-evidence' : 'stage-goal');
         return {
           ...pack,
+          id: guidanceActionId,
+          catalogIndex: index,
           recommended: true,
-          recommendationReason: historyInsight.reason || recommendationCopy(state.stage, state.goal),
+          guidanceKind,
+          recommendationReason: historyInsight.reason || recommendationCopy(state.stage, state.goal, pack, emptyHistory),
           historyInsight: historyInsight.reason,
-          historyRecommendationScore: historyInsight.score
+          historyRecommendationScore: historyInsight.score,
+          recommendationScore: scoredItem?.score || 0,
+          practiceAction: action || null,
+          guidanceActionId
         };
       });
     }
@@ -1400,6 +1492,8 @@
       const path = contentPackPath('hk-chinese-basics-v1');
       const pack = { ...definition, ...(hkChinesePack || {}) };
       return {
+        id: pack.id || 'hk-chinese-basics-v1',
+        kind: pack.kind || 'flashcards',
         title: pack.title,
         domain: pack.domain,
         language: pack.language,
@@ -1418,6 +1512,8 @@
       const path = contentPackPath('mandarin-basics-v1');
       const pack = { ...definition, ...(mandarinPack || {}) };
       return {
+        id: pack.id || 'mandarin-basics-v1',
+        kind: pack.kind || 'flashcards',
         title: pack.title,
         domain: pack.domain,
         language: pack.language,
@@ -1459,15 +1555,19 @@
       };
     }
 
-    function curriculumPacks() {
-      return recommendCurriculumPacks([
-        { title: '11+ starter bank', domain: '11+ School Prep', language: 'English', learners: 'Young learners', activity: 'MCQ quiz', readiness: 'Live', next: 'Split into topic packs and add source metadata.', recommendedStages: ['primary', 'exam'], recommendedGoals: ['confidence', 'mastery', 'exam-ready'], progressionSteps: ['Start with a mixed diagnostic round', 'Focus quick practice on weak skills', 'Return to timed exam-prep missions'] },
+    function curriculumCatalog() {
+      return [
+        { id: 'question-bank', title: '11+ starter bank', domain: '11+ School Prep', language: 'English', learners: 'Young learners', activity: 'MCQ quiz', readiness: allQuestions.length ? 'Live' : 'Loading pack', next: 'Split into topic packs and add source metadata.', recommendedStages: ['primary', 'exam'], recommendedGoals: ['confidence', 'mastery', 'exam-ready'], progressionSteps: ['Start with a mixed diagnostic round', 'Focus quick practice on weak skills', 'Return to timed exam-prep missions'] },
         hkPackSummary(),
         mandarinPackSummary(),
         mathsPackSummary(),
         lifeUKPackSummary(),
-        { title: 'French first phrases', domain: 'French', language: 'French + English', learners: 'All learners', activity: 'Phrase recall', readiness: 'Planned', next: 'Start with greetings, family, food, and numbers, travel phrases.', recommendedStages: ['early', 'primary', 'adult'], recommendedGoals: ['language', 'confidence'], progressionSteps: ['Start with greetings', 'Add family, food, and numbers', 'Practise phrase recall in short missions'] }
-      ]);
+        { id: 'french-planned', title: 'French first phrases', domain: 'French', language: 'French + English', learners: 'All learners', activity: 'Phrase recall', readiness: 'Planned', next: 'Start with greetings, family, food, and numbers, travel phrases.', recommendedStages: ['early', 'primary', 'adult'], recommendedGoals: ['language', 'confidence'], progressionSteps: ['Start with greetings', 'Add family, food, and numbers', 'Practise phrase recall in short missions'] }
+      ];
+    }
+
+    function curriculumPacks() {
+      return recommendCurriculumPacks(curriculumCatalog());
     }
 
 
@@ -1482,6 +1582,7 @@
       localStorage.setItem(ONBOARDING_KEY, JSON.stringify(next));
       renderOnboarding();
       renderCurriculumPacks();
+      renderNextStepRecommendation();
     }
 
     function selectedStage() {
@@ -1909,6 +2010,7 @@
       const list = document.getElementById('history-list');
       renderParentOverview();
       renderFamilyLeaderboard();
+      renderCurriculumPacks();
       renderNextStepRecommendation(history);
       if (!history.length) {
         panel.style.display = 'none';
@@ -2157,49 +2259,165 @@
     }
 
     function nextStepRecommendation(history = loadHistory()) {
-      const subjects = practiceSubjects().filter(subject => subject !== 'Mixed');
-      if (!subjects.length) return null;
-      const stats = subjectStats(history);
-      const attempted = new Set(Object.keys(stats));
-      const untried = subjects.find(subject => !attempted.has(subject));
-      if (!history.length || untried) {
-        const subject = untried || subjects[0];
+      const state = { stage: 'primary', goal: 'confidence', ...onboardingState() };
+      const setup = stageGoalLabel(state);
+      const packs = curriculumPacks();
+      const recommended = packs
+        .filter(pack => pack.recommended)
+        .sort((a, b) => (Number(b.recommendationScore) || 0) - (Number(a.recommendationScore) || 0)
+          || (Number(b.historyRecommendationScore) || 0) - (Number(a.historyRecommendationScore) || 0)
+          || (Number(a.catalogIndex) || 0) - (Number(b.catalogIndex) || 0));
+      const available = packs.filter(packIsAvailable);
+      const weak = latestWeakSkillInsight(history);
+      if (weak) {
+        const action = practiceTargetForSubject(weak.subject);
+        if (action) {
+          return {
+            kind: 'weak-skill',
+            title: `Review ${weak.skill}`,
+            evidence: `Saved ${weak.subject} practice flagged ${weak.skill}.`,
+            reason: `Saved ${weak.subject} practice flagged ${weak.skill}.`,
+            actionLabel: `Open ${action.label}`,
+            action,
+            subject: weak.subject,
+            packTitle: action.label
+          };
+        }
+      }
+      const weakestQuestion = subjectStatRows(history).filter(row => subjectQuestionCount(row.subject) > 0)[0];
+      if (weakestQuestion && weakestQuestion.percent < 80) {
+        const action = { type: 'question-bank', subject: weakestQuestion.subject, label: `${weakestQuestion.subject} practice` };
         return {
-          subject,
-          title: `Start with ${subject}`,
-          reason: history.length
-            ? `${subject} has no saved attempts yet. Try a focused set so the dashboard can spot strengths and gaps.`
-            : 'Complete one focused round to unlock personalised subject guidance for this learner.'
+          kind: 'weak-subject',
+          title: `Practise ${weakestQuestion.subject} next`,
+          evidence: `${weakestQuestion.subject} is at ${weakestQuestion.percent}% across ${weakestQuestion.total} saved question${weakestQuestion.total === 1 ? '' : 's'} in the available 11+ bank.`,
+          reason: `${weakestQuestion.subject} is at ${weakestQuestion.percent}% across ${weakestQuestion.total} saved question${weakestQuestion.total === 1 ? '' : 's'} in the available 11+ bank.`,
+          actionLabel: `Open ${weakestQuestion.subject} practice`,
+          action,
+          subject: weakestQuestion.subject,
+          packTitle: '11+ starter bank'
         };
       }
-      const weakest = subjectStatRows(history)
-        .filter(row => subjectQuestionCount(row.subject) > 0)[0];
-      if (!weakest) return { subject: subjects[0], title: 'Build a mixed baseline', reason: 'Try a short focused round so the app can recommend the next subject with evidence.' };
-      const reason = weakest.percent >= 80
-        ? `${weakest.subject} is already strong at ${weakest.percent}%. Keep it warm with one focused round.`
-        : `${weakest.subject} is the current focus area at ${weakest.percent}% across ${weakest.total} saved question${weakest.total === 1 ? '' : 's'}.`;
-      return { subject: weakest.subject, title: `Practise ${weakest.subject} next`, reason };
+      const weakestPackSubject = subjectStatRows(history).filter(row => practiceTargetForSubject(row.subject))[0];
+      if (weakestPackSubject && weakestPackSubject.percent < 80) {
+        const action = practiceTargetForSubject(weakestPackSubject.subject);
+        return {
+          kind: 'weak-subject',
+          title: `Practise ${weakestPackSubject.subject} next`,
+          evidence: `${weakestPackSubject.subject} is at ${weakestPackSubject.percent}% in saved learner history.`,
+          reason: `${weakestPackSubject.subject} is at ${weakestPackSubject.percent}% in saved learner history.`,
+          actionLabel: `Open ${action.label}`,
+          action,
+          subject: weakestPackSubject.subject,
+          packTitle: action.label
+        };
+      }
+      const top = recommended[0] || available[0];
+      if (!top) return null;
+      const action = top.practiceAction || packPracticeTarget(top, history);
+      if (!history.length) {
+        return {
+          kind: 'baseline',
+          title: `Baseline: start with ${top.title}`,
+          evidence: `No saved practice for this learner. Baseline from ${setup} and available pack metadata (${top.title}).`,
+          reason: `No saved practice for this learner. Baseline from ${setup} and available pack metadata (${top.title}).`,
+          actionLabel: `Open ${top.title}`,
+          action,
+          subject: top.domain,
+          packTitle: top.title
+        };
+      }
+      const stageGoalEvidence = top.historyInsight
+        || (top.recommendationReason && !/No saved practice yet/i.test(top.recommendationReason)
+          ? top.recommendationReason
+          : `Available pack metadata match for ${setup}${top.title ? ` (${top.title})` : ''}.`);
+      return {
+        kind: 'stage-goal',
+        title: `Continue with ${top.title}`,
+        evidence: stageGoalEvidence,
+        reason: stageGoalEvidence,
+        actionLabel: `Open ${top.title}`,
+        action,
+        subject: top.domain,
+        packTitle: top.title
+      };
+    }
+
+    function clearGuidanceFocus() {
+      document.querySelectorAll('.guidance-focus').forEach(node => node.classList.remove('guidance-focus'));
+    }
+
+    function focusGuidanceTarget(id) {
+      clearGuidanceFocus();
+      const node = document.getElementById(id);
+      if (!node) return;
+      node.classList.add('guidance-focus');
+      node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function openRecommendedPracticeTarget(action) {
+      if (!action) return;
+      window.__learningQuestTestState = {
+        ...(window.__learningQuestTestState || {}),
+        openedRecommendedPractice: {
+          type: action.type,
+          subject: action.subject || null,
+          packKey: action.packKey || null,
+          label: action.label || null
+        }
+      };
+      if (action.type === 'question-bank') {
+        selectPracticeSubject(action.subject || 'Mixed');
+        focusGuidanceTarget('practice-panel');
+        return;
+      }
+      if (action.type === 'maths-foundation') {
+        focusGuidanceTarget('maths-foundation-grid');
+        return;
+      }
+      if (action.type === 'life-uk-drill') {
+        startLifeUKDrill();
+        focusGuidanceTarget('life-uk-drill-area');
+        return;
+      }
+      if (action.type === 'life-uk') {
+        focusGuidanceTarget('life-uk-grid');
+        return;
+      }
+      if (action.type === 'matching') {
+        focusGuidanceTarget(action.packKey === 'mandarin' ? 'mandarin-matching-grid' : 'hk-matching-grid');
+      }
+    }
+
+    function openRecommendedPractice(id) {
+      openRecommendedPracticeTarget(guidanceActions[id]);
     }
 
     function startRecommendedPractice(subject) {
+      const target = practiceTargetForSubject(subject);
+      if (target) {
+        openRecommendedPracticeTarget(target);
+        return;
+      }
       selectPracticeSubject(subject);
-      document.getElementById('practice-panel')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      focusGuidanceTarget('practice-panel');
     }
 
     function renderNextStepRecommendation(history = loadHistory()) {
       const panel = document.getElementById('next-step-panel');
       const card = document.getElementById('next-step-card');
       const rec = nextStepRecommendation(history);
-      if (!rec) {
-        panel.style.display = 'none';
+      if (!rec || !card || !panel) {
+        if (panel) panel.style.display = 'none';
         return;
       }
-      const count = subjectQuestionCount(rec.subject);
+      if (rec.action) guidanceActions['next-step'] = rec.action;
       panel.style.display = 'block';
       card.innerHTML = `
+        ${rec.kind === 'baseline' ? '<div class="next-step-kind">Baseline</div>' : ''}
         <div class="next-step-title">${escapeHTML(rec.title)}</div>
-        <div class="next-step-meta">${escapeHTML(rec.reason)} ${count ? `${count} question${count === 1 ? '' : 's'} available.` : ''}</div>
-        <button class="btn btn-secondary" onclick="startRecommendedPractice('${escapeHTML(rec.subject)}')">Use ${escapeHTML(rec.subject)} quick practice</button>
+        <div class="next-step-meta"><strong>Evidence:</strong> ${escapeHTML(rec.evidence)}</div>
+        ${rec.action ? `<button class="btn btn-secondary" type="button" onclick="openRecommendedPractice('next-step')">${escapeHTML(rec.actionLabel)}</button>` : ''}
       `;
     }
 
@@ -3836,6 +4054,20 @@
         recommendedProgressionPaths: curriculumPacks().filter(pack => pack.recommended).map(pack => progressionPathText(pack)),
         historyAwareCurriculumInsights: curriculumPacks().filter(pack => pack.recommended && pack.historyInsight).map(pack => pack.historyInsight),
         historyRecommendationScores: curriculumPacks().filter(pack => pack.recommended).map(pack => ({ title: pack.title, score: pack.historyRecommendationScore || 0 })),
+        recommendedEvidence: curriculumPacks().filter(pack => pack.recommended).map(pack => pack.recommendationReason),
+        recommendedGuidanceKinds: curriculumPacks().filter(pack => pack.recommended).map(pack => pack.guidanceKind),
+        nextStepRecommendation: (() => {
+          const rec = nextStepRecommendation(history);
+          return rec ? {
+            kind: rec.kind,
+            title: rec.title,
+            evidence: rec.evidence,
+            actionLabel: rec.actionLabel,
+            actionType: rec.action?.type || null,
+            subject: rec.subject || null,
+            packTitle: rec.packTitle || null
+          } : null;
+        })(),
         parentCoachActions: parentCoachActions(),
         matchingPracticeCounts: { hkChinese: hkChineseFlashcards.length ? Math.min(4, hkChineseFlashcards.length) : 0, mandarin: mandarinFlashcards.length ? Math.min(4, mandarinFlashcards.length) : 0 },
         mathsFoundationCardCount: mathsFoundationCards.length,
@@ -4220,10 +4452,11 @@
             <span class="curriculum-badge">${escapeHTML(pack.language)}</span>
             <span class="curriculum-badge">${escapeHTML(pack.activity)}</span>
           </div>
-          ${pack.recommended ? `<div class="curriculum-meta"><strong>Why:</strong> ${escapeHTML(pack.recommendationReason)}</div>` : ''}
-          ${pack.recommended && pack.historyInsight ? `<div class="curriculum-meta curriculum-insight"><strong>Learner signal:</strong> ${escapeHTML(pack.historyInsight)}</div>` : ''}
+          ${pack.recommended && pack.guidanceKind === 'baseline' ? '<div class="curriculum-badges"><span class="curriculum-badge">Baseline</span></div>' : ''}
+          ${pack.recommended ? `<div class="curriculum-meta curriculum-insight"><strong>Evidence:</strong> ${escapeHTML(pack.recommendationReason)}</div>` : ''}
           ${pack.recommended ? `<div class="curriculum-meta"><strong>Path:</strong> ${escapeHTML(progressionPathText(pack))}</div>` : ''}
           <div class="curriculum-meta"><strong>Next:</strong> ${escapeHTML(pack.next)}</div>
+          ${pack.recommended && pack.practiceAction ? `<button class="btn btn-secondary" type="button" onclick="openRecommendedPractice('${escapeHTML(pack.id || pack.title)}')">Open ${escapeHTML(pack.practiceAction.label || pack.title)}</button>` : ''}
         </article>
       `).join('');
       updateRecommendedCurriculumTestState();
@@ -4784,6 +5017,7 @@
         renderStats(updatedHistory);
         renderBadges(updatedHistory);
         renderSubjectDashboard(updatedHistory);
+        renderCurriculumPacks();
         renderNextStepRecommendation(updatedHistory);
         renderParentOverview();
         updateQuestionBankTestState(updatedHistory[0]);
