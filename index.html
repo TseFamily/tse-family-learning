@@ -1294,9 +1294,12 @@
       return `${stage} · ${goal}`;
     }
 
-    function recommendationCopy(stageId, goalId, pack = null) {
+    function recommendationCopy(stageId, goalId, pack = null, emptyHistory = true) {
       const setup = stageGoalLabel({ stage: stageId, goal: goalId });
       const packTitle = pack?.title ? ` (${pack.title})` : '';
+      if (!emptyHistory) {
+        return `Available pack metadata match for ${setup}${packTitle}.`;
+      }
       return `Baseline from ${setup} and available pack metadata${packTitle}. No saved practice yet.`;
     }
 
@@ -1474,7 +1477,7 @@
           catalogIndex: index,
           recommended: true,
           guidanceKind,
-          recommendationReason: historyInsight.reason || recommendationCopy(state.stage, state.goal, pack),
+          recommendationReason: historyInsight.reason || recommendationCopy(state.stage, state.goal, pack, emptyHistory),
           historyInsight: historyInsight.reason,
           historyRecommendationScore: historyInsight.score,
           recommendationScore: scoredItem?.score || 0,
@@ -2324,11 +2327,15 @@
           packTitle: top.title
         };
       }
+      const stageGoalEvidence = top.historyInsight
+        || (top.recommendationReason && !/No saved practice yet/i.test(top.recommendationReason)
+          ? top.recommendationReason
+          : `Available pack metadata match for ${setup}${top.title ? ` (${top.title})` : ''}.`);
       return {
         kind: 'stage-goal',
         title: `Continue with ${top.title}`,
-        evidence: top.recommendationReason || `Available pack metadata match for ${setup}.`,
-        reason: top.recommendationReason || `Available pack metadata match for ${setup}.`,
+        evidence: stageGoalEvidence,
+        reason: stageGoalEvidence,
         actionLabel: `Open ${top.title}`,
         action,
         subject: top.domain,

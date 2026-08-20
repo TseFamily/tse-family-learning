@@ -1355,6 +1355,9 @@ test('guidance turns stage, packs, and saved evidence into the next available pr
   expect(weakState.recommendedCurriculumTitles).toContain('Maths Foundation practice');
   expect(weakState.historyAwareCurriculumInsights.join(' ')).toContain('Make 20');
   expect(weakState.recommendedCurriculumTitles).not.toContain('French first phrases');
+  expect(weakState.nextStepRecommendation.evidence).not.toMatch(/No saved practice yet/i);
+  expect(weakState.recommendedEvidence.join(' ')).not.toMatch(/No saved practice yet/i);
+  expect(weakState.recommendedEvidence.join(' ')).toMatch(/Make 20|available pack metadata match/i);
 
   await page.locator('#next-step-panel').getByRole('button', { name: /Open Maths Foundation practice/ }).tap();
   const openedWeak = await page.evaluate(() => window.__learningQuestTestState.openedRecommendedPractice);
@@ -1397,6 +1400,48 @@ test('guidance does not recommend a planned or unavailable pack', async ({ page 
   await expect(page.locator('#next-step-panel')).not.toContainText('French first phrases');
 });
 
+test('saved evidence is not named as empty history on a stage/goal fallback', async ({ page }) => {
+  await page.goto('/');
+  await waitForQuestionBank(page);
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.mathsFoundationPackId === 'maths-foundation-v1'
+      && window.__learningQuestTestState?.lifeUKPackId === 'life-uk-v1',
+    null,
+    { timeout: 10000 }
+  );
+  await page.evaluate(() => {
+    localStorage.setItem('learningquest-history-v1-learner-1', JSON.stringify([{
+      date: 'Seed',
+      completedAt: '2026-08-20T10:00:00.000Z',
+      correct: 9,
+      total: 10,
+      percent: 90,
+      focus: 'Life in the UK',
+      subjects: { 'Life in the UK': { correct: 9, total: 10 } },
+      activityType: 'life-uk-practice',
+      practiceMode: 'life-uk-starter',
+      attempted: 10
+    }]));
+  });
+  await page.reload();
+  await waitForQuestionBank(page);
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.nextStepRecommendation
+      && Array.isArray(window.__learningQuestTestState?.recommendedEvidence),
+    null,
+    { timeout: 10000 }
+  );
+
+  const state = await page.evaluate(() => window.__learningQuestTestState);
+  expect(state.nextStepRecommendation.kind).not.toBe('baseline');
+  expect(state.nextStepRecommendation.evidence).not.toMatch(/No saved practice yet/i);
+  expect(state.recommendedEvidence.join(' ')).not.toMatch(/No saved practice yet/i);
+  expect(state.recommendedCurriculumTitles).not.toContain('French first phrases');
+  expect(state.nextStepRecommendation.evidence).toMatch(/Life in the UK|available pack metadata match/i);
+  await expect(page.locator('#next-step-panel')).not.toContainText('No saved practice yet');
+  await expect(page.locator('#next-step-panel')).toContainText('Evidence:');
+});
+
 test('saved 11+ results open the matching available question practice', async ({ page }) => {
   await page.goto('/');
   await waitForQuestionBank(page);
@@ -1434,4 +1479,6 @@ test('saved 11+ results open the matching available question practice', async ({
   const state = await page.evaluate(() => window.__learningQuestTestState);
   expect(state.recommendedCurriculumTitles).not.toContain('French first phrases');
   expect(state.nextStepRecommendation.evidence).not.toMatch(/XP|streak|pass target/i);
+  expect(state.nextStepRecommendation.evidence).not.toMatch(/No saved practice yet/i);
+  expect(state.recommendedEvidence.join(' ')).not.toMatch(/No saved practice yet/i);
 });
