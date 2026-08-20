@@ -369,7 +369,12 @@ for (const marker of [
   'question-bank-practice',
   'Submit answer',
   'updateQuestionBankTestState',
-  'quizAnswersLocked'
+  'quizAnswersLocked',
+  'HISTORY_LIMIT',
+  'persistHistory',
+  'isGovernedHistoryEntry',
+  'resetProgressRuntimeState',
+  'activeLearnerHistoryKey'
 ]) {
   if (!html.includes(marker)) throw new Error(`Missing runtime HK Chinese content-pack marker: ${marker}`);
 }
