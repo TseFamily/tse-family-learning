@@ -8,6 +8,9 @@ one clear next activity, gives immediate teaching feedback, and keeps enough
 local history for the learner or a family coach to choose what to practise
 next.
 
+The product name is LearningQuest. The Tse Family organisation and this
+repository host it; they are not a second product or a second destination.
+
 The product is broader than the school-prep quiz from which it grew, but it is
 not a generic catalogue of promised subjects. A learning path exists only when
 checked-in question or content-pack data drives a usable activity. The shared
@@ -71,8 +74,8 @@ optional pack outage disables unrelated question practice, histories cross
 local learner keys, private family identity becomes product data, or local
 storage/export is described as protected identity or automatic sync.
 
-The durable responsibilities and exact failure oracles are in
-[the capability graph](capabilities.md). Source, check, deployed artifact, and
+The durable identities, their fates, and exact failure oracles are in
+[the identity graph](capabilities.md). Source, check, deployed artifact, and
 live observations remain separate evidence layers.
 
 ## Non-goals
