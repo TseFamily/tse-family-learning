@@ -61,6 +61,18 @@ async function completeLockedQuestion(page, question, { probeUnlock = false } = 
 }
 
 
+
+async function readLearnerHistories(page) {
+  return page.evaluate(() => ({
+    learner1: JSON.parse(localStorage.getItem('learningquest-history-v1-learner-1') || '[]'),
+    learner2: JSON.parse(localStorage.getItem('learningquest-history-v1-learner-2') || '[]'),
+    learner3: JSON.parse(localStorage.getItem('learningquest-history-v1-learner-3') || '[]'),
+    coach: JSON.parse(localStorage.getItem('learningquest-history-v1-coach-demo') || '[]'),
+    legacy: localStorage.getItem('learningquest-history-v1'),
+    active: localStorage.getItem('learningquest-active-learner-v1')
+  }));
+}
+
 test('mobile app shell opens without horizontal overflow and mission onboarding works', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByText('LearningQuest').first()).toBeVisible();
@@ -1017,4 +1029,278 @@ test('question bank practice still completes when an optional pack is missing', 
   await expect(page.locator('#score-num')).toHaveText('3');
   const history = await page.evaluate(() => JSON.parse(localStorage.getItem('learningquest-history-v1-learner-1')));
   expect(history[0]).toMatchObject({ activityType: 'question-bank-practice', total: 3, correct: 3 });
+});
+
+test('bounded sanitized history stays on the active learner and restores after reload', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await expect(page.locator('#hk-matching-grid .matching-card').first()).toBeVisible();
+
+  await page.locator('#hk-matching-grid .matching-card').first().getByRole('button', { name: 'Dad / father' }).tap();
+  await expect(page.locator('#hk-matching-grid .matching-card').first().getByText('✅ Matched')).toBeVisible();
+  await expect(page.locator('#history-panel').getByText('Traditional HK Chinese matching')).toBeVisible();
+
+  const afterLearner1 = await readLearnerHistories(page);
+  expect(['learner-1', null]).toContain(afterLearner1.active);
+  expect(afterLearner1.legacy).toBeNull();
+  expect(afterLearner1.learner2).toEqual([]);
+  expect(afterLearner1.learner1).toHaveLength(1);
+  expect(afterLearner1.learner1[0]).toMatchObject({
+    activityType: 'matching-practice',
+    matchingPackKey: 'hkChinese',
+    correct: 1,
+    total: 4,
+    attempted: 1,
+    percent: 25
+  });
+  expect(afterLearner1.learner1[0].learner).toBeUndefined();
+  expect(Object.keys(afterLearner1.learner1[0]).sort()).toEqual(expect.arrayContaining([
+    'activityType', 'attempted', 'correct', 'date', 'focus', 'matchingPackKey', 'percent', 'subjects', 'total'
+  ]));
+
+  await page.getByRole('button', { name: /Learner 2/ }).tap();
+  await expect(page.locator('#learner-note')).toContainText('Progress is saved separately for Learner 2');
+  await expect(page.locator('#hk-matching-grid .matching-card').first().getByText('Tap the meaning that matches this term.')).toBeVisible();
+  await expect(page.locator('#history-panel')).toBeHidden();
+
+  const makeTwentyCard = page.locator('#maths-foundation-grid .maths-card', { hasText: 'What number goes with 13 to make 20?' });
+  await makeTwentyCard.getByRole('textbox', { name: 'Answer for What number goes with 13 to make 20?' }).fill('6');
+  await makeTwentyCard.getByRole('button', { name: 'Check answer' }).tap();
+  await expect(makeTwentyCard.getByText('Try again')).toBeVisible();
+  await expect(page.locator('#history-panel').getByText('Maths Foundation answer practice')).toBeVisible();
+
+  const afterLearner2 = await readLearnerHistories(page);
+  expect(afterLearner2.active).toBe('learner-2');
+  expect(afterLearner2.learner1).toHaveLength(1);
+  expect(afterLearner2.learner1[0]).toMatchObject({ activityType: 'matching-practice', matchingPackKey: 'hkChinese' });
+  expect(afterLearner2.learner2).toHaveLength(1);
+  expect(afterLearner2.learner2[0]).toMatchObject({
+    activityType: 'maths-foundation-practice',
+    weakSkills: ['Make 20'],
+    attempted: 1
+  });
+  expect(afterLearner2.learner2[0].learner).toBeUndefined();
+
+  await page.getByRole('button', { name: /Learner 1/ }).tap();
+  await expect(page.locator('#hk-matching-grid .matching-card').first().getByText('✅ Matched')).toBeVisible();
+  await expect(page.locator('#history-panel').getByText('Traditional HK Chinese matching')).toBeVisible();
+  await expect(page.locator('#history-panel').getByText('Maths Foundation answer practice')).toHaveCount(0);
+
+  await page.reload();
+  await expect(page.locator('#hk-matching-grid .matching-card').first().getByText('✅ Matched')).toBeVisible();
+  await expect(page.locator('#history-panel').getByText('Traditional HK Chinese matching')).toBeVisible();
+  const restored = await page.evaluate(() => window.__learningQuestTestState);
+  expect(restored.historyLimit).toBe(8);
+  expect(restored.activeLearnerId).toBe('learner-1');
+  expect(restored.activeLearnerHistoryKey).toBe('learningquest-history-v1-learner-1');
+  expect(restored.latestMatchingProgress).toMatchObject({ matchingPackKey: 'hkChinese', attempted: 1 });
+  expect(restored.savedHistoryCount).toBe(1);
+
+  await page.getByRole('button', { name: /Learner 2/ }).tap();
+  await expect(page.locator('#maths-foundation-grid .maths-card').first().getByText('Weak-skill rotation: revisiting this skill from recent learner history.')).toBeVisible();
+  await expect(page.locator('#history-panel').getByText('Maths Foundation answer practice')).toBeVisible();
+  const learner2State = await page.evaluate(() => window.__learningQuestTestState);
+  expect(learner2State.activeLearnerId).toBe('learner-2');
+  expect(learner2State.latestMathsFoundationProgress).toMatchObject({
+    activityType: 'maths-foundation-practice',
+    weakSkills: ['Make 20']
+  });
+  expect(learner2State.latestMatchingProgress).toBeNull();
+});
+
+test('history is bounded to eight entries and unanswered activities are not fabricated', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.lifeUKPackId === 'life-uk-v1',
+    null,
+    { timeout: 10000 }
+  );
+
+  await page.evaluate(() => {
+    const dirty = Array.from({ length: 12 }, (_, index) => ({
+      learner: 'learner-1',
+      privateName: 'Secret Family',
+      date: `Seed ${index + 1}`,
+      completedAt: `2026-07-${String(12 - index).padStart(2, '0')}T10:00:00.000Z`,
+      correct: 1,
+      total: 2,
+      percent: 50,
+      focus: `Seeded round ${index + 1}`,
+      subjects: { English: { correct: 1, total: 2 } },
+      activityType: 'question-bank-practice',
+      practiceMode: 'Mixed',
+      attempted: 2,
+      extraBlob: { nested: true }
+    }));
+    localStorage.setItem('learningquest-history-v1-learner-1', JSON.stringify(dirty));
+    localStorage.setItem('learningquest-history-v1', JSON.stringify([{ activityType: 'question-bank-practice', total: 99 }]));
+  });
+  await page.reload();
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await page.waitForFunction(
+    () => Number(window.__learningQuestTestState?.savedHistoryCount || 0) > 0,
+    null,
+    { timeout: 10000 }
+  );
+
+  const bounded = await readLearnerHistories(page);
+  expect(bounded.learner1).toHaveLength(8);
+  expect(bounded.legacy).toBeNull();
+  expect(bounded.learner1[0]).toMatchObject({ date: 'Seed 1', activityType: 'question-bank-practice', attempted: 2 });
+  expect(bounded.learner1[7]).toMatchObject({ date: 'Seed 8' });
+  expect(bounded.learner1.some(item => item.date === 'Seed 12')).toBeFalsy();
+  expect(bounded.learner1[0].privateName).toBeUndefined();
+  expect(bounded.learner1[0].extraBlob).toBeUndefined();
+  expect(bounded.learner1[0].learner).toBeUndefined();
+
+  await page.getByRole('button', { name: 'Start 24-question full mock (45 min)' }).tap();
+  await expect(page.locator('#life-uk-mock-area')).toBeVisible();
+  await page.getByRole('button', { name: 'Finish mock early' }).tap();
+  await expect(page.locator('#life-uk-mock-area')).toBeEmpty();
+  const afterUnansweredMock = await readLearnerHistories(page);
+  expect(afterUnansweredMock.learner1).toHaveLength(8);
+  expect(afterUnansweredMock.learner1.map(item => item.practiceMode)).not.toContain('life-uk-full-mock');
+
+  await waitForQuestionBank(page);
+  await page.getByRole('button', { name: 'Start this mission' }).tap();
+  await expect(page.locator('#quiz-screen')).toBeVisible();
+  await page.evaluate(() => showResults());
+  const afterUnansweredQuiz = await readLearnerHistories(page);
+  expect(afterUnansweredQuiz.learner1).toHaveLength(8);
+  expect(afterUnansweredQuiz.learner1.every(item => item.date.startsWith('Seed'))).toBeTruthy();
+
+  await page.reload();
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.lifeUKPackId === 'life-uk-v1',
+    null,
+    { timeout: 10000 }
+  );
+
+  const lifeUKCard = page.locator('#life-uk-grid .life-uk-card').first();
+  await lifeUKCard.getByRole('button', { name: 'The Speaker' }).tap();
+  await expect(page.locator('#history-panel').getByText('Life in the UK starter mock')).toBeVisible();
+  const afterPartial = await readLearnerHistories(page);
+  expect(afterPartial.learner1).toHaveLength(8);
+  expect(afterPartial.learner1[0]).toMatchObject({
+    activityType: 'life-uk-practice',
+    practiceMode: 'life-uk-starter-mock',
+    attempted: 1,
+    weakSkills: ['Government']
+  });
+  expect(afterPartial.learner1[0].privateName).toBeUndefined();
+  expect(afterPartial.learner1.some(item => item.date === 'Seed 8')).toBeFalsy();
+
+  const state = await page.evaluate(() => window.__learningQuestTestState);
+  expect(state.historyLimit).toBe(8);
+  expect(state.savedHistoryCount).toBe(8);
+  expect(state.latestLifeUKProgress).toMatchObject({ practiceMode: 'life-uk-starter-mock', weakSkills: ['Government'] });
+  expect(state.lifeUKReviewQueueDueTopics).toEqual(expect.arrayContaining(['Government']));
+});
+
+test('progress import restores onto the active learner without moving another profile', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await expect(page.locator('#maths-foundation-grid .maths-card').first().getByText('Number bonds · Make 10')).toBeVisible();
+
+  await page.getByRole('button', { name: /Learner 2/ }).tap();
+  await expect(page.locator('#learner-note')).toContainText('Progress is saved separately for Learner 2');
+
+  const backup = {
+    app: 'tse-family-learning',
+    version: 2,
+    learner: { id: 'learner-1', name: 'Learner 1' },
+    history: [
+      {
+        learner: 'learner-1',
+        privateName: 'Do not copy',
+        date: 'Imported',
+        completedAt: '2026-06-09T12:00:00.000Z',
+        correct: 0,
+        total: 6,
+        percent: 0,
+        focus: 'Maths Foundation answer practice',
+        subjects: { 'Maths Foundation': { correct: 0, total: 6 } },
+        practiceMode: 'maths-foundation-answer-entry',
+        activityType: 'maths-foundation-practice',
+        attempted: 1,
+        skillResults: { 'Make 20': { correct: 0, attempted: 1 } },
+        weakSkills: ['Make 20'],
+        rotationMode: 'maths-foundation-weak-skill-rotation'
+      },
+      {
+        learner: 'learner-1',
+        date: 'Imported',
+        completedAt: '2026-06-09T12:01:00.000Z',
+        correct: 12,
+        total: 24,
+        percent: 50,
+        focus: 'Life in the UK full timed mock',
+        subjects: { 'Life in the UK': { correct: 12, total: 24 } },
+        practiceMode: 'life-uk-full-mock',
+        activityType: 'life-uk-practice',
+        attempted: 24,
+        passMark: 75,
+        passed: false,
+        skillResults: { Government: { correct: 0, attempted: 2 } },
+        weakSkills: ['Government'],
+        timedMock: true
+      },
+      ...Array.from({ length: 10 }, (_, index) => ({
+        date: `Overflow ${index + 1}`,
+        activityType: 'question-bank-practice',
+        correct: 0,
+        total: 5,
+        percent: 0,
+        attempted: 5,
+        focus: 'Overflow'
+      }))
+    ]
+  };
+
+  const dataTransfer = await page.evaluateHandle((payload) => {
+    const file = new File([JSON.stringify(payload)], 'learningquest-backup.json', { type: 'application/json' });
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    return dt;
+  }, backup);
+  await page.evaluate((dt) => {
+    const input = document.getElementById('import-progress');
+    input.files = dt.files;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  }, dataTransfer);
+
+  await expect(page.locator('#history-panel').getByText('Maths Foundation answer practice')).toBeVisible();
+  await expect(page.locator('#maths-foundation-grid .maths-card').first().getByText('Weak-skill rotation: revisiting this skill from recent learner history.')).toBeVisible();
+
+  const imported = await readLearnerHistories(page);
+  expect(imported.active).toBe('learner-2');
+  expect(imported.learner1).toEqual([]);
+  expect(imported.learner2).toHaveLength(8);
+  expect(imported.learner2[0]).toMatchObject({
+    activityType: 'maths-foundation-practice',
+    weakSkills: ['Make 20']
+  });
+  expect(imported.learner2[0].privateName).toBeUndefined();
+  expect(imported.learner2[0].learner).toBeUndefined();
+  expect(imported.learner2[1]).toMatchObject({
+    activityType: 'life-uk-practice',
+    practiceMode: 'life-uk-full-mock',
+    timedMock: true,
+    weakSkills: ['Government']
+  });
+
+  const state = await page.evaluate(() => window.__learningQuestTestState);
+  expect(state.activeLearnerId).toBe('learner-2');
+  expect(state.latestMathsFoundationProgress).toMatchObject({ weakSkills: ['Make 20'] });
+  expect(state.latestLifeUKMockProgress).toMatchObject({ practiceMode: 'life-uk-full-mock', timedMock: true });
+  expect(state.lifeUKReviewQueueDueTopics).toEqual(expect.arrayContaining(['Government']));
+  expect(state.savedHistoryCount).toBe(8);
+
+  await page.getByRole('button', { name: /Learner 1/ }).tap();
+  await expect(page.locator('#history-panel')).toBeHidden();
+  const switched = await readLearnerHistories(page);
+  expect(switched.learner1).toEqual([]);
+  expect(switched.learner2).toHaveLength(8);
 });

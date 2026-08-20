@@ -1066,6 +1066,7 @@
     let answered = false;
     let selectedOptionIndex = null;
     const HISTORY_KEY = 'learningquest-history-v1';
+    const HISTORY_LIMIT = 8;
     const LEARNER_KEY = 'learningquest-active-learner-v1';
     const APP_PROFILE = {
       product: 'LearningQuest',
@@ -1560,9 +1561,17 @@
     function loadHistoryFor(id = activeLearnerId()) {
       try {
         const key = learnerHistoryKey(id);
-        const legacy = id === 'learner-1' ? localStorage.getItem(HISTORY_KEY) : null;
-        const parsed = JSON.parse(localStorage.getItem(key) || legacy || '[]');
-        return Array.isArray(parsed) ? parsed.slice(0, 8) : [];
+        const stored = localStorage.getItem(key);
+        const legacy = (!stored && id === 'learner-1') ? localStorage.getItem(HISTORY_KEY) : null;
+        const parsed = JSON.parse(stored || legacy || '[]');
+        if (!Array.isArray(parsed)) return [];
+        const cleaned = parsed.slice(0, HISTORY_LIMIT).map(cleanHistoryEntry).filter(isGovernedHistoryEntry);
+        const serialized = JSON.stringify(cleaned);
+        if (legacy || (stored && stored !== serialized)) {
+          localStorage.setItem(key, serialized);
+          if (id === 'learner-1') localStorage.removeItem(HISTORY_KEY);
+        }
+        return cleaned;
       } catch {
         return [];
       }
@@ -1572,20 +1581,31 @@
       return loadHistoryFor();
     }
 
+    function persistHistory(history, id = activeLearnerId()) {
+      const cleaned = (Array.isArray(history) ? history : [])
+        .slice(0, HISTORY_LIMIT)
+        .map(cleanHistoryEntry)
+        .filter(isGovernedHistoryEntry);
+      localStorage.setItem(learnerHistoryKey(id), JSON.stringify(cleaned));
+      if (id === 'learner-1') localStorage.removeItem(HISTORY_KEY);
+      return cleaned;
+    }
+
     function saveHistory(entry) {
-      const history = [entry, ...loadHistory()].slice(0, 8);
-      localStorage.setItem(learnerHistoryKey(), JSON.stringify(history));
-      return history;
+      const cleaned = cleanHistoryEntry(entry);
+      if (!isGovernedHistoryEntry(cleaned)) return loadHistory();
+      return persistHistory([cleaned, ...loadHistory()]);
     }
 
     function upsertHistoryEntry(entry, matcher) {
+      const cleaned = cleanHistoryEntry(entry);
+      if (!isGovernedHistoryEntry(cleaned)) return loadHistory();
       const current = loadHistory();
-      const existingIndex = current.findIndex(matcher);
-      const history = existingIndex >= 0
-        ? [entry, ...current.slice(0, existingIndex), ...current.slice(existingIndex + 1)].slice(0, 8)
-        : [entry, ...current].slice(0, 8);
-      localStorage.setItem(learnerHistoryKey(), JSON.stringify(history));
-      return history;
+      const existingIndex = typeof matcher === 'function' ? current.findIndex(matcher) : -1;
+      const next = existingIndex >= 0
+        ? [cleaned, ...current.slice(0, existingIndex), ...current.slice(existingIndex + 1)]
+        : [cleaned, ...current];
+      return persistHistory(next);
     }
 
     function subjectStats(history) {
@@ -1914,7 +1934,18 @@
     }
 
     function cleanSubjects(value) {
-      return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+      if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+      const cleaned = {};
+      for (const [subject, result] of Object.entries(value)) {
+        if (!result || typeof result !== 'object' || Array.isArray(result)) continue;
+        const name = String(subject || '').trim().slice(0, 80);
+        if (!name) continue;
+        const total = Math.max(0, Number(result.total || 0));
+        const correct = Math.max(0, Math.min(total, Number(result.correct || 0)));
+        cleaned[name] = { correct, total };
+        if (Object.keys(cleaned).length >= HISTORY_LIMIT) break;
+      }
+      return cleaned;
     }
 
     function cleanSkillResults(value) {
@@ -1922,54 +1953,102 @@
       const cleaned = {};
       for (const [skill, result] of Object.entries(value)) {
         if (!result || typeof result !== 'object' || Array.isArray(result)) continue;
+        const name = String(skill || '').trim().slice(0, 80);
+        if (!name) continue;
         const attempted = Math.max(0, Number(result.attempted || 0));
         const correct = Math.max(0, Math.min(attempted, Number(result.correct || 0)));
-        if (attempted) cleaned[String(skill)] = { correct, attempted };
+        if (attempted) cleaned[name] = { correct, attempted };
+        if (Object.keys(cleaned).length >= 32) break;
       }
       return Object.keys(cleaned).length ? cleaned : null;
     }
 
-    function cleanStringList(value) {
+    function cleanStringList(value, limit = HISTORY_LIMIT) {
       if (!Array.isArray(value)) return [];
-      return Array.from(new Set(value.map(item => String(item || '').trim()).filter(Boolean))).slice(0, 8);
+      return Array.from(new Set(value.map(item => String(item || '').trim()).filter(Boolean))).slice(0, limit);
+    }
+
+    function isGovernedHistoryEntry(item) {
+      if (!item || typeof item !== 'object') return false;
+      if (item.attempted !== undefined) {
+        const attempted = Number(item.attempted);
+        if (!Number.isFinite(attempted) || attempted <= 0) return false;
+      }
+      const activityType = String(item.activityType || '').trim();
+      const total = Number(item.total || 0);
+      return Boolean(activityType) || total > 0;
     }
 
     function cleanHistoryEntry(item) {
-      const total = Math.max(0, Number(item.total || questions.length || 0));
+      if (!item || typeof item !== 'object') {
+        return { date: 'Imported', correct: 0, total: 0, percent: 0, focus: 'Mixed practice', subjects: {} };
+      }
+      const total = Math.max(0, Number(item.total || 0));
       const correct = Math.max(0, Math.min(total, Number(item.correct || 0)));
       const percent = Math.max(0, Math.min(100, Number(item.percent ?? (total ? Math.round((correct / total) * 100) : 0))));
       const cleaned = {
-        date: String(item.date || 'Imported'),
-        completedAt: item.completedAt ? String(item.completedAt) : new Date().toISOString(),
+        date: String(item.date || 'Imported').slice(0, 40),
+        completedAt: item.completedAt ? String(item.completedAt).slice(0, 40) : undefined,
         correct,
         total,
         percent,
-        focus: String(item.focus || 'Mixed practice'),
+        focus: String(item.focus || 'Mixed practice').slice(0, 120),
         subjects: cleanSubjects(item.subjects),
-        practiceMode: item.practiceMode ? String(item.practiceMode) : undefined,
-        difficultyMode: item.difficultyMode ? String(item.difficultyMode) : undefined,
-        skillMode: item.skillMode ? String(item.skillMode) : undefined,
-        activityType: item.activityType ? String(item.activityType) : undefined,
+        practiceMode: item.practiceMode ? String(item.practiceMode).slice(0, 80) : undefined,
+        difficultyMode: item.difficultyMode ? String(item.difficultyMode).slice(0, 80) : undefined,
+        skillMode: item.skillMode ? String(item.skillMode).slice(0, 80) : undefined,
+        activityType: item.activityType ? String(item.activityType).slice(0, 80) : undefined,
         timed: item.timed === undefined ? undefined : Boolean(item.timed),
         attempted: item.attempted === undefined ? undefined : Math.max(0, Number(item.attempted || 0)),
-        matchingPackKey: item.matchingPackKey ? String(item.matchingPackKey) : undefined,
-        rotationMode: item.rotationMode ? String(item.rotationMode) : undefined,
+        matchingPackKey: item.matchingPackKey ? String(item.matchingPackKey).slice(0, 40) : undefined,
+        rotationMode: item.rotationMode ? String(item.rotationMode).slice(0, 80) : undefined,
         passMark: item.passMark === undefined ? undefined : Math.max(0, Number(item.passMark || 0)),
-        passed: item.passed === undefined ? undefined : Boolean(item.passed)
+        passed: item.passed === undefined ? undefined : Boolean(item.passed),
+        timedMock: item.timedMock === undefined ? undefined : Boolean(item.timedMock),
+        timeExpired: item.timeExpired === undefined ? undefined : Boolean(item.timeExpired),
+        scenarioStyle: item.scenarioStyle === undefined ? undefined : Boolean(item.scenarioStyle),
+        scheduleMode: item.scheduleMode ? String(item.scheduleMode).slice(0, 80) : undefined
       };
       const skillResults = cleanSkillResults(item.skillResults);
       if (skillResults) cleaned.skillResults = skillResults;
       const weakSkills = cleanStringList(item.weakSkills);
       if (weakSkills.length) cleaned.weakSkills = weakSkills;
+      const drillSources = cleanStringList(item.drillSources);
+      if (drillSources.length) cleaned.drillSources = drillSources;
+      const focusTopics = cleanStringList(item.focusTopics);
+      if (focusTopics.length) cleaned.focusTopics = focusTopics;
+      const dueTopics = cleanStringList(item.dueTopics);
+      if (dueTopics.length) cleaned.dueTopics = dueTopics;
       Object.keys(cleaned).forEach(key => cleaned[key] === undefined && delete cleaned[key]);
       return cleaned;
     }
 
-    function restoreProgressRuntimeState(history) {
-      for (const key of Object.keys(matchingPracticeScores)) matchingPracticeScores[key] = {};
-      for (const key of Object.keys(mathsFoundationPracticeScores)) delete mathsFoundationPracticeScores[key];
-      for (const key of Object.keys(lifeUKPracticeScores)) delete lifeUKPracticeScores[key];
-      for (const key of Object.keys(lifeUKSelectedAnswers)) delete lifeUKSelectedAnswers[key];
+    function clearKeyedState(store) {
+      for (const key of Object.keys(store)) delete store[key];
+    }
+
+    function resetProgressRuntimeState() {
+      stopLifeUKMockTimer();
+      matchingPracticeScores.hkChinese = {};
+      matchingPracticeScores.mandarin = {};
+      clearKeyedState(mathsFoundationPracticeScores);
+      clearKeyedState(lifeUKPracticeScores);
+      clearKeyedState(lifeUKSelectedAnswers);
+      clearKeyedState(lifeUKMockSelectedAnswers);
+      clearKeyedState(lifeUKDrillSelectedAnswers);
+      clearKeyedState(lifeUKDrillScores);
+      clearKeyedState(lifeUKReviewQueueSelectedAnswers);
+      clearKeyedState(lifeUKReviewQueueScores);
+      clearKeyedState(lifeUKScenarioSelectedAnswers);
+      clearKeyedState(lifeUKScenarioScores);
+      lifeUKMockState = null;
+      lifeUKDrillState = null;
+      lifeUKReviewQueueState = null;
+      lifeUKScenarioState = null;
+    }
+
+    function restoreProgressRuntimeState(history = loadHistory()) {
+      resetProgressRuntimeState();
       for (const item of [...history].reverse()) {
         if (item.activityType === 'matching-practice' && item.matchingPackKey && item.attempted) {
           matchingPracticeScores[item.matchingPackKey] = matchingPracticeScores[item.matchingPackKey] || {};
@@ -1985,7 +2064,7 @@
             mathsFoundationPracticeScores[index + 1] = Number(result.correct || 0) >= Number(result.attempted || 0);
           }
         }
-        if (item.activityType === 'life-uk-practice' && item.skillResults) {
+        if (item.activityType === 'life-uk-practice' && item.practiceMode === 'life-uk-starter-mock' && item.skillResults) {
           const resultsByTopic = item.skillResults;
           for (const [index, question] of lifeUKPracticeQuestions().entries()) {
             const result = resultsByTopic[question.topic];
@@ -1997,6 +2076,7 @@
       renderChineseMatchingPractice();
       renderMathsFoundationPractice();
       renderLifeUKPractice();
+      renderLifeUKFullMock();
       renderLifeUKDrill();
       renderLifeUKReviewQueue();
       renderLifeUKMockScoreTrend();
@@ -2038,8 +2118,7 @@
           const payload = JSON.parse(reader.result);
           const imported = Array.isArray(payload) ? payload : payload.history;
           if (!Array.isArray(imported)) throw new Error('Missing history array');
-          const cleaned = imported.slice(0, 8).map(cleanHistoryEntry);
-          localStorage.setItem(learnerHistoryKey(), JSON.stringify(cleaned));
+          const cleaned = persistHistory(imported);
           renderHistory(cleaned);
           restoreProgressRuntimeState(cleaned);
           renderParentOverview();
@@ -2551,7 +2630,7 @@
         skillResults: lifeUKTopicResults(),
         weakSkills: lifeUKWeakTopics()
       };
-      const history = upsertHistoryEntry(entry, item => item.activityType === 'life-uk-practice');
+      const history = upsertHistoryEntry(entry, item => item.activityType === 'life-uk-practice' && item.practiceMode === 'life-uk-starter-mock');
       renderHistory(history);
       lifeUKSyncTopicSRFromSkillResults(entry.skillResults, entry.completedAt);
       renderLifeUKReviewQueue();
@@ -2669,6 +2748,7 @@
 
     function saveLifeUKMockProgress(finishedByTime = false) {
       if (!lifeUKMockState) return null;
+      if (Number(lifeUKMockState.answered || 0) <= 0) return null;
       const total = lifeUKMockState.total;
       const correct = lifeUKMockState.correct;
       const attempted = lifeUKMockState.answered;
@@ -2718,6 +2798,10 @@
 
     function finishLifeUKFullMock(finishedByTime) {
       if (!lifeUKMockState || lifeUKMockState.finished) return;
+      if (Number(lifeUKMockState.answered || 0) <= 0) {
+        cancelLifeUKFullMock();
+        return;
+      }
       lifeUKMockState.finished = true;
       stopLifeUKMockTimer();
       const saved = saveLifeUKMockProgress(finishedByTime);
@@ -2918,6 +3002,10 @@
 
     function finishLifeUKDrill() {
       if (!lifeUKDrillState || lifeUKDrillState.finished) return;
+      if (Number(lifeUKDrillState.answered || 0) <= 0) {
+        cancelLifeUKDrill();
+        return;
+      }
       lifeUKDrillState.finished = true;
       const saved = saveLifeUKDrillProgress();
       lifeUKDrillState.result = saved;
@@ -2927,6 +3015,7 @@
 
     function saveLifeUKDrillProgress() {
       if (!lifeUKDrillState) return null;
+      if (Number(lifeUKDrillState.answered || 0) <= 0) return null;
       const total = lifeUKDrillState.total;
       const correct = lifeUKDrillState.correct;
       const attempted = lifeUKDrillState.answered;
@@ -3376,6 +3465,10 @@
 
     function finishLifeUKReviewQueueDrill() {
       if (!lifeUKReviewQueueState || lifeUKReviewQueueState.finished) return;
+      if (Number(lifeUKReviewQueueState.answered || 0) <= 0) {
+        cancelLifeUKReviewQueueDrill();
+        return;
+      }
       lifeUKReviewQueueState.finished = true;
       const saved = saveLifeUKReviewQueueProgress();
       lifeUKReviewQueueState.result = saved;
@@ -3385,6 +3478,7 @@
 
     function saveLifeUKReviewQueueProgress() {
       if (!lifeUKReviewQueueState) return null;
+      if (Number(lifeUKReviewQueueState.answered || 0) <= 0) return null;
       const total = lifeUKReviewQueueState.total;
       const correct = lifeUKReviewQueueState.correct;
       const attempted = lifeUKReviewQueueState.answered;
@@ -3802,7 +3896,11 @@
         audioPromptRates: { ...audioPromptRates },
         latestAudioPrompt: window.__learningQuestTestState?.latestAudioPrompt || null,
         latestMatchingProgress,
-        latestMathsFoundationProgress
+        latestMathsFoundationProgress,
+        historyLimit: HISTORY_LIMIT,
+        activeLearnerId: activeLearnerId(),
+        activeLearnerHistoryKey: learnerHistoryKey(),
+        savedHistoryCount: history.length
       };
     }
 
@@ -3911,6 +4009,10 @@
 
     function finishLifeUKScenarioPractice() {
       if (!lifeUKScenarioState || lifeUKScenarioState.finished) return;
+      if (Number(lifeUKScenarioState.answered || 0) <= 0) {
+        cancelLifeUKScenarioPractice();
+        return;
+      }
       lifeUKScenarioState.finished = true;
       const saved = saveLifeUKScenarioProgress();
       lifeUKScenarioState.result = saved;
@@ -3920,6 +4022,7 @@
 
     function saveLifeUKScenarioProgress() {
       if (!lifeUKScenarioState) return null;
+      if (Number(lifeUKScenarioState.answered || 0) <= 0) return null;
       const total = lifeUKScenarioState.total;
       const correct = lifeUKScenarioState.correct;
       const attempted = lifeUKScenarioState.answered;
@@ -4438,7 +4541,9 @@
 
     function selectLearner(id) {
       if (!LEARNERS.some(learner => learner.id === id)) return;
+      const changed = id !== activeLearnerId();
       localStorage.setItem(LEARNER_KEY, id);
+      if (changed) restoreProgressRuntimeState(loadHistory());
       renderLearners();
       renderHistory();
     }
@@ -4474,6 +4579,7 @@
         renderOnboarding();
         renderDailyChallenge();
         renderHistory();
+        restoreProgressRuntimeState(loadHistory());
       })
       .catch(error => {
         console.error(error);
@@ -4662,24 +4768,29 @@
 
       const plan = buildStudyPlan(subjects);
       document.getElementById('study-plan').innerHTML = plan.html;
-      const learner = activeLearner();
-      const updatedHistory = saveHistory({
-        learner: learner.id,
-        date: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
-        completedAt: new Date().toISOString(),
-        correct, total, percent: pct, focus: plan.focus, subjects,
-        practiceMode: selectedSubject,
-        difficultyMode: selectedDifficulty,
-        skillMode: selectedSkill,
-        activityType: 'question-bank-practice',
-        timed: true
-      });
-      renderStats(updatedHistory);
-      renderBadges(updatedHistory);
-      renderSubjectDashboard(updatedHistory);
-      renderNextStepRecommendation(updatedHistory);
-      renderParentOverview();
-      updateQuestionBankTestState(updatedHistory[0]);
+      const attempted = answers.filter(answer => answer !== undefined && answer !== null).length;
+      if (attempted > 0) {
+        const updatedHistory = saveHistory({
+          date: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+          completedAt: new Date().toISOString(),
+          correct, total, percent: pct, focus: plan.focus, subjects,
+          practiceMode: selectedSubject,
+          difficultyMode: selectedDifficulty,
+          skillMode: selectedSkill,
+          activityType: 'question-bank-practice',
+          timed: true,
+          attempted
+        });
+        renderStats(updatedHistory);
+        renderBadges(updatedHistory);
+        renderSubjectDashboard(updatedHistory);
+        renderNextStepRecommendation(updatedHistory);
+        renderParentOverview();
+        updateQuestionBankTestState(updatedHistory[0]);
+      } else {
+        renderHistory();
+        updateQuestionBankTestState(null);
+      }
 
       // Review list
       document.getElementById('review-list').innerHTML =
