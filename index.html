@@ -1458,17 +1458,26 @@
         const guidanceActionId = pack.id || pack.title;
         if (action) guidanceActions[guidanceActionId] = action;
         if (!recommendedIndexes.has(index)) {
-          return { ...pack, id: guidanceActionId, recommended: false, practiceAction: action || null };
+          return {
+            ...pack,
+            id: guidanceActionId,
+            catalogIndex: index,
+            recommended: false,
+            recommendationScore: scoredItem?.score || 0,
+            practiceAction: action || null
+          };
         }
         const guidanceKind = emptyHistory ? 'baseline' : (historyInsight.reason ? 'saved-evidence' : 'stage-goal');
         return {
           ...pack,
           id: guidanceActionId,
+          catalogIndex: index,
           recommended: true,
           guidanceKind,
           recommendationReason: historyInsight.reason || recommendationCopy(state.stage, state.goal, pack),
           historyInsight: historyInsight.reason,
           historyRecommendationScore: historyInsight.score,
+          recommendationScore: scoredItem?.score || 0,
           practiceAction: action || null,
           guidanceActionId
         };
@@ -1570,6 +1579,7 @@
       localStorage.setItem(ONBOARDING_KEY, JSON.stringify(next));
       renderOnboarding();
       renderCurriculumPacks();
+      renderNextStepRecommendation();
     }
 
     function selectedStage() {
@@ -2249,7 +2259,11 @@
       const state = { stage: 'primary', goal: 'confidence', ...onboardingState() };
       const setup = stageGoalLabel(state);
       const packs = curriculumPacks();
-      const recommended = packs.filter(pack => pack.recommended);
+      const recommended = packs
+        .filter(pack => pack.recommended)
+        .sort((a, b) => (Number(b.recommendationScore) || 0) - (Number(a.recommendationScore) || 0)
+          || (Number(b.historyRecommendationScore) || 0) - (Number(a.historyRecommendationScore) || 0)
+          || (Number(a.catalogIndex) || 0) - (Number(b.catalogIndex) || 0));
       const available = packs.filter(packIsAvailable);
       const weak = latestWeakSkillInsight(history);
       if (weak) {

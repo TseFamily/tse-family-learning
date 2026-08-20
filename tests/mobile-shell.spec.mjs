@@ -1425,7 +1425,7 @@ test('saved 11+ results open the matching available question practice', async ({
   await expect(page.locator('#next-step-panel .next-step-title')).toHaveText('Practise Phonics next');
   await expect(page.locator('#next-step-panel')).toContainText('Phonics is at 20%');
   await expect(page.locator('#next-step-panel')).toContainText('available 11+ bank');
-  await expect(page.locator('.curriculum-card.recommended')).toContainText('Phonics is at 20% in saved 11+ practice.');
+  await expect(page.locator('.curriculum-card.recommended', { hasText: '11+ starter bank' })).toContainText('Phonics is at 20% in saved 11+ practice.');
   await page.locator('#next-step-panel').getByRole('button', { name: /Open Phonics practice/ }).tap();
   const opened = await page.evaluate(() => window.__learningQuestTestState.openedRecommendedPractice);
   expect(opened).toMatchObject({ type: 'question-bank', subject: 'Phonics' });
