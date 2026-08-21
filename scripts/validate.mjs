@@ -118,6 +118,60 @@ for (const marker of [
 }
 if (!serviceWorkerSource.includes('./content-packs/life-uk.json')) throw new Error('Service worker must cache Life in the UK content pack');
 
+// TFL-APP: compose practice, guidance, family, and continuity into one
+// mobile PWA journey. In a mobile-sized supported browser a person can open
+// the LearningQuest shell without horizontal overflow, choose a generic local
+// learner, stage, and goal, start an available practice, receive immediate
+// feedback, observe the selected learner's saved result and next action, and
+// use the honest same-browser coach and continuity paths. The manifest
+// exposes the standalone PWA identity. The shell never invents a child
+// account, remote progress writer, chat/social surface, or a deployed/live
+// proof claim.
+for (const marker of [
+  'Set up today’s mission',
+  'Start this mission',
+  'quiz-screen',
+  'results-screen',
+  'history-panel',
+  'next-step-panel',
+  'next-step-card',
+  'parent-panel',
+  'leaderboard-panel',
+  'import-progress',
+  'exportProgress',
+  'overflow-x: hidden',
+  'manifest.webmanifest',
+  "navigator.serviceWorker.register('./sw.js')",
+  'Same-browser overview',
+  'on this browser',
+  'not authentication, parental authorization, or isolation',
+  'not a cloud ranking or public leaderboard',
+  'never uploads, syncs, merges, or recovers accounts'
+]) {
+  if (!html.includes(marker)) throw new Error(`Missing TFL-APP marker: ${marker}`);
+}
+for (const forbidden of [
+  'child account',
+  'create an account',
+  'created account',
+  'cloud sync',
+  'auto-sync',
+  'automatically sync',
+  'background upload',
+  'remote progress writer',
+  'public profile',
+  'social sharing',
+  'social-sharing',
+  'chat with',
+  'chat room',
+  'instant message',
+  'messaging',
+  'live journey',
+  'deployed'
+]) {
+  if (html.includes(forbidden)) throw new Error(`TFL-APP must not claim an invented account, remote/chat/social surface, or deployed/live proof: ${forbidden}`);
+}
+
 function validatePackFile(path, expectedId, fields, label) {
   const pack = JSON.parse(fs.readFileSync(path, 'utf8'));
   if (pack.id !== expectedId) throw new Error(`${label} pack id changed unexpectedly`);
@@ -515,9 +569,14 @@ for (const [i, q] of data.questions.entries()) {
   if (!Number.isInteger(q.answer) || q.answer < 0 || q.answer >= q.options.length) throw new Error(`Question ${q.id} has invalid answer index`);
 }
 
+// TFL-APP: manifest.webmanifest exposes the standalone PWA identity.
 const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
+for (const field of ['name', 'short_name', 'description', 'start_url', 'scope', 'display', 'background_color', 'theme_color', 'orientation', 'categories', 'lang']) {
+  if (!manifest[field]) throw new Error(`PWA manifest missing ${field}`);
+}
 if (manifest.display !== 'standalone') throw new Error('PWA manifest must use standalone display');
-if (!manifest.name || !manifest.start_url) throw new Error('PWA manifest missing name/start_url');
+if (manifest.orientation !== 'portrait-primary') throw new Error('PWA manifest must declare portrait-primary orientation');
+if (!Array.isArray(manifest.categories) || !manifest.categories.includes('education')) throw new Error('PWA manifest must declare the education category');
 
 console.log(`Validated LearningQuest static app with ${data.questions.length} questions.`);
 
