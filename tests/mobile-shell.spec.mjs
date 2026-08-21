@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import { expect, test } from '@playwright/test';
 
 async function waitForQuestionBank(page) {
@@ -1775,4 +1776,138 @@ test('family coaching overview, comparison, and follow-up use only saved local h
   expect(histories.learner2[0]).toMatchObject({ weakSkills: ['Make 20'] });
   expect(histories.learner3).toEqual([]);
   expect(histories.coach).toEqual([]);
+});
+
+test('TFL-APP: practice, guidance, family, and continuity compose into one mobile PWA journey', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+  await waitForQuestionBank(page);
+
+  // The composed shell opens in a mobile-sized browser without horizontal overflow.
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+
+  // 1) Choose a generic local learner, stage, and goal; the mission updates.
+  await page.getByRole('button', { name: /Learner 2/ }).tap();
+  await expect(page.locator('#learner-note')).toContainText('Progress is saved separately for Learner 2 on this browser.');
+  await page.getByRole('button', { name: 'Adult' }).tap();
+  await page.getByRole('button', { name: 'Learn language' }).tap();
+  await expect(page.locator('#daily-mission-card strong')).toHaveText('Listen & recall: Adult');
+
+  // 2) Start an available practice and receive immediate answer feedback.
+  const bank = await loadQuestionBank(page);
+  await page.locator('#practice-options').getByRole('button', { name: 'Phonics (5)' }).tap();
+  await page.locator('#difficulty-options').getByRole('button', { name: 'Foundation (12)' }).tap();
+  await page.locator('#skill-options').getByRole('button', { name: 'Sound patterns (5)' }).tap();
+  const focused = filteredBank(bank, 'Phonics', 'Foundation', 'Sound patterns');
+  expect(focused).toHaveLength(3);
+  await page.getByRole('button', { name: 'Start this mission' }).tap();
+  await expect(page.locator('#quiz-screen')).toBeVisible();
+  for (let index = 0; index < focused.length; index += 1) {
+    await completeLockedQuestion(page, focused[index], { probeUnlock: index === 0 });
+    await page.getByRole('button', { name: index === focused.length - 1 ? 'Finish' : 'Next →' }).tap();
+  }
+  await expect(page.locator('#results-screen')).toBeVisible();
+  await expect(page.locator('#score-num')).toHaveText('3');
+  await expect(page.locator('#score-total')).toHaveText('3');
+
+  // 3) The result is saved under the selected learner and drives the next action.
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('learningquest-history-v1-learner-2') || '[]'));
+  expect(saved[0]).toMatchObject({ activityType: 'question-bank-practice', practiceMode: 'Phonics', correct: 3, total: 3, percent: 100 });
+  expect(await page.evaluate(() => localStorage.getItem('learningquest-active-learner-v1'))).toBe('learner-2');
+
+  // Return to the shell; the selected learner's saved result and next action render.
+  await page.reload();
+  await waitForQuestionBank(page);
+  await expect(page.locator('#learner-note')).toContainText('Progress is saved separately for Learner 2');
+  await expect(page.locator('#history-panel')).toContainText('3/3 (100%)');
+  await expect(page.locator('#next-step-panel')).toBeVisible();
+  await expect(page.locator('#next-step-card')).toContainText('Evidence:');
+  await expect(page.locator('#next-step-card')).not.toContainText('No saved practice');
+
+  // 4) The honest same-browser coach overview derives from the saved local history.
+  await expect(page.locator('#parent-panel')).toBeVisible();
+  await expect(page.locator('#parent-panel')).toContainText('Same-browser overview');
+  await expect(page.locator('#parent-panel')).toContainText('not authentication, parental authorization, or isolation');
+  await expect(page.locator('#parent-panel').locator('.family-row[data-learner-id="learner-2"]')).toBeVisible();
+  await expect(page.locator('#leaderboard-panel')).toContainText('not a cloud ranking or public leaderboard');
+
+  // 5) The continuity path is present: export writes an explicit versioned backup for the selected learner.
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export' }).tap();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toMatch(/^family-learning-progress-\d{4}-\d{2}-\d{2}\.json$/);
+  const backup = JSON.parse(fs.readFileSync(await download.path(), 'utf8'));
+  expect(backup.app).toBe('tse-family-learning');
+  expect(backup.version).toBe(2);
+  expect(typeof backup.exportedAt).toBe('string');
+  expect(backup.learner).toEqual({ id: 'learner-2', name: 'Learner 2' });
+  expect(backup.history).toHaveLength(1);
+  expect(backup.history[0]).toMatchObject({ activityType: 'question-bank-practice', percent: 100 });
+
+  // 6) Import validates and bounds a versioned backup before restoring the selected learner.
+  const boundedBackup = {
+    app: 'tse-family-learning',
+    version: 2,
+    learner: { id: 'learner-1', name: 'Learner 1' },
+    history: [
+      {
+        privateName: 'Do not copy',
+        date: 'Imported',
+        completedAt: '2026-06-09T12:00:00.000Z',
+        correct: 0,
+        total: 6,
+        percent: 0,
+        focus: 'Maths Foundation answer practice',
+        subjects: { 'Maths Foundation': { correct: 0, total: 6 } },
+        practiceMode: 'maths-foundation-answer-entry',
+        activityType: 'maths-foundation-practice',
+        attempted: 1,
+        skillResults: { 'Make 20': { correct: 0, attempted: 1 } },
+        weakSkills: ['Make 20'],
+        rotationMode: 'maths-foundation-weak-skill-rotation'
+      },
+      ...Array.from({ length: 12 }, (_, index) => ({
+        date: `Overflow ${index + 1}`,
+        completedAt: '2026-06-09T13:00:00.000Z',
+        correct: 0,
+        total: 5,
+        percent: 0,
+        attempted: 5,
+        focus: 'Overflow',
+        activityType: 'question-bank-practice'
+      })),
+      { notGoverned: true, date: 'junk' }
+    ]
+  };
+  const dataTransfer = await page.evaluateHandle(payload => {
+    const file = new File([JSON.stringify(payload)], 'learningquest-backup.json', { type: 'application/json' });
+    const data = new DataTransfer();
+    data.items.add(file);
+    return data;
+  }, boundedBackup);
+  await page.evaluate(data => {
+    const input = document.getElementById('import-progress');
+    input.files = data.files;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  }, dataTransfer);
+
+  const imported = await page.evaluate(() => ({
+    learner1: JSON.parse(localStorage.getItem('learningquest-history-v1-learner-1') || '[]'),
+    learner2: JSON.parse(localStorage.getItem('learningquest-history-v1-learner-2') || '[]'),
+    active: localStorage.getItem('learningquest-active-learner-v1')
+  }));
+  expect(imported.active).toBe('learner-2');
+  expect(imported.learner1).toEqual([]);
+  expect(imported.learner2).toHaveLength(8);
+  expect(imported.learner2.every(entry => entry.privateName === undefined && entry.learner === undefined)).toBeTruthy();
+  expect(imported.learner2[0]).toMatchObject({ activityType: 'maths-foundation-practice', weakSkills: ['Make 20'] });
+  expect(imported.learner2.some(entry => entry.notGoverned)).toBeFalsy();
+
+  // 7) The composed shell stays honest: no invented child account, remote
+  //    progress/chat/social surface, or deployed/live proof claim.
+  const shellCopy = (await page.locator('#start-screen').innerText()).toLowerCase();
+  for (const forbidden of ['child account', 'create an account', 'created account', 'cloud sync', 'auto-sync', 'background upload', 'public profile', 'social sharing', 'chat with', 'chat room', 'instant message', 'messaging', 'live journey', 'deployed']) {
+    expect(shellCopy).not.toContain(forbidden);
+  }
 });
