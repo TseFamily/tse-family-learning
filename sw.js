@@ -1,4 +1,7 @@
-const CACHE_NAME = 'learningquest-static-v1';
+// TFL-CONTINUITY: this service worker is a browser-local cache only. It never
+// uploads, syncs, merges, or recovers accounts; progress moves between
+// browsers only through the explicit export/import the person chooses.
+const CACHE_NAME = 'learningquest-static-v2';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -24,12 +27,21 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
+  const { request } = event;
+  if (request.method !== 'GET') return;
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
-      const copy = response.clone();
-      caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
-      return response;
-    }).catch(() => caches.match('./index.html')))
+    caches.match(request).then(cached => {
+      if (cached) return cached;
+      return fetch(request).then(response => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+        return response;
+      }).catch(() => {
+        if (request.mode === 'navigate') return caches.match('./index.html');
+        return new Response('Offline', { status: 503, statusText: 'Offline' });
+      });
+    })
   );
 });
