@@ -1098,24 +1098,17 @@
       { id: 'exam-ready', label: 'Get exam-ready', mode: 'Exam mode' },
       { id: 'language', label: 'Learn language', mode: 'Listen & recall' }
     ];
-    const LEARNING_DOMAINS = [
-      { id: 'eleven-plus', icon: '🎓', title: '11+ School Prep', audience: 'Young learners', status: 'Live practice', state: 'ready', description: 'English, Maths, Verbal Reasoning, and Phonics starter bank.' },
-      { id: 'chinese-hk', icon: '繁', title: 'Chinese · Traditional HK', audience: 'Family', status: 'Roadmap slice', state: 'next', description: 'Traditional Chinese, Cantonese prompts, Jyutping, and Hong Kong usage.' },
-      { id: 'chinese-cn', icon: '简', title: 'Chinese · Simplified Mandarin', audience: 'Family', status: 'Roadmap slice', state: 'next', description: 'Simplified Chinese, Mandarin Pinyin, pronunciation, and Mainland usage.' },
-      { id: 'maths-foundation', icon: '🧮', title: 'Maths Foundation', audience: 'Primary learners', status: 'Roadmap slice', state: 'next', description: 'Numbers, bonds, times tables, word problems, and confidence drills.' },
-      { id: 'primary', icon: '📚', title: 'Primary Learning', audience: 'Primary learners', status: 'Planned', state: 'planned', description: 'Reading, spelling, science, school skills, and age-banded practice.' },
-      { id: 'french', icon: '🇫🇷', title: 'French', audience: 'Family', status: 'Planned', state: 'planned', description: 'Vocabulary, phrases, listening prompts, grammar, and spaced recall.' },
-      { id: 'life-uk', icon: '🇬🇧', title: 'Life in the UK', audience: 'Adult learners', status: 'Live slice', state: 'next', description: 'Expanded 48-question bank, 75% pass target, shuffled mocks, weak-topic review, adaptive drills, and mock score trend.' },
-      { id: 'english', icon: '✍️', title: 'English Mastery', audience: 'Family', status: 'Planned', state: 'planned', description: 'Grammar, comprehension, writing, vocabulary, and reading confidence.' }
-    ];
+    function liveLearningDomains() {
+      return [
+        { id: 'eleven-plus', icon: '🎓', title: '11+ School Prep', audience: 'Young learners', status: allQuestions.length ? 'Live practice' : 'Loading bank', state: allQuestions.length ? 'ready' : 'next', description: 'English, Maths, Verbal Reasoning, and Phonics starter bank.' },
+        { id: 'chinese-hk', icon: '繁', title: 'Chinese · Traditional HK', audience: 'Family', status: hkChinesePackError ? 'Pack unavailable' : (hkChineseFlashcards.length ? 'Live slice' : 'Loading pack'), state: hkChineseFlashcards.length ? 'ready' : 'next', description: 'Traditional Chinese, Cantonese prompts, Jyutping, and Hong Kong usage.' },
+        { id: 'chinese-cn', icon: '简', title: 'Chinese · Simplified Mandarin', audience: 'Family', status: mandarinPackError ? 'Pack unavailable' : (mandarinFlashcards.length ? 'Live slice' : 'Loading pack'), state: mandarinFlashcards.length ? 'ready' : 'next', description: 'Simplified Chinese, Mandarin Pinyin, pronunciation, and Mainland usage.' },
+        { id: 'maths-foundation', icon: '🧮', title: 'Maths Foundation', audience: 'Primary learners', status: mathsFoundationPackError ? 'Pack unavailable' : (mathsFoundationCards.length ? 'Live slice' : 'Loading pack'), state: mathsFoundationCards.length ? 'ready' : 'next', description: 'Numbers, bonds, times tables, word problems, and confidence drills.' },
+        { id: 'life-uk', icon: '🇬🇧', title: 'Life in the UK', audience: 'Adult learners', status: lifeUKPackError ? 'Pack unavailable' : (lifeUKQuestions.length ? 'Live slice' : 'Loading pack'), state: lifeUKQuestions.length ? 'ready' : 'next', description: 'Citizenship facts, timed mock, weak-topic review, and scenario practice.' }
+      ];
+    }
     const CONTENT_PACK_REGISTRY_PATH = 'content-packs/registry.json';
-    const FALLBACK_CONTENT_PACK_REGISTRY = [
-      { id: 'hk-chinese-basics-v1', path: 'content-packs/hk-chinese-basics.json', kind: 'flashcards', title: 'Traditional HK Chinese basics', domain: 'Chinese · Traditional HK', language: '繁體中文 + Cantonese', learners: 'All learners', activity: 'Flashcards + matching + comparison + audio prompts + listen/repeat', readiness: 'Live slice', next: 'Expand family words into colours, numbers, greetings, Jyutping, comparison drills, and audio prompts.', schema: ['traditional', 'jyutping', 'canto', 'english', 'prompt'], renderTarget: 'flashcard-grid', recommendedStages: ['early', 'primary', 'adult'], recommendedGoals: ['confidence', 'language', 'mastery'], progressionSteps: ['Start with family words and greetings', 'Practise colours, numbers, and Jyutping recall', 'Move into matching practice, comparison drills, audio prompts, and short household phrases'] },
-      { id: 'mandarin-basics-v1', path: 'content-packs/mandarin-basics.json', kind: 'flashcards', title: 'Simplified Mandarin basics', domain: 'Chinese · Simplified Mandarin', language: '简体中文 + Pinyin', learners: 'All learners', activity: 'Flashcards + matching + comparison + audio prompts + listen/repeat', readiness: 'Live slice', next: 'Expand into matching practice, audio prompts, and Traditional/Simplified comparison drills.', schema: ['simplified', 'traditional', 'pinyin', 'english', 'prompt'], renderTarget: 'mandarin-flashcard-grid', recommendedStages: ['early', 'primary', 'adult'], recommendedGoals: ['language', 'confidence', 'mastery'], progressionSteps: ['Start with greetings and core family words', 'Compare Simplified, Traditional, and Pinyin forms', 'Use matching practice and comparison drills, then try audio prompts'] },
-      { id: 'maths-foundation-v1', path: 'content-packs/maths-foundation.json', kind: 'practice-cards', title: 'Maths Foundation practice', domain: 'Maths Foundation', language: 'English', learners: 'Early and primary learners', activity: 'Practice cards + Number-line models + Adaptive answer entry + weak-skill rotation + mental maths + confidence drills', readiness: 'Live slice', next: 'Add adaptive number-line hints for more operations and learner-specific mixed review.', schema: ['topic', 'skill', 'prompt', 'answer', 'strategy'], renderTarget: 'maths-foundation-grid', recommendedStages: ['early', 'primary'], recommendedGoals: ['confidence', 'mastery'], progressionSteps: ['Start with number bonds to 10 and 20', 'Practise place value and skip counting', 'Move into times tables, fractions, and short word problems', 'Type answers and unlock strategy feedback', 'Review weak skills first with number-line support'] },
-      { id: 'life-uk-v1', path: 'content-packs/life-uk.json', kind: 'mock-questions', title: 'Life in the UK starter mock', domain: 'Life in the UK', language: 'English', learners: 'Adult learners', activity: 'Practice questions + expanded question bank + richer explanations + starter mock mode + full timed mock + shuffled selection + weak-topic review + adaptive weak-topic drill + topic spaced repetition review queue + polished review-queue scheduling + mock score trend chart + scenario-style practice', readiness: 'Live slice', next: 'Add more Life in the UK audio or mixed revision packs.', schema: ['topic', 'prompt', 'options', 'answer', 'explanation'], renderTarget: 'life-uk-grid', recommendedStages: ['adult'], recommendedGoals: ['exam-ready', 'mastery'], progressionSteps: ['Start with civic basics and everyday UK facts', 'Study clearer explanations after each answer to lock in citizenship facts', 'Practise weak citizenship topics from saved attempts', 'Build toward a 24-question, 45-minute mock test from an expanded bank', 'Run adaptive weak-topic drills from saved mock review data', 'Use the review queue to revisit due citizenship topics from saved mastery', 'Follow polished due/overdue review-queue scheduling for citizenship topics', 'Track full-mock score trends toward the 75% pass target', 'Practise real-life citizenship scenarios drawn from everyday UK situations'] }
-    ];
-    let contentPackRegistry = [...FALLBACK_CONTENT_PACK_REGISTRY];
+    let contentPackRegistry = [];
     let contentPackRegistryError = null;
     let hkChinesePack = null;
     let hkChineseFlashcards = [];
@@ -1269,7 +1262,7 @@
 
 
     function contentPackDefinition(id) {
-      return contentPackRegistry.find(pack => pack.id === id) || FALLBACK_CONTENT_PACK_REGISTRY.find(pack => pack.id === id);
+      return contentPackRegistry.find(pack => pack.id === id) || null;
     }
 
     function contentPackPath(id) {
@@ -1278,7 +1271,7 @@
 
     function packRecoveryNext(error, path) {
       return error
-        ? `Question practice still works; retry ${path} after it recovers.`
+        ? `Question practice still works; retry ${path || 'the content pack registry'} after it recovers.`
         : `Runtime-load ${path} from ${CONTENT_PACK_REGISTRY_PATH} and render the flashcards from external JSON.`;
     }
 
@@ -1501,7 +1494,7 @@
         learners: pack.learners,
         activity: pack.activity,
         readiness: hkChinesePackError ? 'Pack unavailable' : (hkChinesePack ? (pack.readiness || 'Live slice') : 'Loading pack'),
-        next: hkChinesePackError ? packRecoveryNext(hkChinesePackError, path) : (pack.next || definition.next),
+        next: hkChinesePackError ? packRecoveryNext(hkChinesePackError, path) : (pack.next || definition?.next),
         recommendedStages: pack.recommendedStages || [],
         recommendedGoals: pack.recommendedGoals || [],
         progressionSteps: pack.progressionSteps || []
@@ -1521,7 +1514,7 @@
         learners: pack.learners,
         activity: pack.activity,
         readiness: mandarinPackError ? 'Pack unavailable' : (mandarinPack ? (pack.readiness || 'Live slice') : 'Loading pack'),
-        next: mandarinPackError ? packRecoveryNext(mandarinPackError, path) : (pack.next || definition.next),
+        next: mandarinPackError ? packRecoveryNext(mandarinPackError, path) : (pack.next || definition?.next),
         recommendedStages: pack.recommendedStages || [],
         recommendedGoals: pack.recommendedGoals || [],
         progressionSteps: pack.progressionSteps || []
@@ -1535,7 +1528,7 @@
       return {
         ...pack,
         readiness: mathsFoundationPackError ? 'Pack unavailable' : (mathsFoundationPack ? (pack.readiness || 'Live slice') : 'Loading pack'),
-        next: mathsFoundationPackError ? packRecoveryNext(mathsFoundationPackError, path) : (pack.next || definition.next),
+        next: mathsFoundationPackError ? packRecoveryNext(mathsFoundationPackError, path) : (pack.next || definition?.next),
         recommendedStages: pack.recommendedStages || [],
         recommendedGoals: pack.recommendedGoals || [],
         progressionSteps: pack.progressionSteps || []
@@ -1549,7 +1542,7 @@
       return {
         ...pack,
         readiness: lifeUKPackError ? 'Pack unavailable' : (lifeUKPack ? (pack.readiness || 'Live slice') : 'Loading pack'),
-        next: lifeUKPackError ? packRecoveryNext(lifeUKPackError, path) : (pack.next || definition.next),
+        next: lifeUKPackError ? packRecoveryNext(lifeUKPackError, path) : (pack.next || definition?.next),
         recommendedStages: pack.recommendedStages || [],
         recommendedGoals: pack.recommendedGoals || [],
         progressionSteps: pack.progressionSteps || []
@@ -1562,9 +1555,8 @@
         hkPackSummary(),
         mandarinPackSummary(),
         mathsPackSummary(),
-        lifeUKPackSummary(),
-        { id: 'french-planned', title: 'French first phrases', domain: 'French', language: 'French + English', learners: 'All learners', activity: 'Phrase recall', readiness: 'Planned', next: 'Start with greetings, family, food, and numbers, travel phrases.', recommendedStages: ['early', 'primary', 'adult'], recommendedGoals: ['language', 'confidence'], progressionSteps: ['Start with greetings', 'Add family, food, and numbers', 'Practise phrase recall in short missions'] }
-      ];
+        lifeUKPackSummary()
+      ].filter(pack => pack && pack.title && pack.readiness !== 'Planned');
     }
 
     function curriculumPacks() {
@@ -2480,7 +2472,7 @@
     function renderLearningDomains() {
       const grid = document.getElementById('domain-grid');
       if (!grid) return;
-      grid.innerHTML = LEARNING_DOMAINS.map(domain => `
+      grid.innerHTML = liveLearningDomains().map(domain => `
         <article class="domain-card ${escapeHTML(domain.state)}">
           <div class="domain-icon">${escapeHTML(domain.icon)}</div>
           <div class="domain-title">${escapeHTML(domain.title)}</div>
@@ -4105,6 +4097,10 @@
       const lifeUKPractice = lifeUKPracticeQuestions();
       window.__learningQuestTestState = {
         ...(window.__learningQuestTestState || {}),
+        contentPackRegistryCount: contentPackRegistry.length,
+        contentPackRegistryError,
+        curriculumCatalogTitles: curriculumCatalog().map(pack => pack.title),
+        contentPackRenderTargets: contentPackRegistry.map(pack => ({ id: pack.id, path: pack.path, schema: pack.schema, renderTarget: pack.renderTarget })),
         recommendedCurriculumTitles: curriculumPacks().filter(pack => pack.recommended).map(pack => pack.title),
         recommendedProgressionPaths: curriculumPacks().filter(pack => pack.recommended).map(pack => progressionPathText(pack)),
         historyAwareCurriculumInsights: curriculumPacks().filter(pack => pack.recommended && pack.historyInsight).map(pack => pack.historyInsight),
@@ -4514,7 +4510,7 @@
     function renderCurriculumPacks() {
       const grid = document.getElementById('curriculum-grid');
       if (!grid) return;
-      grid.innerHTML = curriculumPacks().map(pack => `
+      grid.innerHTML = curriculumPacks().filter(pack => pack && pack.title && pack.readiness !== 'Planned').map(pack => `
         <article class="curriculum-card ${pack.recommended ? 'recommended' : ''}">
           <div class="curriculum-head">
             <div>
@@ -4550,6 +4546,7 @@
           if (!pack[field]) throw new Error(`Content pack registry item ${index + 1} missing ${field}`);
         });
         if (!Array.isArray(pack.schema) || !pack.schema.length) throw new Error(`Content pack registry item ${index + 1} missing schema`);
+        if (pack.readiness === 'Planned') throw new Error(`Content pack registry item ${index + 1} is a planned label without valid pack data`);
       });
       return registry.packs;
     }
@@ -4563,7 +4560,7 @@
         window.__learningQuestTestState = { ...(window.__learningQuestTestState || {}), contentPackRegistryCount: contentPackRegistry.length, contentPackRegistryError: null };
         return contentPackRegistry;
       } catch (error) {
-        contentPackRegistry = [...FALLBACK_CONTENT_PACK_REGISTRY];
+        contentPackRegistry = [];
         contentPackRegistryError = error.message || 'Could not load the content pack registry';
         window.__learningQuestTestState = { ...(window.__learningQuestTestState || {}), contentPackRegistryCount: contentPackRegistry.length, contentPackRegistryError };
         console.warn(contentPackRegistryError);
@@ -4587,6 +4584,7 @@
     async function loadHKChinesePack() {
       try {
         const path = contentPackPath('hk-chinese-basics-v1');
+        if (!path) throw new Error(`Could not resolve hk-chinese-basics-v1 from ${CONTENT_PACK_REGISTRY_PATH}`);
         const response = await fetch(`${path}?v=${Date.now()}`);
         if (!response.ok) throw new Error(`Could not load ${path}: ${response.status}`);
         hkChinesePack = validateHKChinesePack(await response.json());
@@ -4623,6 +4621,7 @@
     async function loadMandarinPack() {
       try {
         const path = contentPackPath('mandarin-basics-v1');
+        if (!path) throw new Error(`Could not resolve mandarin-basics-v1 from ${CONTENT_PACK_REGISTRY_PATH}`);
         const response = await fetch(`${path}?v=${Date.now()}`);
         if (!response.ok) throw new Error(`Could not load ${path}: ${response.status}`);
         mandarinPack = validateMandarinPack(await response.json());
@@ -4658,6 +4657,7 @@
     async function loadMathsFoundationPack() {
       try {
         const path = contentPackPath('maths-foundation-v1');
+        if (!path) throw new Error(`Could not resolve maths-foundation-v1 from ${CONTENT_PACK_REGISTRY_PATH}`);
         const response = await fetch(`${path}?v=${Date.now()}`);
         if (!response.ok) throw new Error(`Could not load ${path}: ${response.status}`);
         mathsFoundationPack = validateMathsFoundationPack(await response.json());
@@ -4700,6 +4700,7 @@
     async function loadLifeUKPack() {
       try {
         const path = contentPackPath('life-uk-v1');
+        if (!path) throw new Error(`Could not resolve life-uk-v1 from ${CONTENT_PACK_REGISTRY_PATH}`);
         const response = await fetch(`${path}?v=${Date.now()}`);
         if (!response.ok) throw new Error(`Could not load ${path}: ${response.status}`);
         lifeUKPack = validateLifeUKPack(await response.json());

@@ -73,6 +73,55 @@ async function readLearnerHistories(page) {
   }));
 }
 
+test('validated content packs and the school-practice bank drive the catalog without planned cards', async ({ page }) => {
+  await page.goto('/');
+  await waitForQuestionBank(page);
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.contentPackRegistryCount >= 4
+      && window.__learningQuestTestState?.hkChinesePackId === 'hk-chinese-basics-v1'
+      && window.__learningQuestTestState?.mandarinPackId === 'mandarin-basics-v1'
+      && window.__learningQuestTestState?.mathsFoundationPackId === 'maths-foundation-v1'
+      && window.__learningQuestTestState?.lifeUKPackId === 'life-uk-v1',
+    null,
+    { timeout: 10000 }
+  );
+
+  await expect(page.locator('#domain-grid .domain-title', { hasText: '11+ School Prep' })).toBeVisible();
+  await expect(page.locator('#domain-grid .domain-title', { hasText: 'Chinese · Traditional HK' })).toBeVisible();
+  await expect(page.locator('#domain-grid .domain-title', { hasText: 'Chinese · Simplified Mandarin' })).toBeVisible();
+  await expect(page.locator('#domain-grid .domain-title', { hasText: 'Maths Foundation' })).toBeVisible();
+  await expect(page.locator('#domain-grid .domain-title', { hasText: 'Life in the UK' })).toBeVisible();
+  await expect(page.locator('#domain-grid .domain-status', { hasText: 'Planned' })).toHaveCount(0);
+  await expect(page.locator('#domain-grid')).not.toContainText('Primary Learning');
+  await expect(page.locator('#domain-grid')).not.toContainText('English Mastery');
+  await expect(page.locator('#domain-grid .domain-title', { hasText: /^French$/ })).toHaveCount(0);
+  await expect(page.locator('#curriculum-grid .curriculum-title', { hasText: 'French first phrases' })).toHaveCount(0);
+  await expect(page.locator('#curriculum-grid .curriculum-status', { hasText: 'Planned' })).toHaveCount(0);
+  await expect(page.locator('#curriculum-grid .curriculum-title', { hasText: '11+ starter bank' })).toBeVisible();
+  await expect(page.locator('#curriculum-grid .curriculum-title', { hasText: 'Traditional HK Chinese basics' })).toBeVisible();
+  await expect(page.locator('#curriculum-grid .curriculum-title', { hasText: 'Simplified Mandarin basics' })).toBeVisible();
+  await expect(page.locator('#curriculum-grid .curriculum-title', { hasText: 'Maths Foundation practice' })).toBeVisible();
+  await expect(page.locator('#curriculum-grid .curriculum-title', { hasText: 'Life in the UK starter mock' })).toBeVisible();
+
+  const state = await page.evaluate(() => window.__learningQuestTestState);
+  expect(state.contentPackRegistryError).toBeNull();
+  expect(state.practiceQuestionBankCount).toBeGreaterThanOrEqual(20);
+  expect(state.curriculumCatalogTitles).toEqual(expect.arrayContaining([
+    '11+ starter bank',
+    'Traditional HK Chinese basics',
+    'Simplified Mandarin basics',
+    'Maths Foundation practice',
+    'Life in the UK starter mock'
+  ]));
+  expect(state.curriculumCatalogTitles).not.toContain('French first phrases');
+  expect(state.contentPackRenderTargets).toEqual(expect.arrayContaining([
+    expect.objectContaining({ id: 'hk-chinese-basics-v1', path: 'content-packs/hk-chinese-basics.json', renderTarget: 'flashcard-grid', schema: expect.arrayContaining(['traditional', 'jyutping', 'canto', 'english', 'prompt']) }),
+    expect.objectContaining({ id: 'mandarin-basics-v1', path: 'content-packs/mandarin-basics.json', renderTarget: 'mandarin-flashcard-grid', schema: expect.arrayContaining(['simplified', 'traditional', 'pinyin', 'english', 'prompt']) }),
+    expect.objectContaining({ id: 'maths-foundation-v1', path: 'content-packs/maths-foundation.json', renderTarget: 'maths-foundation-grid', schema: expect.arrayContaining(['topic', 'skill', 'prompt', 'answer', 'strategy']) }),
+    expect.objectContaining({ id: 'life-uk-v1', path: 'content-packs/life-uk.json', renderTarget: 'life-uk-grid', schema: expect.arrayContaining(['topic', 'prompt', 'options', 'answer', 'explanation']) })
+  ]));
+});
+
 test('mobile app shell opens without horizontal overflow and mission onboarding works', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByText('LearningQuest').first()).toBeVisible();
@@ -460,23 +509,42 @@ test('question practice remains available when optional Life in the UK pack is u
   expect(state.mathsFoundationPackId).toBe('maths-foundation-v1');
 });
 
-test('registered content packs fall back when registry is unavailable', async ({ page }) => {
+test('content packs show recovery state when the registry is unavailable; question practice stays', async ({ page }) => {
   await page.route('**/content-packs/registry.json*', route => route.fulfill({ status: 503, body: 'registry unavailable' }));
   await page.goto('/');
 
   await expect(page.getByText('LearningQuest').first()).toBeVisible();
-  await expect(page.locator('#flashcard-grid .flashcard-term', { hasText: '早晨' })).toBeVisible();
-  await expect(page.locator('#mandarin-flashcard-grid .flashcard-term', { hasText: '早上好' })).toBeVisible();
-  await expect(page.locator('#maths-foundation-grid .maths-card').first().getByText('Number bonds · Make 10')).toBeVisible();
-  await expect(page.locator('#life-uk-grid .life-uk-card').first().getByText('Who appoints the Prime Minister after a general election?')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Set up today’s mission' })).toBeVisible();
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.contentPackRegistryError,
+    null,
+    { timeout: 10000 }
+  );
+  await page.waitForFunction(
+    () => window.__learningQuestTestState?.hkChinesePackError
+      && window.__learningQuestTestState?.mandarinPackError
+      && window.__learningQuestTestState?.mathsFoundationPackError
+      && window.__learningQuestTestState?.lifeUKPackError,
+    null,
+    { timeout: 10000 }
+  );
+  await expect(page.locator('#flashcard-grid .flashcard-placeholder').getByText('Question practice remains available')).toBeVisible();
+  await expect(page.locator('#mandarin-flashcard-grid .flashcard-placeholder').getByText('Question practice remains available')).toBeVisible();
+  await expect(page.locator('#maths-foundation-grid .maths-card').getByText('Try quiz practice while this pack recovers.')).toBeVisible();
+  await expect(page.locator('#life-uk-grid .life-uk-card').getByText('Use the other practice packs while this mock recovers.')).toBeVisible();
+  await expect(page.locator('#curriculum-grid .curriculum-title', { hasText: '11+ starter bank' })).toBeVisible();
+  await expect(page.locator('#domain-grid .domain-title', { hasText: '11+ School Prep' })).toBeVisible();
+  await expect(page.locator('#domain-grid .domain-status', { hasText: 'Planned' })).toHaveCount(0);
 
   const state = await page.evaluate(() => window.__learningQuestTestState);
-  expect(state.contentPackRegistryCount).toBeGreaterThanOrEqual(4);
+  expect(state.contentPackRegistryCount).toBe(0);
   expect(state.contentPackRegistryError).toContain('content-packs/registry.json');
-  expect(state.hkChinesePackId).toBe('hk-chinese-basics-v1');
-  expect(state.mandarinPackId).toBe('mandarin-basics-v1');
-  expect(state.mathsFoundationPackId).toBe('maths-foundation-v1');
-  expect(state.lifeUKPackId).toBe('life-uk-v1');
+  expect(state.contentPackRenderTargets).toEqual([]);
+  expect(state.practiceQuestionBankCount).toBeGreaterThanOrEqual(20);
+  expect(state.hkChinesePackId).toBeNull();
+  expect(state.mandarinPackId).toBeNull();
+  expect(state.mathsFoundationPackId).toBeNull();
+  expect(state.lifeUKPackId).toBeNull();
 });
 
 test('Life in the UK full timed mock renders, scores answers, and records progress', async ({ page }) => {
