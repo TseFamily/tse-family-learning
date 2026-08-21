@@ -122,6 +122,7 @@ for (const [id, path, fields] of [
   if (!registered) throw new Error(`Content pack registry missing ${id}`);
   if (registered.path !== path) throw new Error(`Content pack registry path mismatch for ${id}`);
   if (!Array.isArray(registered.schema) || fields.some(field => !registered.schema.includes(field))) throw new Error(`Content pack registry schema mismatch for ${id}`);
+  if (registered.readiness === 'Planned') throw new Error(`Content pack registry ${id} is a planned label without valid pack data`);
   for (const field of ['kind', 'title', 'domain', 'language', 'learners', 'activity', 'readiness', 'next', 'renderTarget']) {
     if (!registered[field]) throw new Error(`Content pack registry ${id} missing ${field}`);
   }
@@ -170,13 +171,15 @@ const mandarinPack = validatePackFile('content-packs/mandarin-basics.json', 'man
 const mathsFoundationPack = validateMathsPackFile('content-packs/maths-foundation.json', 'maths-foundation-v1', registryById['maths-foundation-v1'].schema, 'Maths Foundation');
 const lifeUKPack = validateLifeUKPackFile('content-packs/life-uk.json', 'life-uk-v1', registryById['life-uk-v1'].schema, 'Life in the UK');
 for (const marker of [
-  'FALLBACK_CONTENT_PACK_REGISTRY',
+  'liveLearningDomains',
+  'contentPackPath',
+  'contentPackDefinition',
+  'curriculumCatalog',
+  'validateContentPackRegistry',
+  'loadContentPackRegistry',
   'renderCurriculumPacks',
   'content-packs/registry.json',
-  'content-packs/hk-chinese-basics.json',
-  'content-packs/mandarin-basics.json',
   'Number bonds',
-  'Practice cards + Number-line models + Adaptive answer entry + weak-skill rotation + mental maths + confidence drills',
   'Maths Foundation practice cards',
   'validateMathsFoundationPack',
   'loadMathsFoundationPack',
@@ -202,9 +205,7 @@ for (const marker of [
   'mathsFoundationWeakSkills',
   'mathsFoundationRotationMode',
   'maths-foundation-weak-skill-rotation',
-  'Review weak skills first with number-line support',
   'MATHS_FOUNDATION_PRACTICE_LIMIT',
-  'content-packs/maths-foundation.json',
   'renderChineseMatchingPractice',
   'matchingPracticeCounts',
   'renderChineseComparisonDrill',
@@ -287,7 +288,6 @@ for (const marker of [
   'mandarinPackError',
   'flashcard-placeholder',
   'life-uk-v1',
-  'content-packs/life-uk.json',
   'Life in the UK starter mock',
   'renderLifeUKPractice',
   'validateLifeUKPack',
@@ -299,12 +299,9 @@ for (const marker of [
   'latestLifeUKProgress',
   'lifeUKWeakTopics',
   '75% pass target',
-  'Build toward a 24-question, 45-minute mock test from an expanded bank',
   'expanded question bank',
-  'shuffled selection',
   'lifeUKShuffledQuestions',
   'lifeUKFullMockSelectedQuestions',
-  'starter mock mode',
   'weak-topic review',
   'Question practice remains available',
   'full timed mock',
@@ -346,8 +343,6 @@ for (const marker of [
   'LIFE_UK_SR_MAX_INTERVAL_DAYS',
   'startLifeUKReviewQueueDrill',
   'renderLifeUKReviewQueue',
-  'topic spaced repetition',
-  'polished review-queue scheduling',
   'Review queue · polished topic scheduling',
   'Priority now:',
   'life-uk-review-queue-summary',
@@ -361,7 +356,6 @@ for (const marker of [
   'LIFE_UK_MOCK_SCORE_TREND_LIMIT',
   'mock score trend chart',
   'Mock score trend',
-  'Track full-mock score trends toward the 75% pass target',
   'scenario-style practice',
   'life-uk-scenario-area',
   'life-uk-scenario-actions',
@@ -378,7 +372,6 @@ for (const marker of [
   'lifeUKScenarioState',
   'LIFE_UK_SCENARIO_QUESTION_COUNT',
   'life-uk-scenario-practice',
-  'Practise real-life citizenship scenarios drawn from everyday UK situations',
   'Start scenario-style practice',
   'submitSelectedAnswer',
   'quizAdvance',
@@ -397,6 +390,28 @@ for (const marker of [
 }
 for (const inlineSeed of ['baa4 baa1', 'zou2 san4', 'bàba', 'zǎoshang hǎo', 'Find something red nearby']) {
   if (html.includes(inlineSeed)) throw new Error(`HK Chinese flashcards should be runtime-loaded from JSON, not inline seeded: ${inlineSeed}`);
+}
+
+for (const forbidden of [
+  'FALLBACK_CONTENT_PACK_REGISTRY',
+  'french-planned',
+  'French first phrases',
+  "status: 'Planned'",
+  "state: 'planned'",
+  "readiness: 'Planned'",
+  'Primary Learning',
+  'English Mastery'
+]) {
+  if (html.includes(forbidden)) throw new Error(`Planned domain/card or inline second copy of governed pack data still present: ${forbidden}`);
+}
+
+for (const path of [
+  'content-packs/hk-chinese-basics.json',
+  'content-packs/mandarin-basics.json',
+  'content-packs/maths-foundation.json',
+  'content-packs/life-uk.json'
+]) {
+  if (html.includes(path)) throw new Error(`Content pack path must be resolved from the registry only, not inlined in the shell: ${path}`);
 }
 
 const data = JSON.parse(fs.readFileSync('questions.json', 'utf8'));
