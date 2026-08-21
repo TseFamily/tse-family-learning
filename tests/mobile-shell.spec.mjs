@@ -1099,6 +1099,70 @@ test('question bank practice still completes when an optional pack is missing', 
   expect(history[0]).toMatchObject({ activityType: 'question-bank-practice', total: 3, correct: 3 });
 });
 
+test('shipped generic profiles switch locally; stage/goal update the mission and per-profile recommendations without account claims', async ({ page }) => {
+  await page.goto('/');
+  await waitForQuestionBank(page);
+
+  // All shipped generic learner profiles are present and switchable.
+  const profileButtons = page.locator('#learner-options .learner-chip');
+  await expect(profileButtons).toHaveCount(4);
+  for (const name of ['Learner 1', 'Learner 2', 'Learner 3', 'Coach Demo']) {
+    await expect(page.locator('#learner-options .learner-chip', { hasText: name })).toBeVisible();
+  }
+  await expect(page.locator('#learner-options .learner-chip.active')).toContainText('Learner 1');
+  await expect(page.locator('#learner-note')).toContainText('Progress is saved separately for Learner 1 on this browser.');
+
+  // Choosing a stage and goal updates the active mission and the baseline recommendation.
+  await page.getByRole('button', { name: 'Adult' }).tap();
+  await page.getByRole('button', { name: 'Learn language' }).tap();
+  await expect(page.locator('#daily-mission-card strong')).toHaveText('Listen & recall: Adult');
+  await expect(page.locator('#daily-mission-card > span')).toHaveText('5 language or life-skills prompts');
+  await expect(page.locator('.curriculum-card.recommended .curriculum-title', { hasText: 'Simplified Mandarin basics' })).toBeVisible();
+  await expect(page.locator('.curriculum-card.recommended').getByText(/Baseline from Adult · Learn language/).first()).toBeVisible();
+
+  // Stage/goal preferences are honestly browser-level: switching profiles keeps them.
+  await page.getByRole('button', { name: /Learner 2/ }).tap();
+  await expect(page.locator('#learner-note')).toContainText('Progress is saved separately for Learner 2 on this browser.');
+  await expect(page.locator('#daily-mission-card strong')).toHaveText('Listen & recall: Adult');
+  const onboarding = await page.evaluate(() => JSON.parse(localStorage.getItem('learningquest-onboarding-v1') || '{}'));
+  expect(onboarding).toMatchObject({ stage: 'adult', goal: 'language' });
+
+  // Practice history keys remain distinct per selected profile.
+  await page.locator('#hk-matching-grid .matching-card').first().getByRole('button', { name: 'Dad / father' }).tap();
+  const afterPractice = await readLearnerHistories(page);
+  expect(afterPractice.active).toBe('learner-2');
+  expect(afterPractice.learner2).toHaveLength(1);
+  expect(afterPractice.learner1).toEqual([]);
+  expect(afterPractice.learner3).toEqual([]);
+  expect(afterPractice.coach).toEqual([]);
+  expect(afterPractice.legacy).toBeNull();
+  await expect(page.locator('#history-panel').getByText('Traditional HK Chinese matching')).toBeVisible();
+
+  // Switching to a profile with no saved history updates the recommendation to a labeled baseline.
+  await page.getByRole('button', { name: /Learner 3/ }).tap();
+  await expect(page.locator('#learner-note')).toContainText('Progress is saved separately for Learner 3 on this browser.');
+  await expect(page.locator('#history-panel')).toBeHidden();
+  await expect(page.locator('#next-step-panel')).toBeVisible();
+  await expect(page.locator('#next-step-card')).toContainText('Baseline');
+  await expect(page.locator('#next-step-card')).toContainText('No saved practice for this learner');
+
+  // Switching back to the profile with saved evidence updates the recommendation from that profile's history.
+  await page.getByRole('button', { name: /Learner 2/ }).tap();
+  await expect(page.locator('#history-panel').getByText('Traditional HK Chinese matching')).toBeVisible();
+  await expect(page.locator('#next-step-card')).toContainText('saved learner history');
+  await expect(page.locator('#next-step-card')).not.toContainText('No saved practice');
+  const state = await page.evaluate(() => window.__learningQuestTestState);
+  expect(state.activeLearnerId).toBe('learner-2');
+  expect(state.activeLearnerHistoryKey).toBe('learningquest-history-v1-learner-2');
+
+  // The learner strip never describes profiles as accounts or authenticated identities.
+  const learnerCopy = (await page.locator('#start-screen .learner-strip').innerText()).toLowerCase();
+  for (const forbidden of ['account', 'login', 'log in', 'sign in', 'sign up', 'password', 'authenticated', 'protected child']) {
+    expect(learnerCopy).not.toContain(forbidden);
+  }
+  expect(learnerCopy).toContain('on this browser');
+});
+
 test('bounded sanitized history stays on the active learner and restores after reload', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByText('LearningQuest').first()).toBeVisible();
