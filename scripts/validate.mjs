@@ -29,6 +29,40 @@ const scriptMatch = html.match(/<script>([\s\S]*)<\/script>\s*<\/body>/);
 if (!scriptMatch) throw new Error('Could not locate inline script');
 new vm.Script(scriptMatch[1]);
 
+// TFL-LEARNER: one browser can switch among the shipped generic learner
+// profiles, choose a browser-level stage and learning goal, and see the
+// active mission and recommendations update. History keys stay distinct per
+// selected profile, and the shell never describes a profile as a created
+// account, authenticated identity, or protected child record.
+for (const marker of [
+  'learningquest-active-learner-v1',
+  'learningquest-onboarding-v1',
+  'const LEARNERS = [',
+  "id: 'learner-1'",
+  "id: 'learner-2'",
+  "id: 'learner-3'",
+  "id: 'coach-demo'",
+  'LEARNER_STAGES',
+  'LEARNING_GOALS',
+  'learnerHistoryKey',
+  'activeLearnerId',
+  'activeLearner',
+  'selectLearner',
+  'renderLearners',
+  'renderOnboarding',
+  'missionForSelection',
+  'saveOnboardingState',
+  'Progress is saved separately for',
+  'on this browser'
+]) {
+  if (!html.includes(marker)) throw new Error(`Missing TFL-LEARNER marker: ${marker}`);
+}
+for (const forbidden of ['login', 'log in', 'log on', 'sign in', 'sign on', 'sign up', 'signup', 'password', 'create an account', 'created account', 'child account', 'protected child record', 'authenticated identity']) {
+  if (new RegExp(`\\b${forbidden.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(html)) {
+    throw new Error(`TFL-LEARNER must not describe profiles as accounts or authenticated identities: ${forbidden}`);
+  }
+}
+
 function validatePackFile(path, expectedId, fields, label) {
   const pack = JSON.parse(fs.readFileSync(path, 'utf8'));
   if (pack.id !== expectedId) throw new Error(`${label} pack id changed unexpectedly`);
