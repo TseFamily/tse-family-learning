@@ -63,6 +63,61 @@ for (const forbidden of ['login', 'log in', 'log on', 'sign in', 'sign on', 'sig
   }
 }
 
+// TFL-CONTINUITY: on a browser where service-worker registration and
+// installation succeed, sw.js caches the app shell, required question bank,
+// manifest, registry, and shipped pack files and serves cached GETs when the
+// network is unavailable. Local history survives an ordinary reload. Export
+// creates an explicit versioned JSON backup for the selected learner; import
+// validates and bounds its history before restoring that selected learner.
+// Service-worker failure remains non-blocking online. No account recovery,
+// background upload, automatic cross-device sync, merge, or
+// conflict-resolution claim is made.
+for (const marker of [
+  'exportProgress',
+  'version: 2',
+  'exportedAt',
+  'learner: { id: learner.id, name: learner.name }',
+  'importProgress',
+  'persistHistory(imported)',
+  'isGovernedHistoryEntry',
+  'HISTORY_LIMIT',
+  'learnerHistoryKey',
+  'localStorage',
+  "navigator.serviceWorker.register('./sw.js')",
+  'Non-blocking',
+  'browser-local JSON files',
+  'never uploads, syncs, merges, or recovers accounts'
+]) {
+  if (!html.includes(marker)) throw new Error(`Missing TFL-CONTINUITY marker: ${marker}`);
+}
+for (const forbidden of ['automatic cross-device sync', 'cross-device sync', 'auto-sync', 'cloud sync', 'background upload', 'account recovery', 'account-recovery', 'conflict resolution', 'automatically merge']) {
+  if (html.includes(forbidden)) throw new Error(`TFL-CONTINUITY must not claim remote or automatic progress handling: ${forbidden}`);
+}
+const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
+for (const marker of [
+  'learningquest-static-v2',
+  "'./'",
+  "'./index.html'",
+  "'./questions.json'",
+  "'./manifest.webmanifest'",
+  "'./content-packs/registry.json'",
+  "'./content-packs/hk-chinese-basics.json'",
+  "'./content-packs/mandarin-basics.json'",
+  "'./content-packs/maths-foundation.json'",
+  "'./content-packs/life-uk.json'",
+  "request.method !== 'GET'",
+  'url.origin !== self.location.origin',
+  'caches.match(request)',
+  "request.mode === 'navigate'",
+  'cache.addAll(CORE_ASSETS)',
+  'self.skipWaiting()',
+  'self.clients.claim()',
+  'browser-local cache only'
+]) {
+  if (!serviceWorkerSource.includes(marker)) throw new Error(`Missing TFL-CONTINUITY service-worker marker: ${marker}`);
+}
+if (!serviceWorkerSource.includes('./content-packs/life-uk.json')) throw new Error('Service worker must cache Life in the UK content pack');
+
 function validatePackFile(path, expectedId, fields, label) {
   const pack = JSON.parse(fs.readFileSync(path, 'utf8'));
   if (pack.id !== expectedId) throw new Error(`${label} pack id changed unexpectedly`);
@@ -472,8 +527,6 @@ if (!serverLog.includes('LearningQuest running on port')) throw new Error('serve
 
 const dockerfile = fs.readFileSync('Dockerfile', 'utf8');
 if (!dockerfile.includes('COPY content-packs ./content-packs')) throw new Error('Dockerfile must publish content-packs for production');
-const serviceWorker = fs.readFileSync('sw.js', 'utf8');
-if (!serviceWorker.includes('./content-packs/life-uk.json')) throw new Error('Service worker must cache Life in the UK content pack');
 void hkChinesePack;
 void mandarinPack;
 void mathsFoundationPack;
