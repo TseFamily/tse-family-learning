@@ -6,6 +6,11 @@ PWA assets, learner progress model, browser-local backup/import behavior,
 curriculum content-pack registry, starter packs, validation script, Playwright
 mobile smoke, and deployment notes for this product.
 
+Destination is [`docs/vision.md`](docs/vision.md). Identity, fate, and oracles
+are [`docs/capabilities.md`](docs/capabilities.md).
+`FAMILY_LEARNING_HUB_ROADMAP.md` is historical prototype notes, not current
+destination.
+
 ## Lifecycle And Layer
 
 - Lifecycle: `active`
@@ -38,8 +43,11 @@ information must not become reusable product defaults.
 
 ## Public Surfaces
 
-- `README.md`, `DEPLOY.md`, `DEBUG.md`, and
-  `FAMILY_LEARNING_HUB_ROADMAP.md` document product state and operation.
+- `README.md`, `DEPLOY.md`, and `DEBUG.md` document entry and operation.
+- [`docs/vision.md`](docs/vision.md) is destination.
+  [`docs/capabilities.md`](docs/capabilities.md) is the identity graph.
+- `FAMILY_LEARNING_HUB_ROADMAP.md` is historical prototype notes, not current
+  destination or product state.
 - `index.html`, `server.js`, `sw.js`, and `manifest.webmanifest` define the
   static app and PWA runtime.
 - `content-packs/registry.json` and `content-packs/*.json` define curriculum
