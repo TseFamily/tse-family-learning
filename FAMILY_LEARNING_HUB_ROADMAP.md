@@ -1,4 +1,18 @@
-# Family Learning Hub Roadmap
+# Family Learning Hub Roadmap (historical)
+
+**Historical only.** This file is frozen prototype history from the
+private-name Family Learning Hub era. It is not LearningQuest destination,
+identity, current work, or product state.
+
+- Destination: [`docs/vision.md`](docs/vision.md)
+- Identity, fate, and oracles: [`docs/capabilities.md`](docs/capabilities.md)
+
+Private family names in this file are prototype residue. They must not become
+reusable product defaults. `scripts/validate.mjs` continues to reject those
+names in the product shell.
+
+The sections below are preserved as history. Do not extend them as a live
+roadmap.
 
 ## Current baseline
 
