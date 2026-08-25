@@ -1,16 +1,16 @@
 {
+  "packageManager": "bun@1.4.0",
   "name": "tse-family-learning",
   "version": "1.0.0",
   "description": "LearningQuest — mobile-native HTML5 learning app for personalised practice",
   "scripts": {
     "build": "echo 'Static site ready'",
-    "validate": "node scripts/validate.mjs",
-    "test": "npm run validate && node scripts/assert-public-path.cjs",
+    "validate": "bun scripts/validate.mjs",
+    "test": "bun test",
     "smoke:mobile": "playwright test",
-    "start": "node server.js"
+    "start": "bun server.js"
   },
-  "engines": {
-    "node": ">=18"
+  "engines": { "bun": ">=1.4.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.44.0"
