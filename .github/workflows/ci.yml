@@ -27,17 +27,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: '20'
+          bun-version-file: .bun-version
+      - name: Record Bun pin
+        run: bun --version
       - name: Install dependencies
-        run: npm install
+        run: bun install --frozen-lockfile
       - name: Validate static app
-        run: npm test
+        run: bun test
       - name: Build
-        run: npm run build
+        run: bun run build
       - name: Install Playwright browser
-        run: npx playwright install --with-deps chromium
+        run: bunx playwright install --with-deps chromium
       - name: Mobile app shell smoke test
-        run: npm run smoke:mobile
+        run: bunx playwright test

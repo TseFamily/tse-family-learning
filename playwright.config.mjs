@@ -13,7 +13,7 @@ export default defineConfig({
   testDir: './tests',
   timeout: 30_000,
   webServer: {
-    command: 'npm start',
+    command: 'bun server.js',
     url: 'http://127.0.0.1:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 20_000

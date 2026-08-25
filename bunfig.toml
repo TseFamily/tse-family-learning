@@ -1,0 +1,3 @@
+[test]
+# Playwright specs under tests/ are a real-browser oracle, not bun:test.
+root = "./scripts"

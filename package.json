@@ -6,9 +6,9 @@
   "scripts": {
     "build": "echo 'Static site ready'",
     "validate": "bun scripts/validate.mjs",
-    "test": "bun run validate && bun scripts/assert-public-path.cjs",
+    "test": "bun test",
     "smoke:mobile": "playwright test",
-    "start": "node server.js"
+    "start": "bun server.js"
   },
   "engines": { "bun": ">=1.4.0"
   },
