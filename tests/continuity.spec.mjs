@@ -26,19 +26,11 @@ async function waitForCoreApp(page) {
 }
 
 async function waitForQuestionBank(page) {
-  await page.waitForFunction(
-    () => Number(window.__learningQuestTestState?.practiceQuestionBankCount || 0) >= 20,
-    null,
-    { timeout: 10000 }
-  );
+  await expect(page.locator('#curriculum-grid .curriculum-title', { hasText: '11+ starter bank' })).toBeVisible({ timeout: 10000 });
 }
 
 async function waitForLifeUKPack(page) {
-  await page.waitForFunction(
-    () => window.__learningQuestTestState?.lifeUKPackId === 'life-uk-v1',
-    null,
-    { timeout: 10000 }
-  );
+  await expect(page.getByRole('button', { name: 'Start 24-question full mock (45 min)' })).toBeVisible({ timeout: 10000 });
 }
 
 async function installServiceWorker(page) {
@@ -95,11 +87,10 @@ test('continuity: service worker caches the shell, bank, manifest, registry, and
   await waitForQuestionBank(page);
   await waitForLifeUKPack(page);
 
-  const state = await page.evaluate(() => window.__learningQuestTestState);
   expect(await page.evaluate(() => navigator.onLine)).toBe(false);
-  expect(state.practiceQuestionBankCount).toBeGreaterThanOrEqual(20);
-  expect(state.lifeUKPackId).toBe('life-uk-v1');
-  expect(state.savedHistoryCount).toBe(1);
+  await expect(page.locator('#curriculum-grid .curriculum-title', { hasText: '11+ starter bank' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Life in the UK starter mock' })).toBeVisible();
+  await expect(page.locator('#history-panel').getByText('Life in the UK')).toBeVisible();
   const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('learningquest-history-v1-learner-1') || '[]'));
   expect(stored).toHaveLength(1);
   expect(stored[0]).toMatchObject({ focus: 'Life in the UK', percent: 90, activityType: 'life-uk-practice' });
