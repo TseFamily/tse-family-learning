@@ -79,3 +79,47 @@ textual edge list.
 5. Browser-local profiles and manual JSON transfer are not identity, access
    control, cloud durability, or sync.
 6. This graph does not authorize merge, release, deployment, or a live claim.
+
+## Release boundary (GOV-017)
+
+Declared 2026-08-31 per company ADR-030 and governance audit GOV-017
+(`SylphxAI/owner` runbook `GOVERNANCE-AUDIT-2026-08-28.md`). Docs declaration
+of current truth only. This is a family product under the TseFamily
+organisation; company delivery vocabulary does not override the plain
+boundary below.
+
+- **Public probe.** The cheapest falsifiable customer-visible proof at this
+  product's boundary is the LearningQuest shell itself — a person opens the
+  deployed static app, sees the learner/stage/goal selector, and starts a
+  question-backed practice. The only documented publicly reachable surface is
+  the GitHub Pages preview `https://tsefamily.github.io/tse-family-learning/`
+  from `main`, which the README scopes as a preview, not production
+  ("GitHub Pages is not production. A reachable URL is not the product
+  contract"). No customer domain exists (`Ordinary: none`); whether the Sylphx
+  product path (`tart-duo-uvt9`) currently holds a deployed, publicly
+  locatable runtime is Unknown — the doctrine deploy note is not a public
+  locator.
+- **Owned manifest/migration writers.** Deployment uses the normal Sylphx
+  product path for project `tart-duo-uvt9`, driven by this repo's
+  `sylphx.toml`: one static `web` service built from the repo `Dockerfile`
+  (health path `/`). CI (`.github/workflows/ci.yml`) validates, builds, and
+  runs the Playwright mobile smoke on PRs and merge groups. GitHub Pages
+  publishes the preview surface from `main`. Migration writer: none — the
+  product is a static app with no database and no migration step.
+- **Consumed receipts.** GitHub Actions check runs and merge-group receipts
+  (CI validation/build/smoke), GitHub Pages deployment receipts for the
+  preview, and Sylphx product-path deployment receipts for `tart-duo-uvt9`.
+  No company Apps/Journal/Compute/Identity/Commerce receipts are consumed:
+  the app is browser-local by design.
+- **Runtime effects.** A static file server (`server.js`, SPA fallback) serves
+  the app in the Sylphx deployment path; in the user's browser, `sw.js` runs a
+  cache-first service worker and learner history lives in browser-local
+  storage. No server-side state, database, worker, or scheduled job exists.
+- **Forbidden writes.** No account, remote progress writer, public profile,
+  chat, social-sharing, or automatic sync path (vision family/data boundary;
+  `TFL-CONTINUITY`); progress crosses browsers only by explicit manual JSON
+  export/import. `server.js`'s SPA fallback is not an account, progress,
+  curriculum, or child-safety authority. Private family names and
+  school-specific promises must not become product data (`TFL-CONTENT`
+  private-name check). CI, a deployment record, or a reachable URL must never
+  be sold as an installed, offline, or live learning journey (`TFL-APP`).
