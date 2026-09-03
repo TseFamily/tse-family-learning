@@ -31,16 +31,41 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+  // The app cache-busts static GETs with `?v=<now>` (see index.html). Strip
+  // the query so a versioned request hits the bare cached entry offline.
+  const bareUrl = new URL(request.url);
+  bareUrl.search = '';
+  const bareKey = bareUrl.toString();
   event.respondWith(
-    caches.match(request).then(cached => {
+    caches.match(request, { ignoreSearch: true }).then(cached => {
       if (cached) return cached;
-      return fetch(request).then(response => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
-        return response;
-      }).catch(() => {
-        if (request.mode === 'navigate') return caches.match('./index.html');
-        return new Response('Offline', { status: 503, statusText: 'Offline' });
+      return caches.match(bareKey).then(byBare => {
+        if (byBare) return byBare;
+        return fetch(request).then(response => {
+          if (response && (response.ok || response.type === 'opaque')) {
+            const copy = response.clone();
+            // Store under the bare key so `file?v=<now>` does not fan out
+            // into one cache entry per timestamp; ignoreSearch lookups still
+            // match the bare entry for both bare and versioned requests.
+            caches.open(CACHE_NAME).then(cache => cache.put(bareKey, copy));
+          } else {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+          }
+          return response;
+        }).catch(() => {
+          // Network failed (offline): re-check the bare cache before the
+          // app fallback so versioned data GETs still serve offline.
+          return caches.match(request, { ignoreSearch: true }).then(
+            retry => retry
+              || caches.match(bareKey).then(
+                retryBare => retryBare
+                  || (request.mode === 'navigate'
+                    ? caches.match('./index.html')
+                    : new Response('Offline', { status: 503, statusText: 'Offline' }))
+              )
+          );
+        });
       });
     })
   );
