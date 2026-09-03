@@ -25,6 +25,22 @@ expectRejected('/' + encodeURIComponent('..') + '/package.json');
 expectRejected('/index.html%00.js');
 expectRejected('/\\package.json');
 expectRejected('%E0%A4%A');
+// Encoded traversal shapes (lower/upper/mixed case, encoded slashes,
+// dot-slash runs, nested inside a real subdir): all must fail closed.
+expectRejected('/..%2f..%2fetc/passwd');
+expectRejected('/%2e%2e/%2e%2e/package.json');
+expectRejected('/%2E%2E/package.json');
+expectRejected('/....//....//package.json');
+expectRejected('/content-packs/../package.json');
+expectRejected('/content-packs/%2e%2e/package.json');
+expectRejected('..%2fpackage.json');
+expectRejected('/%c0%afpackage.json');
+expectRejected('/%00');
+expectRejected('');
+// Non-string request targets never reach the filesystem.
+assert.equal(resolvePublicPath(null), null, 'null requestUrl');
+assert.equal(resolvePublicPath(undefined), null, 'undefined requestUrl');
+assert.equal(resolvePublicPath(42), null, 'numeric requestUrl');
 
 function request(port, urlPath, headers = {}) {
   return new Promise((resolve, reject) => {
