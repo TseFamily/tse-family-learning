@@ -42,6 +42,33 @@ assert.equal(resolvePublicPath(null), null, 'null requestUrl');
 assert.equal(resolvePublicPath(undefined), null, 'undefined requestUrl');
 assert.equal(resolvePublicPath(42), null, 'numeric requestUrl');
 
+function resolveManifestMember(member, manifestUrl) {
+  assert.equal(typeof member, 'string', `manifest member from ${manifestUrl} must be a string`);
+  assert.notEqual(member, '', `manifest member from ${manifestUrl} must not be empty`);
+  return new URL(member, manifestUrl);
+}
+
+function assertStandaloneBindsToApp(manifest, manifestUrl, appUrl) {
+  const app = new URL(appUrl);
+  const start = resolveManifestMember(manifest.start_url, manifestUrl);
+  const scope = resolveManifestMember(manifest.scope, manifestUrl);
+  assert.equal(
+    scope.href,
+    app.href,
+    `PWA scope resolved from ${manifestUrl} must be ${app.href}, got ${scope.href}`
+  );
+  const indexInsideApp = new URL('index.html', app.href);
+  assert.ok(
+    start.href === app.href || start.href === indexInsideApp.href,
+    `PWA start_url resolved from ${manifestUrl} must bind to ${app.href}, got ${start.href}`
+  );
+  assert.ok(
+    start.href.startsWith(scope.href),
+    `PWA start_url ${start.href} is outside scope ${scope.href}`
+  );
+  return { start, scope };
+}
+
 function request(port, urlPath, headers = {}) {
   return new Promise((resolve, reject) => {
     const req = http.get({ hostname: '127.0.0.1', port, path: urlPath, headers }, (res) => {
@@ -78,6 +105,24 @@ server.listen(0, '127.0.0.1', async () => {
     assert.equal(asset.status, 200);
     const manifest = JSON.parse(asset.body);
     assert.equal(manifest.display, 'standalone');
+
+    // TFL-APP standalone identity: start_url and scope are resolved by the
+    // browser against the manifest URL. On the GitHub project Pages host the
+    // origin root is not the app (it 404s). Members of "/" therefore bind
+    // standalone launches to https://tsefamily.github.io/ instead of
+    // https://tsefamily.github.io/tse-family-learning/.
+    const PAGES_APP = 'https://tsefamily.github.io/tse-family-learning/';
+    const PAGES_MANIFEST = 'https://tsefamily.github.io/tse-family-learning/manifest.webmanifest';
+    const pages = assertStandaloneBindsToApp(manifest, PAGES_MANIFEST, PAGES_APP);
+    assert.notEqual(pages.start.href, 'https://tsefamily.github.io/');
+    assert.notEqual(pages.scope.href, 'https://tsefamily.github.io/');
+
+    const localManifestUrl = `http://127.0.0.1:${port}/manifest.webmanifest`;
+    const localApp = `http://127.0.0.1:${port}/`;
+    const local = assertStandaloneBindsToApp(manifest, localManifestUrl, localApp);
+    const started = await request(port, local.start.pathname || '/');
+    assert.equal(started.status, 200);
+    assert.match(started.body, /LearningQuest/);
 
     const bank = await request(port, '/questions.json');
     assert.equal(bank.status, 200);
