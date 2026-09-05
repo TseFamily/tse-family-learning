@@ -82,8 +82,7 @@ textual edge list.
 
 ## Release boundary (GOV-017)
 
-Declared 2026-08-31 per company ADR-030 and governance audit GOV-017
-(`SylphxAI/owner` runbook `GOVERNANCE-AUDIT-2026-08-28.md`). Docs declaration
+Declared 2026-08-31 per company release law ([owner `standards/release-control-plane.md`](https://github.com/SylphxAI/owner/blob/main/standards/release-control-plane.md)). Docs declaration
 of current truth only. This is a family product under the TseFamily
 organisation; company delivery vocabulary does not override the plain
 boundary below.
