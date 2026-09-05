@@ -396,7 +396,15 @@
     .comparison-label { color: var(--subtext); font-size: 0.72rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
     .comparison-term { color: #92400e; font-size: 1.45rem; font-weight: 900; line-height: 1.1; margin-top: 4px; }
     .comparison-meta { color: var(--subtext); font-size: 0.78rem; line-height: 1.35; }
-    .comparison-note { color: #92400e; font-size: 0.8rem; font-weight: 900; }
+    .comparison-note { color: #92400e; font-size: 0.8rem; font-weight: 900; min-height: 1.2em; }
+    .comparison-options { display: grid; gap: 6px; }
+    .comparison-option { border: 1px solid #fde68a; background: #fff; color: #92400e; border-radius: 10px; padding: 8px 10px; font-weight: 800; text-align: left; cursor: pointer; transition: all 0.2s; }
+    .comparison-option:hover { border-color: #f59e0b; background: #fffbeb; transform: translateY(-1px); }
+    .comparison-option.correct { border-color: #16a34a; background: #dcfce7; color: #166534; }
+    .comparison-option.incorrect { border-color: #fb7185; background: #fff1f2; color: #be123c; }
+    .comparison-option:disabled { cursor: default; transform: none; }
+    .comparison-score { display: inline-flex; align-items: center; gap: 6px; width: fit-content; border-radius: 999px; background: #fef3c7; color: #92400e; padding: 5px 9px; font-size: 0.74rem; font-weight: 900; }
+    .comparison-feedback { min-height: 1.2em; color: #92400e; font-size: 0.78rem; font-weight: 900; }
     .life-uk-card { border: 1px solid #bfdbfe; background: linear-gradient(180deg, #eff6ff, #fff); border-radius: 16px; padding: 12px; display: grid; gap: 8px; align-content: start; }
     .life-uk-topic { color: #1d4ed8; font-size: 0.74rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
     .life-uk-question { color: #1e3a8a; font-size: 1.02rem; font-weight: 900; line-height: 1.28; }
@@ -996,7 +1004,7 @@
             <div class="matching-panel" id="hk-matching-panel"><h3>🔗 Traditional HK Chinese matching practice</h3><p>Match the Traditional term to its English meaning before repeating the Cantonese prompt.</p><div class="matching-grid" id="hk-matching-grid"></div></div>
             <div class="flashcard-panel" id="mandarin-flashcard-panel"><h3>🧧 Simplified Mandarin starter cards</h3><p>A second reusable curriculum slice: Simplified characters, Pinyin, Traditional comparison, and English meaning.</p><div class="flashcard-grid" id="mandarin-flashcard-grid"></div></div>
             <div class="matching-panel" id="mandarin-matching-panel"><h3>🔗 Simplified Mandarin matching practice</h3><p>Match Simplified characters to English meaning, then compare Pinyin and Traditional forms.</p><div class="matching-grid" id="mandarin-matching-grid"></div></div>
-            <div class="comparison-panel" id="comparison-panel"><h3>🪞 Traditional/Simplified comparison drill</h3><p>Compare shared meanings across the runtime HK Chinese and Mandarin packs before moving into audio prompts.</p><div class="comparison-grid" id="comparison-grid"></div></div>
+            <div class="comparison-panel" id="comparison-panel"><h3>🪞 Traditional/Simplified comparison drill</h3><p>Choose the Simplified form that matches each Traditional term. Feedback and a saved score appear after each answer.</p><div class="comparison-grid" id="comparison-grid"></div></div>
             <div class="maths-panel" id="maths-foundation-panel"><h3>🧮 Maths Foundation practice cards</h3><p>Number bonds, place value, skip counting, and times-table prompts are runtime-loaded from the content-pack registry.</p><div class="maths-grid" id="maths-foundation-grid"></div></div>
             <div class="life-uk-panel" id="life-uk-panel"><h3>🇬🇧 Life in the UK starter mock</h3><p>Expanded citizenship questions with richer explanations are runtime-loaded from the content-pack registry, with a shuffled 24-question full timed mock, weak-topic review, a spaced-repetition review queue with polished due/overdue scheduling, a mock score trend chart, and scenario-style practice for everyday UK situations.</p><div class="life-uk-mock-actions" id="life-uk-mock-actions"><button class="btn btn-secondary life-uk-mock-start" type="button" onclick="startLifeUKFullMock()">⏱️ Start 24-question full mock (45 min)</button></div><div class="life-uk-mock-area" id="life-uk-mock-area"></div><div class="life-uk-mock-score-trend-area" id="life-uk-mock-score-trend-area"></div><div class="life-uk-drill-actions" id="life-uk-drill-actions"></div><div class="life-uk-drill-area" id="life-uk-drill-area"></div><div class="life-uk-review-queue-area" id="life-uk-review-queue-area"></div><div class="life-uk-scenario-actions" id="life-uk-scenario-actions"><button class="btn btn-secondary life-uk-scenario-start" type="button" onclick="startLifeUKScenarioPractice()">🎭 Start scenario-style practice</button></div><div class="life-uk-scenario-area" id="life-uk-scenario-area"></div><div class="life-uk-grid" id="life-uk-grid"></div></div>
           </article>
@@ -1123,6 +1131,7 @@
     let lifeUKQuestions = [];
     let lifeUKPackError = null;
     const matchingPracticeScores = { hkChinese: {}, mandarin: {} };
+    const comparisonPracticeScores = {};
     const mathsFoundationPracticeScores = {};
     const lifeUKPracticeScores = {};
     const lifeUKSelectedAnswers = {};
@@ -1150,6 +1159,7 @@
     const CHINESE_AUDIO_PROMPT_LIMIT = 5;
     const MATHS_FOUNDATION_PRACTICE_LIMIT = 6;
     const LIFE_UK_PRACTICE_LIMIT = 6;
+    const COMPARISON_PRACTICE_LIMIT = 6;
     const LIFE_UK_FULL_MOCK_QUESTION_COUNT = 24;
     const LIFE_UK_FULL_MOCK_TIME_LIMIT_SECONDS = 45 * 60;
     const LIFE_UK_MOCK_SCORE_TREND_LIMIT = 6;
@@ -1330,6 +1340,9 @@
       if (subject === 'Chinese · Simplified Mandarin') {
         return mandarinFlashcards.length ? { type: 'matching', packKey: 'mandarin', label: 'Simplified Mandarin matching' } : null;
       }
+      if (subject === 'Chinese · Traditional/Simplified') {
+        return comparisonDrillCards().length ? { type: 'comparison', label: 'Traditional/Simplified comparison' } : null;
+      }
       if (subject && subject !== 'Mixed' && subjectQuestionCount(subject)) {
         return { type: 'question-bank', subject, label: `${subject} practice` };
       }
@@ -1405,11 +1418,19 @@
         if (latest) {
           return { score: latest.percent < 80 ? 5 : 2, reason: `Traditional HK Chinese matching is at ${latest.percent}% from saved practice.` };
         }
+        const comparison = history.find(item => item.activityType === 'comparison-drill');
+        if (comparison) {
+          return { score: comparison.percent < 80 ? 5 : 2, reason: `Traditional/Simplified comparison is at ${comparison.percent}% from saved practice.` };
+        }
       }
       if (domain === 'Chinese · Simplified Mandarin') {
         const latest = history.find(item => item.activityType === 'matching-practice' && item.matchingPackKey === 'mandarin');
         if (latest) {
           return { score: latest.percent < 80 ? 5 : 2, reason: `Simplified Mandarin matching is at ${latest.percent}% from saved practice.` };
+        }
+        const comparison = history.find(item => item.activityType === 'comparison-drill');
+        if (comparison) {
+          return { score: comparison.percent < 80 ? 5 : 2, reason: `Traditional/Simplified comparison is at ${comparison.percent}% from saved practice.` };
         }
       }
       if (domain === 'Life in the UK') {
@@ -2117,6 +2138,7 @@
       stopLifeUKMockTimer();
       matchingPracticeScores.hkChinese = {};
       matchingPracticeScores.mandarin = {};
+      clearKeyedState(comparisonPracticeScores);
       clearKeyedState(mathsFoundationPracticeScores);
       clearKeyedState(lifeUKPracticeScores);
       clearKeyedState(lifeUKSelectedAnswers);
@@ -2140,6 +2162,13 @@
           matchingPracticeScores[item.matchingPackKey] = matchingPracticeScores[item.matchingPackKey] || {};
           for (let index = 1; index <= Math.min(Number(item.attempted || 0), Number(item.total || 0)); index += 1) {
             matchingPracticeScores[item.matchingPackKey][index] = index <= Number(item.correct || 0);
+          }
+        }
+        if (item.activityType === 'comparison-drill' && item.skillResults) {
+          for (const card of comparisonDrillCards()) {
+            const result = item.skillResults[card.traditional];
+            if (!result || !result.attempted) continue;
+            comparisonPracticeScores[card.index] = Number(result.correct || 0) >= Number(result.attempted || 0);
           }
         }
         if (item.activityType === 'maths-foundation-practice' && item.skillResults) {
@@ -2370,6 +2399,10 @@
       }
       if (action.type === 'matching') {
         focusGuidanceTarget(action.packKey === 'mandarin' ? 'mandarin-matching-grid' : 'hk-matching-grid');
+        return;
+      }
+      if (action.type === 'comparison') {
+        focusGuidanceTarget('comparison-grid');
       }
     }
 
@@ -2607,7 +2640,7 @@
         .map(hkCard => ({ hkCard, mandarinCard: byMeaning.get(hkCard.english) }))
         .filter(pair => pair.mandarinCard)
         .sort((left, right) => Number(left.hkCard.traditional === left.mandarinCard.simplified) - Number(right.hkCard.traditional === right.mandarinCard.simplified))
-        .slice(0, 6)
+        .slice(0, COMPARISON_PRACTICE_LIMIT)
         .map((pair, index) => ({
           index: index + 1,
           traditional: pair.hkCard.traditional,
@@ -2617,6 +2650,71 @@
           pinyin: pair.mandarinCard.pinyin,
           changed: pair.hkCard.traditional !== pair.mandarinCard.simplified
         }));
+    }
+
+    function comparisonAnswerOptions(cards, index) {
+      if (!cards.length) return [];
+      return cards.map(card => card.simplified).slice(index).concat(cards.map(card => card.simplified).slice(0, index));
+    }
+
+    function comparisonPracticeScore(total = COMPARISON_PRACTICE_LIMIT) {
+      const attempts = Object.values(comparisonPracticeScores);
+      const correct = attempts.filter(Boolean).length;
+      return { correct, attempted: attempts.length, total };
+    }
+
+    function comparisonPracticeSummary(total = COMPARISON_PRACTICE_LIMIT) {
+      const score = comparisonPracticeScore(total);
+      return `${score.correct}/${score.total} matched · ${score.attempted} tried`;
+    }
+
+    function comparisonSkillResults() {
+      const results = {};
+      for (const card of comparisonDrillCards()) {
+        const recorded = comparisonPracticeScores[card.index];
+        if (typeof recorded !== 'boolean') continue;
+        results[card.traditional] = { correct: recorded ? 1 : 0, attempted: 1 };
+      }
+      return Object.keys(results).length ? results : undefined;
+    }
+
+    function saveComparisonPracticeProgress(total = COMPARISON_PRACTICE_LIMIT) {
+      const score = comparisonPracticeScore(total);
+      const percent = total ? Math.round((score.correct / total) * 100) : 0;
+      const entry = {
+        date: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+        completedAt: new Date().toISOString(),
+        correct: score.correct,
+        total,
+        percent,
+        focus: 'Traditional/Simplified comparison',
+        subjects: { 'Chinese · Traditional/Simplified': { correct: score.correct, total } },
+        practiceMode: 'comparison-drill',
+        activityType: 'comparison-drill',
+        attempted: score.attempted,
+        skillResults: comparisonSkillResults()
+      };
+      const history = upsertHistoryEntry(entry, item => item.activityType === 'comparison-drill');
+      renderHistory(history);
+      return entry;
+    }
+
+    function comparisonCardAnswer(cardIndex) {
+      return comparisonDrillCards().find(card => card.index === Number(cardIndex))?.simplified;
+    }
+
+    function recordComparisonAnswer(cardIndex, selectedAnswer) {
+      const expectedAnswer = comparisonCardAnswer(cardIndex);
+      if (expectedAnswer === undefined) return;
+      comparisonPracticeScores[cardIndex] = selectedAnswer === expectedAnswer;
+      const total = comparisonDrillCards().length || COMPARISON_PRACTICE_LIMIT;
+      const saved = saveComparisonPracticeProgress(total);
+      renderChineseComparisonDrill();
+      updateRecommendedCurriculumTestState();
+      window.__learningQuestTestState = {
+        ...(window.__learningQuestTestState || {}),
+        latestComparisonProgress: saved
+      };
     }
 
     function renderChineseComparisonDrill() {
@@ -2633,9 +2731,13 @@
           </article>`;
         return;
       }
-      grid.innerHTML = cards.map(card => `
+      grid.innerHTML = cards.map((card, optionIndex) => {
+        const recorded = comparisonPracticeScores[card.index];
+        const answered = typeof recorded === 'boolean';
+        const options = comparisonAnswerOptions(cards, optionIndex);
+        return `
         <article class="comparison-card" data-comparison-index="${card.index}">
-          <div class="comparison-prompt">Pair ${card.index}: compare the writing systems</div>
+          <div class="comparison-prompt">Pair ${card.index}: choose the Simplified form</div>
           <div class="comparison-forms">
             <div class="comparison-form">
               <div class="comparison-label">Traditional HK</div>
@@ -2644,14 +2746,22 @@
             </div>
             <div class="comparison-form">
               <div class="comparison-label">Simplified Mandarin</div>
-              <div class="comparison-term">${escapeHTML(card.simplified)}</div>
-              <div class="comparison-meta">Pinyin: ${escapeHTML(card.pinyin)}</div>
+              <div class="comparison-term">${answered ? escapeHTML(card.simplified) : '？'}</div>
+              <div class="comparison-meta">${answered ? `Pinyin: ${escapeHTML(card.pinyin)}` : 'Choose the matching Simplified form'}</div>
             </div>
           </div>
-          <div class="comparison-note">${card.changed ? 'Notice what changes between scripts.' : 'Same written form — pronunciation changes.'}</div>
+          <div class="comparison-options" role="group" aria-label="Simplified options for ${escapeHTML(card.traditional)}">
+            ${options.map(option => `
+              <button type="button" class="comparison-option ${answered && option === card.simplified ? 'correct' : ''} ${answered && option !== card.simplified && recorded === false ? 'incorrect' : ''}" data-answer="${escapeHTML(option)}" onclick="recordComparisonAnswer(${card.index}, this.dataset.answer)" ${answered ? 'disabled' : ''}>${escapeHTML(option)}</button>
+            `).join('')}
+          </div>
+          <div class="comparison-feedback">${answered ? (recorded ? '✅ Matched' : `↪ Correct answer: ${escapeHTML(card.simplified)}`) : 'Tap the Simplified form that matches this Traditional term.'}</div>
+          <div class="comparison-score">${escapeHTML(comparisonPracticeSummary(cards.length))}</div>
+          <div class="comparison-note">${answered ? (card.changed ? 'Notice what changes between scripts.' : 'Same written form — pronunciation changes.') : ''}</div>
           <div class="comparison-meta">Meaning: ${escapeHTML(card.english)}</div>
         </article>
-      `).join('');
+      `;
+      }).join('');
     }
 
     function normaliseMathsAnswer(value) {
@@ -4023,6 +4133,7 @@
       const latestMatchingProgress = lastMatchingProgress || history.find(item => item.activityType === 'matching-practice') || null;
       const latestMathsFoundationProgress = lastMathsFoundationProgress || history.find(item => item.activityType === 'maths-foundation-practice') || null;
       const latestLifeUKProgress = lastLifeUKProgress || history.find(item => item.activityType === 'life-uk-practice') || null;
+      const latestComparisonProgress = history.find(item => item.activityType === 'comparison-drill') || null;
       const mathsPracticeCards = mathsFoundationPracticeCards();
       const lifeUKPractice = lifeUKPracticeQuestions();
       window.__learningQuestTestState = {
@@ -4121,6 +4232,9 @@
         matchingPracticeScores: { hkChinese: matchingPracticeScore('hkChinese', hkChineseFlashcards.length ? Math.min(4, hkChineseFlashcards.length) : 0), mandarin: matchingPracticeScore('mandarin', mandarinFlashcards.length ? Math.min(4, mandarinFlashcards.length) : 0) },
         mathsFoundationPracticeScores: mathsFoundationPracticeScore(mathsPracticeCards.length || MATHS_FOUNDATION_PRACTICE_LIMIT),
         comparisonDrillPairs: comparisonDrillCards().map(card => ({ traditional: card.traditional, simplified: card.simplified, english: card.english, changed: card.changed })),
+        comparisonPracticeCount: comparisonDrillCards().length,
+        comparisonPracticeScores: comparisonPracticeScore(comparisonDrillCards().length || COMPARISON_PRACTICE_LIMIT),
+        latestComparisonProgress,
         audioPromptCounts: { hkChinese: audioPromptCards(hkChineseFlashcards, 'hkChinese').length, mandarin: audioPromptCards(mandarinFlashcards, 'mandarin').length },
         audioPromptLocales: ['zh-HK', 'zh-CN'],
         audioVoiceHints: { hkChinese: audioVoiceHint('zh-HK'), mandarin: audioVoiceHint('zh-CN') },

@@ -230,11 +230,21 @@ test('mobile app shell opens without horizontal overflow and mission onboarding 
   await twoTimesCard.getByRole('button', { name: 'Check answer' }).tap();
   await expect(twoTimesCard.getByText('✅ Correct — strategy unlocked.')).toBeVisible();
   await expect(twoTimesCard.getByText('Double 6 to make 12.')).toBeVisible();
-  await expect(page.locator('#comparison-grid .comparison-card').first().getByText('Traditional HK')).toBeVisible();
-  await expect(page.locator('#comparison-grid .comparison-card').first().getByText('Simplified Mandarin')).toBeVisible();
-  await expect(page.locator('#comparison-grid .comparison-card', { hasText: '爸爸' }).getByText('Same written form — pronunciation changes.')).toBeVisible();
-  await expect(page.locator('#comparison-grid .comparison-card', { hasText: '媽媽' }).getByText('妈妈')).toBeVisible();
-  await expect(page.locator('#comparison-grid .comparison-card', { hasText: '紅色' }).getByText('红色')).toBeVisible();
+  const comparisonCard = page.locator('#comparison-grid .comparison-card').first();
+  await expect(comparisonCard.getByText('Traditional HK')).toBeVisible();
+  await expect(comparisonCard.getByText('Simplified Mandarin')).toBeVisible();
+  await expect(comparisonCard.locator('.comparison-term', { hasText: '媽媽' })).toBeVisible();
+  await expect(comparisonCard.locator('.comparison-term', { hasText: '？' })).toBeVisible();
+  await expect(comparisonCard.getByText('Tap the Simplified form that matches this Traditional term.')).toBeVisible();
+  await expect(comparisonCard).not.toContainText('Correct answer:');
+  await expect(comparisonCard).not.toContainText('Same written form');
+  await expect(comparisonCard).not.toContainText('Notice what changes');
+  await expect(comparisonCard).not.toContainText(/pass target|PASSED/i);
+  await comparisonCard.getByRole('button', { name: '妈妈' }).tap();
+  await expect(comparisonCard.getByText('✅ Matched')).toBeVisible();
+  await expect(comparisonCard.getByText('1/6 matched · 1 tried')).toBeVisible();
+  await expect(comparisonCard.getByText('Notice what changes between scripts.')).toBeVisible();
+  await expect(page.locator('#history-panel').getByText('Traditional/Simplified comparison')).toBeVisible();
   await expect(page.locator('#hk-matching-grid .matching-card').first().getByText('Dad / father')).toBeVisible();
   await expect(page.locator('#mandarin-matching-grid .matching-card').first().getByText('bàba')).toBeVisible();
   await expect(page.locator('#hk-matching-grid .matching-card').first().getByText('Tap the meaning that matches this term.')).toBeVisible();
@@ -257,7 +267,8 @@ test('mobile app shell opens without horizontal overflow and mission onboarding 
   expect(savedHistory).toEqual(expect.arrayContaining([
     expect.objectContaining({ activityType: 'life-uk-practice', correct: 0, total: 6, percent: 0, weakSkills: ['Government'] }),
     expect.objectContaining({ activityType: 'maths-foundation-practice', correct: 2, total: 6, percent: 33 }),
-    expect.objectContaining({ activityType: 'matching-practice', matchingPackKey: 'hkChinese', correct: 1, total: 4, percent: 25 })
+    expect.objectContaining({ activityType: 'matching-practice', matchingPackKey: 'hkChinese', correct: 1, total: 4, percent: 25 }),
+    expect.objectContaining({ activityType: 'comparison-drill', correct: 1, total: 6, percent: 17, attempted: 1, focus: 'Traditional/Simplified comparison' })
   ]));
 
   const makeTwentyCard = page.locator('#maths-foundation-grid .maths-card', { hasText: 'What number goes with 13 to make 20?' });
@@ -854,6 +865,74 @@ test('matching practice does not expose answers before submit', async ({ page })
   await firstCard.getByRole('button', { name: 'Dad / father' }).tap();
   await expect(firstCard.getByText('✅ Matched')).toBeVisible();
   await expect(firstCard.locator('.matching-option').first()).toBeDisabled();
+});
+
+test('comparison drill scores answers, writes history, and does not leak before submit', async ({ page }) => {
+  await page.goto('/');
+  await waitForShippedPacks(page);
+  const firstCard = page.locator('#comparison-grid .comparison-card').first();
+  await expect(firstCard).toBeVisible();
+  await expect(firstCard.locator('.comparison-term', { hasText: '媽媽' })).toBeVisible();
+  await expect(firstCard.locator('.comparison-term', { hasText: '？' })).toBeVisible();
+  await expect(firstCard.getByText('Tap the Simplified form that matches this Traditional term.')).toBeVisible();
+  const leaked = await firstCard.locator('.comparison-option').evaluateAll(els => els.map(el => ({
+    expected: el.getAttribute('data-expected'),
+    correct: el.getAttribute('data-correct')
+  })));
+  expect(leaked.every(item => item.expected == null && item.correct == null)).toBeTruthy();
+  await expect(firstCard).not.toContainText('Correct answer:');
+  await expect(firstCard).not.toContainText('Same written form');
+  await expect(firstCard).not.toContainText('Notice what changes');
+  await expect(firstCard).not.toContainText(/pass target|PASSED/i);
+  await expect(firstCard.locator('.comparison-option.correct')).toHaveCount(0);
+
+  await firstCard.getByRole('button', { name: '妈妈' }).tap();
+  await expect(firstCard.getByText('✅ Matched')).toBeVisible();
+  await expect(firstCard.getByText('1/6 matched · 1 tried')).toBeVisible();
+  await expect(firstCard.getByText('Notice what changes between scripts.')).toBeVisible();
+  await expect(firstCard.locator('.comparison-option').first()).toBeDisabled();
+  await expect(page.locator('#history-panel').getByText('Traditional/Simplified comparison')).toBeVisible();
+
+  const dadCard = page.locator('#comparison-grid .comparison-card', { hasText: 'Dad / father' });
+  await dadCard.getByRole('button', { name: '爸爸' }).tap();
+  await expect(dadCard.getByText('✅ Matched')).toBeVisible();
+  await expect(dadCard.getByText('Same written form — pronunciation changes.')).toBeVisible();
+  await expect(dadCard.getByText('2/6 matched · 2 tried')).toBeVisible();
+
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('learningquest-history-v1-learner-1')));
+  expect(saved[0]).toMatchObject({
+    activityType: 'comparison-drill',
+    practiceMode: 'comparison-drill',
+    correct: 2,
+    total: 6,
+    attempted: 2,
+    percent: 33,
+    focus: 'Traditional/Simplified comparison',
+    subjects: { 'Chinese · Traditional/Simplified': { correct: 2, total: 6 } },
+    skillResults: {
+      媽媽: { correct: 1, attempted: 1 },
+      爸爸: { correct: 1, attempted: 1 }
+    }
+  });
+  expect(saved[0].learner).toBeUndefined();
+  expect(saved[0].passed).toBeUndefined();
+  expect(saved[0].passMark).toBeUndefined();
+
+  await page.reload();
+  await waitForShippedPacks(page);
+  const restored = page.locator('#comparison-grid .comparison-card').first();
+  await expect(restored.getByText('✅ Matched')).toBeVisible();
+  await expect(restored.getByText('2/6 matched · 2 tried')).toBeVisible();
+  await expect(page.locator('#history-panel').getByText('Traditional/Simplified comparison')).toBeVisible();
+  const restoredHistory = await page.evaluate(() => JSON.parse(localStorage.getItem('learningquest-history-v1-learner-1')));
+  expect(restoredHistory[0]).toMatchObject({ activityType: 'comparison-drill', correct: 2, total: 6, attempted: 2 });
+
+  await page.getByRole('button', { name: /Learner 2/ }).tap();
+  await expect(page.locator('#comparison-grid .comparison-card').first().getByText('Tap the Simplified form that matches this Traditional term.')).toBeVisible();
+  await expect(page.locator('#history-panel')).toBeHidden();
+  const afterLearner2 = await readLearnerHistories(page);
+  expect(afterLearner2.learner1[0]).toMatchObject({ activityType: 'comparison-drill', correct: 2, total: 6 });
+  expect(afterLearner2.learner2).toEqual([]);
 });
 
 test('browser speech and placeholder cards do not count as completed practice', async ({ page }) => {
