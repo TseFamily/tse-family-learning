@@ -164,5 +164,13 @@ for (const field of ['name', 'short_name', 'description', 'start_url', 'scope', 
 if (manifest.display !== 'standalone') throw new Error('PWA manifest must use standalone display');
 if (manifest.orientation !== 'portrait-primary') throw new Error('PWA manifest must declare portrait-primary orientation');
 if (!Array.isArray(manifest.categories) || !manifest.categories.includes('education')) throw new Error('PWA manifest must declare the education category');
+if (!Array.isArray(manifest.icons) || manifest.icons.length === 0) throw new Error('PWA manifest must declare icons');
+const iconSizes = new Set(manifest.icons.map(icon => icon.sizes));
+if (!iconSizes.has('192x192') || !iconSizes.has('512x512')) throw new Error('PWA manifest must declare 192x192 and 512x512 icons');
+for (const icon of manifest.icons) {
+  if (!icon.src || !icon.sizes || icon.type !== 'image/png') {
+    throw new Error('PWA manifest icons must declare src, sizes, and image/png type');
+  }
+}
 
 console.log(`Validated LearningQuest static app with ${data.questions.length} questions.`);

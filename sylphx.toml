@@ -20,6 +20,7 @@ watch_paths = [
   "server.js",
   "package.json",
   "content-packs/**",
+  "icons/**",
   "Dockerfile",
   "sylphx.toml",
 ]

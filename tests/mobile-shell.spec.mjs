@@ -1,6 +1,14 @@
 import fs from 'node:fs';
 import { expect, test } from '@playwright/test';
 
+function expectPngDimensions(body, width, height) {
+  const bytes = Buffer.from(body);
+  expect(bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))).toBeTruthy();
+  expect(bytes.toString('ascii', 12, 16)).toBe('IHDR');
+  expect(bytes.readUInt32BE(16)).toBe(width);
+  expect(bytes.readUInt32BE(20)).toBe(height);
+}
+
 async function waitForQuestionBank(page) {
   await expect(page.locator('#curriculum-grid .curriculum-title', { hasText: '11+ starter bank' })).toBeVisible({ timeout: 10000 });
 }
@@ -1511,5 +1519,45 @@ test('TFL-APP: practice, guidance, family, and continuity compose into one mobil
   const shellCopy = (await page.locator('#start-screen').innerText()).toLowerCase();
   for (const forbidden of ['child account', 'create an account', 'created account', 'cloud sync', 'auto-sync', 'background upload', 'public profile', 'social sharing', 'chat with', 'chat room', 'instant message', 'messaging', 'live journey', 'deployed']) {
     expect(shellCopy).not.toContain(forbidden);
+  }
+});
+
+test('TFL-APP: standalone manifest exposes installable PNG icons', async ({ page, request }) => {
+  await page.goto('/');
+  await expect(page.getByText('LearningQuest').first()).toBeVisible();
+
+  const apple = page.locator('link[rel="apple-touch-icon"]');
+  await expect(apple).toHaveCount(1);
+  const appleHref = await apple.getAttribute('href');
+  expect(appleHref).toBeTruthy();
+  const appleUrl = new URL(appleHref, page.url());
+  const appleRes = await request.get(appleUrl.href);
+  expect(appleRes.status()).toBe(200);
+  expectPngDimensions(await appleRes.body(), 180, 180);
+
+  const manifestHref = await page.locator('link[rel="manifest"]').getAttribute('href');
+  expect(manifestHref).toBeTruthy();
+  const manifestUrl = new URL(manifestHref, page.url());
+  const manifestRes = await request.get(manifestUrl.href);
+  expect(manifestRes.status()).toBe(200);
+  const manifest = await manifestRes.json();
+  expect(manifest.display).toBe('standalone');
+  expect(Array.isArray(manifest.icons)).toBeTruthy();
+  expect(manifest.icons.length).toBeGreaterThanOrEqual(2);
+
+  const sized = new Map(manifest.icons.map(icon => [icon.sizes, icon]));
+  expect(sized.has('192x192')).toBeTruthy();
+  expect(sized.has('512x512')).toBeTruthy();
+
+  for (const icon of manifest.icons) {
+    expect(icon.src).toBeTruthy();
+    expect(icon.type).toBe('image/png');
+    const [width, height] = String(icon.sizes).split('x').map(Number);
+    expect(width).toBeGreaterThan(0);
+    expect(height).toBe(width);
+    const iconUrl = new URL(icon.src, manifestUrl);
+    const iconRes = await request.get(iconUrl.href);
+    expect(iconRes.status()).toBe(200);
+    expectPngDimensions(await iconRes.body(), width, height);
   }
 });

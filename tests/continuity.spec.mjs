@@ -14,6 +14,9 @@ const CORE_ASSETS = [
   '/index.html',
   '/questions.json',
   '/manifest.webmanifest',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
+  '/icons/apple-touch-icon.png',
   '/content-packs/registry.json',
   '/content-packs/hk-chinese-basics.json',
   '/content-packs/mandarin-basics.json',
@@ -88,6 +91,24 @@ test('continuity: service worker caches the shell, bank, manifest, registry, and
   await waitForLifeUKPack(page);
 
   expect(await page.evaluate(() => navigator.onLine)).toBe(false);
+  const cachedIcon = await page.evaluate(async () => {
+    const response = await fetch('./icons/icon-192.png');
+    const buffer = await response.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    const view = new DataView(buffer);
+    return {
+      ok: response.ok,
+      status: response.status,
+      magic: Array.from(bytes.slice(0, 8)),
+      width: view.getUint32(16),
+      height: view.getUint32(20)
+    };
+  });
+  expect(cachedIcon.ok).toBeTruthy();
+  expect(cachedIcon.status).toBe(200);
+  expect(cachedIcon.magic).toEqual([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  expect(cachedIcon.width).toBe(192);
+  expect(cachedIcon.height).toBe(192);
   await expect(page.locator('#curriculum-grid .curriculum-title', { hasText: '11+ starter bank' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Life in the UK starter mock' })).toBeVisible();
   await expect(page.locator('#history-panel').getByText('Life in the UK')).toBeVisible();
