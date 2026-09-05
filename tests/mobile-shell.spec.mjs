@@ -105,6 +105,26 @@ async function expectGuidanceDoesNotSellHeuristicProof(page, { historySaved = fa
   }
 }
 
+
+async function expectCatalogDoesNotSellPlannedWork(page) {
+  const catalog = page.locator('#curriculum-grid');
+  await expect(page.locator('.topbar-pill')).toHaveText('Family learning PWA');
+  await expect(page.locator('#today h1')).toHaveText('Choose a learner, then practise.');
+  await expect(page.locator('#quiz-desc')).toContainText('share this browser');
+  await expect(page.locator('#today')).not.toContainText(/adaptive practice|for any learner|beautifully focused/i);
+  await expect(page.locator('#learn .section-head')).not.toContainText(/many learners, subjects, ages, and goals/i);
+  await expect(page.locator('#curriculum .section-head')).toContainText('Checked-in practice only');
+  await expect(page.locator('#curriculum .section-head')).not.toContainText(/primary practice|for every learner/i);
+  await expect(catalog).not.toContainText(/\bPath:/);
+  await expect(catalog).not.toContainText('Split into topic packs');
+  await expect(catalog).not.toContainText('Expand family words');
+  await expect(catalog).not.toContainText('Add more Life in the UK audio');
+  await expect(catalog).not.toContainText('Add adaptive number-line');
+  await expect(catalog).not.toContainText('Expand into matching practice');
+  await expect(catalog.locator('.curriculum-card.recommended .curriculum-insight').filter({ hasText: 'Evidence:' }).first()).toBeVisible();
+  await expect(page.locator('#parent-panel')).not.toContainText('Split into topic packs');
+}
+
 async function expectLifeUKSurfaceDoesNotSellExamProof(locator) {
   await expect(locator).not.toContainText(/pass target|real mock-test pass target|% to pass|Not yet —/i);
   await expect(locator).not.toContainText('PASSED', { ignoreCase: false });
@@ -130,6 +150,7 @@ test('validated content packs and the school-practice bank drive the catalog wit
   await expect(page.locator('#curriculum-grid .curriculum-title', { hasText: 'Simplified Mandarin basics' })).toBeVisible();
   await expect(page.locator('#curriculum-grid .curriculum-title', { hasText: 'Maths Foundation practice' })).toBeVisible();
   await expect(page.locator('#curriculum-grid .curriculum-title', { hasText: 'Life in the UK starter mock' })).toBeVisible();
+  await expectCatalogDoesNotSellPlannedWork(page);
 
 });
 
@@ -146,18 +167,18 @@ test('mobile app shell opens without horizontal overflow and mission onboarding 
   await expect(page.getByRole('button', { name: 'Start this mission' })).toBeVisible();
   await expect(page.locator('.curriculum-card.recommended .curriculum-title', { hasText: '11+ starter bank' })).toBeVisible();
   await expect(page.locator('.curriculum-card.recommended').getByText('Baseline from Exam prep · Get exam-ready and available pack metadata (11+ starter bank). No saved practice yet.').first()).toBeVisible();
-  await expect(page.locator('.curriculum-card.recommended').getByText('Start with a mixed diagnostic round → Focus quick practice on weak skills → Return to timed exam-prep missions').first()).toBeVisible();
+  await expectCatalogDoesNotSellPlannedWork(page);
 
   await page.getByRole('button', { name: 'Adult' }).tap();
   await page.getByRole('button', { name: 'Learn language' }).tap();
   await expect(page.getByText('Listen & recall: Adult')).toBeVisible();
   await expect(page.locator('.curriculum-card.recommended .curriculum-title', { hasText: 'Simplified Mandarin basics' })).toBeVisible();
   await expect(page.locator('.curriculum-card.recommended').getByText('Baseline from Adult · Learn language and available pack metadata (Simplified Mandarin basics). No saved practice yet.').first()).toBeVisible();
-  await expect(page.locator('.curriculum-card.recommended').getByText('Start with greetings and core family words → Compare Simplified, Traditional, and Pinyin forms → Use matching practice and comparison drills, then try audio prompts').first()).toBeVisible();
+  await expect(page.locator('#curriculum-grid')).not.toContainText('Start with greetings and core family words');
   await page.getByRole('button', { name: 'Get exam-ready' }).tap();
   await expect(page.locator('.curriculum-card.recommended .curriculum-title', { hasText: 'Life in the UK starter mock' })).toBeVisible();
   await expect(page.locator('.curriculum-card.recommended').getByText('Baseline from Adult · Get exam-ready and available pack metadata (Life in the UK starter mock). No saved practice yet.').first()).toBeVisible();
-  await expect(page.locator('.curriculum-card.recommended').getByText('Start with civic basics and everyday UK facts → Study clearer explanations after each answer to lock in citizenship facts → Practise weak citizenship topics from saved attempts → Build toward a 24-question, 45-minute mock test from an expanded bank').first()).toBeVisible();
+  await expect(page.locator('#curriculum-grid')).not.toContainText('Start with civic basics and everyday UK facts');
   await page.getByRole('button', { name: 'Learn language' }).tap();
   await expect(page.locator('#flashcard-grid .flashcard-term', { hasText: '早晨' })).toBeVisible();
   await expect(page.locator('#flashcard-grid .flashcard-term', { hasText: '紅色' })).toBeVisible();
@@ -229,7 +250,8 @@ test('mobile app shell opens without horizontal overflow and mission onboarding 
   await page.getByRole('button', { name: 'Build confidence' }).tap();
   await expect(page.locator('.curriculum-card.recommended .curriculum-title', { hasText: 'Maths Foundation practice' })).toBeVisible();
   await expect(page.locator('.curriculum-card.recommended').getByText('Maths Foundation is at 33% in saved learner history.').first()).toBeVisible();
-  await expect(page.locator('.curriculum-card.recommended').getByText('Start with number bonds to 10 and 20 → Practise place value and skip counting → Move into times tables, fractions, and short word problems → Type answers and unlock strategy feedback').first()).toBeVisible();
+  await expect(page.locator('#curriculum-grid')).not.toContainText('Start with number bonds to 10 and 20');
+  await expectCatalogDoesNotSellPlannedWork(page);
   const savedHistory = await page.evaluate(() => JSON.parse(localStorage.getItem('learningquest-history-v1-learner-1')));
   expect(savedHistory[0]).toMatchObject({ activityType: 'matching-practice', matchingPackKey: 'mandarin', correct: 1, total: 4, percent: 25 });
   expect(savedHistory).toEqual(expect.arrayContaining([
@@ -345,6 +367,12 @@ test('question practice remains available when optional HK Chinese pack is unava
   await expect(page.getByRole('heading', { name: 'Set up today’s mission' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Start this mission' })).toBeVisible();
   await expect(page.locator('#flashcard-grid .flashcard-placeholder').getByText('Question practice remains available')).toBeVisible({ timeout: 10000 });
+  const hkCard = page.locator('#curriculum-grid .curriculum-card', { hasText: 'Traditional HK Chinese basics' });
+  await expect(hkCard.locator('.curriculum-status')).toHaveText('Pack unavailable');
+  await expect(hkCard).toContainText('Recovery:');
+  await expect(hkCard).toContainText('Question practice still works');
+  await expect(hkCard).not.toContainText('Expand family words');
+  await expect(page.locator('#curriculum-grid')).not.toContainText('Path:');
 });
 
 test('question practice remains available when optional Mandarin pack is unavailable', async ({ page }) => {
