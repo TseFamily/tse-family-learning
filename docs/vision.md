@@ -62,7 +62,8 @@ The destination is present when, on one supported browser, a person can:
 2. receive a mission and curriculum recommendation backed by an available
    checked-in question bank or validated content pack;
 3. complete the selected practice with immediate answer feedback and an
-   understandable result;
+   understandable result (practice facts such as correct/total and percent,
+   not an official exam pass);
 4. see the result restored under the selected learner and used for a next-step
    or same-browser coach action; and
 5. after a successful service-worker installation, reopen the cached core app
@@ -71,8 +72,10 @@ The destination is present when, on one supported browser, a person can:
 
 The oracle fails if a planned curriculum card is presented as an activity, an
 optional pack outage disables unrelated question practice, histories cross
-local learner keys, private family identity becomes product data, or local
-storage/export is described as protected identity or automatic sync.
+local learner keys, private family identity becomes product data, local
+storage/export is described as protected identity or automatic sync, or a
+pass-target, PASSED/Not-yet, or official-exam-readiness claim is sold as
+proof of learning.
 
 The durable identities, their fates, and exact failure oracles are in
 [the identity graph](capabilities.md). Source, check, deployed artifact, and
