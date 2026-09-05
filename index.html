@@ -982,8 +982,7 @@
               <div class="section-icon">🧑‍🚀</div>
             </div>
             <div class="next-step-panel" id="next-step-panel" style="display:none"><h3>🧭 Recommended next step</h3><div class="next-step-card" id="next-step-card"></div></div>
-            <div class="stats-panel" id="stats-panel" style="display:none"><h3>🏅 Learning stats</h3><div class="stats-grid" id="stats-grid"></div></div>
-            <div class="badges-panel" id="badges-panel" style="display:none"><h3>🏆 Milestone badges</h3><div class="badge-grid" id="badge-grid"></div></div>
+            <div class="stats-panel" id="stats-panel" style="display:none"><h3>Saved practice</h3><div class="stats-grid" id="stats-grid"></div></div>
           </article>
 
           <article class="section-card wide" id="curriculum">
@@ -1597,7 +1596,7 @@
         exam: '8 focused exam-prep questions',
         adult: '5 language or life-skills prompts'
       };
-      return { title: `${goal.mode}: ${stage.label}`, description: focusMap[stage.id] || '5 personalised practice prompts', chips: [stage.detail, goal.label, 'XP + next step'] };
+      return { title: `${goal.mode}: ${stage.label}`, description: focusMap[stage.id] || '5 personalised practice prompts', chips: [stage.detail, goal.label, 'next practice'] };
     }
 
     function renderChips(targetId, items, activeId, onClickName) {
@@ -1965,65 +1964,7 @@
       const attempts = history.length;
       const best = attempts ? Math.max(...history.map(item => item.percent || 0)) : 0;
       const average = attempts ? Math.round(history.reduce((sum, item) => sum + (item.percent || 0), 0) / attempts) : 0;
-      const stars = history.filter(item => (item.percent || 0) >= 80).length;
-      const xp = history.reduce((sum, item) => sum + Math.max(10, Math.round((item.percent || 0) / 10) * 5), 0);
-      const level = Math.max(1, Math.floor(xp / 100) + 1);
-      const streak = practiceStreak(history);
-      return { attempts, best, average, stars, xp, level, streak };
-    }
-
-    function milestoneBadges(history) {
-      const stats = historyStats(history);
-      const subjects = subjectStats(history);
-      return [
-        { icon: '🚀', title: 'First quiz', desc: 'Complete your first LearningQuest round.', earned: stats.attempts >= 1 },
-        { icon: '🌟', title: 'Star score', desc: 'Score 80% or higher in any round.', earned: stats.best >= 80 },
-        { icon: '🔥', title: 'Practice streak', desc: 'Practise on two days in a row.', earned: stats.streak >= 2 },
-        { icon: '📚', title: 'Five rounds', desc: 'Finish five saved quiz attempts.', earned: stats.attempts >= 5 },
-        { icon: '🎯', title: 'Subject focus', desc: 'Build history in three subjects.', earned: Object.keys(subjects).length >= 3 },
-        { icon: '🧠', title: 'Level 2 learner', desc: 'Earn 100 practice XP.', earned: stats.level >= 2 }
-      ];
-    }
-
-    function renderBadges(history = loadHistory()) {
-      const panel = document.getElementById('badges-panel');
-      const grid = document.getElementById('badge-grid');
-      if (!history.length) {
-        panel.style.display = 'none';
-        return;
-      }
-      panel.style.display = 'block';
-      grid.innerHTML = milestoneBadges(history).map(badge => `
-        <div class="milestone-badge ${badge.earned ? '' : 'locked'}">
-          <div class="milestone-icon">${badge.earned ? badge.icon : '🔒'}</div>
-          <div class="milestone-title">${escapeHTML(badge.title)}</div>
-          <div class="milestone-desc">${escapeHTML(badge.desc)}</div>
-        </div>
-      `).join('');
-    }
-
-    function practiceDateKey(item) {
-      const raw = item.completedAt || item.date;
-      const parsed = raw ? new Date(raw) : null;
-      if (!parsed || Number.isNaN(parsed.getTime())) return null;
-      return parsed.toISOString().slice(0, 10);
-    }
-
-    function practiceStreak(history) {
-      const dates = new Set(history.map(practiceDateKey).filter(Boolean));
-      if (!dates.size) return 0;
-      const cursor = new Date();
-      const todayKey = cursor.toISOString().slice(0, 10);
-      cursor.setDate(cursor.getDate() - 1);
-      const yesterdayKey = cursor.toISOString().slice(0, 10);
-      if (!dates.has(todayKey) && !dates.has(yesterdayKey)) return 0;
-      if (dates.has(todayKey)) cursor.setDate(cursor.getDate() + 1);
-      let streak = 0;
-      while (dates.has(cursor.toISOString().slice(0, 10))) {
-        streak += 1;
-        cursor.setDate(cursor.getDate() - 1);
-      }
-      return streak;
+      return { attempts, best, average };
     }
 
     function renderStats(history = loadHistory()) {
@@ -2038,10 +1979,7 @@
       grid.innerHTML = [
         ['Attempts', stats.attempts],
         ['Best', `${stats.best}%`],
-        ['Average', `${stats.average}%`],
-        ['Level', stats.level],
-        ['Streak', `${stats.streak} day${stats.streak === 1 ? '' : 's'}`],
-        ['XP', stats.xp]
+        ['Average', `${stats.average}%`]
       ].map(([label, value]) => `
         <div class="stat-tile">
           <div class="stat-val">${escapeHTML(value)}</div>
@@ -2052,7 +1990,6 @@
 
     function renderHistory(history = loadHistory()) {
       renderStats(history);
-      renderBadges(history);
       const panel = document.getElementById('history-panel');
       const list = document.getElementById('history-list');
       renderParentOverview();
@@ -2062,7 +1999,6 @@
       if (!history.length) {
         panel.style.display = 'none';
         document.getElementById('subject-panel').style.display = 'none';
-        document.getElementById('badges-panel').style.display = 'none';
         document.getElementById('data-panel').style.display = 'block';
         return;
       }
@@ -4844,7 +4780,7 @@
       card.innerHTML = `
         <div class="challenge-meta"><span>${escapeHTML(q.subject || 'Mixed')}</span><span>Question ${dailyChallengeIndex(questions.length) + 1}/${questions.length}</span></div>
         <div class="challenge-question">${escapeHTML(q.question)}</div>
-        <div class="challenge-tip">Try this one first today, then complete the full quiz to save progress and streaks.</div>
+        <div class="challenge-tip">Try this one first today, then complete the full quiz to save progress.</div>
       `;
     }
 
@@ -5091,7 +5027,6 @@
           attempted
         });
         renderStats(updatedHistory);
-        renderBadges(updatedHistory);
         renderSubjectDashboard(updatedHistory);
         renderCurriculumPacks();
         renderNextStepRecommendation(updatedHistory);
