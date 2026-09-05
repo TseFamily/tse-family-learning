@@ -105,6 +105,11 @@ async function expectGuidanceDoesNotSellHeuristicProof(page, { historySaved = fa
   }
 }
 
+async function expectLifeUKSurfaceDoesNotSellExamProof(locator) {
+  await expect(locator).not.toContainText(/pass target|real mock-test pass target|% to pass|Not yet —/i);
+  await expect(locator).not.toContainText('PASSED', { ignoreCase: false });
+}
+
 test('validated content packs and the school-practice bank drive the catalog without planned cards', async ({ page }) => {
   await page.goto('/');
   await waitForShippedPacks(page);
@@ -181,7 +186,8 @@ test('mobile app shell opens without horizontal overflow and mission onboarding 
   const lifeUKCard = page.locator('#life-uk-grid .life-uk-card').first();
   await lifeUKCard.getByRole('button', { name: 'The Speaker' }).tap();
   await expect(lifeUKCard.getByText('Try again in review — this topic is now flagged.')).toBeVisible();
-  await expect(lifeUKCard.getByText('0/6 correct · 0% · 75% pass target')).toBeVisible();
+  await expect(lifeUKCard.getByText('0/6 correct · 0%')).toBeVisible();
+  await expectLifeUKSurfaceDoesNotSellExamProof(page.locator('#life-uk-panel'));
   await expect(lifeUKCard.getByText('Explanation: The monarch appoints as Prime Minister')).toBeVisible();
   await expect(page.locator('#history-panel').getByText('Life in the UK starter mock')).toBeVisible();
   await expect(page.locator('#maths-foundation-grid .maths-card').first().getByText('Number bonds · Make 10')).toBeVisible();
@@ -409,6 +415,7 @@ test('Life in the UK full timed mock renders, scores answers, and records progre
   await expect(page.locator('#life-uk-mock-grid .life-uk-mock-card').first().getByText('Who appoints the Prime Minister after a general election?')).toBeVisible();
   await expect(page.locator('.life-uk-mock-timer')).toContainText(/\d{2}:\d{2}/);
   await expect(page.locator('.life-uk-mock-status')).toContainText('Answered 0/24');
+  await expectLifeUKSurfaceDoesNotSellExamProof(page.locator('.life-uk-mock-status'));
 
   const firstMockCard = page.locator('#life-uk-mock-grid .life-uk-mock-card').first();
   await firstMockCard.getByRole('button', { name: 'The monarch' }).tap();
@@ -424,7 +431,9 @@ test('Life in the UK full timed mock renders, scores answers, and records progre
   await expect(page.locator('.life-uk-mock-result')).toBeVisible();
   await expect(page.locator('.life-uk-mock-result h4')).toContainText(/Full timed mock complete/);
   await expect(page.locator('#life-uk-mock-area')).toContainText('1/24 correct');
-  await expect(page.locator('#life-uk-mock-area')).toContainText('75% pass target');
+  await expect(page.locator('#life-uk-mock-area')).toContainText('4%');
+  await expect(page.locator('.life-uk-mock-result')).toContainText('Weak topics:');
+  await expectLifeUKSurfaceDoesNotSellExamProof(page.locator('#life-uk-mock-area'));
   await expect(page.locator('.life-uk-mock-review-item').first()).toContainText('Q1.');
 
   await expect(page.locator('.life-uk-topic-breakdown')).toBeVisible();
@@ -482,7 +491,9 @@ test('Life in the UK adaptive weak-topic drill pulls from full-mock weak skills 
 
   await expect(page.locator('.life-uk-drill-result')).toBeVisible();
   await expect(page.locator('.life-uk-drill-result h4')).toContainText(/Adaptive weak-topic drill complete/);
-  await expect(page.locator('.life-uk-drill-result')).toContainText(/75% pass target/);
+  await expect(page.locator('.life-uk-drill-result')).toContainText(/\d+\/\d+ correct · \d+%/);
+  await expect(page.locator('.life-uk-drill-result')).toContainText('Keep practising flagged topics');
+  await expectLifeUKSurfaceDoesNotSellExamProof(page.locator('.life-uk-drill-result'));
   await expect(page.locator('.life-uk-drill-result .life-uk-topic-breakdown')).toBeVisible();
   await expect(page.locator('.life-uk-drill-result .life-uk-topic-breakdown')).toContainText('Per-topic breakdown');
   const drillHistory = await page.evaluate(() => JSON.parse(localStorage.getItem('learningquest-history-v1-learner-1') || '[]'));
@@ -592,7 +603,9 @@ test('Life in the UK mock score trend chart renders from saved full mocks', asyn
 
   await expect(page.locator('#life-uk-mock-score-trend-area .life-uk-mock-score-trend-card')).toBeVisible();
   await expect(page.locator('#life-uk-mock-score-trend-area')).toContainText('Mock score trend');
-  await expect(page.locator('#life-uk-mock-score-trend-area')).toContainText('Pass target 75%');
+  await expect(page.locator('#life-uk-mock-score-trend-area')).toContainText('Latest 67%');
+  await expect(page.locator('#life-uk-mock-score-trend-area')).toContainText('Last 2 full mocks');
+  await expectLifeUKSurfaceDoesNotSellExamProof(page.locator('#life-uk-mock-score-trend-area'));
   await expect(page.locator('.life-uk-mock-score-trend-chart .life-uk-mock-score-trend-bar-wrap')).toHaveCount(2);
 
 
@@ -733,6 +746,9 @@ test('Life in the UK scenario-style practice renders situations, scores answers,
 
   await expect(page.locator('.life-uk-scenario-result')).toBeVisible();
   await expect(page.locator('.life-uk-scenario-result')).toContainText('Scenario practice complete');
+  await expect(page.locator('.life-uk-scenario-result')).toContainText('correct');
+  await expect(page.locator('.life-uk-scenario-result')).toContainText('Keep practising');
+  await expectLifeUKSurfaceDoesNotSellExamProof(page.locator('.life-uk-scenario-result'));
   const pack = await page.evaluate(async () => (await fetch('/content-packs/life-uk.json')).json());
   expect(pack.questions.filter(question => question.style === 'scenario' || question.scenario).length).toBeGreaterThanOrEqual(12);
   const scenarioHistory = await page.evaluate(() => JSON.parse(localStorage.getItem('learningquest-history-v1-learner-1') || '[]'));
