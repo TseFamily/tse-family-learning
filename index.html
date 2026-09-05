@@ -910,7 +910,7 @@
             <div class="brand-subtitle">Mobile Learning</div>
           </div>
         </div>
-        <div class="topbar-pill">Public mobile app foundation</div>
+        <div class="topbar-pill">Family learning PWA</div>
       </nav>
 
       <div class="mobile-tabs" aria-label="Mobile app sections">
@@ -923,9 +923,9 @@
       <main>
         <section class="hero-v2" id="today">
           <div class="today-hero">
-            <div class="hero-eyebrow">📱 Mobile-native learning app</div>
-            <h1>Your learning day, beautifully focused.</h1>
-            <p id="quiz-desc">A mobile-first learning app for any learner — combining guided missions, adaptive practice, progress insights, and curriculum packs without feeling like a cramped quiz page.</p>
+            <div class="hero-eyebrow">Local practice on this browser</div>
+            <h1>Choose a learner, then practise.</h1>
+            <p id="quiz-desc">A family learning PWA for children and adults who share this browser. Stage, goal, and recent practice pick the next activity from the question bank and validated packs.</p>
             <div class="hero-actions">
               <button class="hero-primary" onclick="startQuiz()">Start mission →</button>
               <button class="hero-secondary" onclick="document.getElementById('learn').scrollIntoView({behavior:'smooth'})">Explore learning paths</button>
@@ -955,7 +955,7 @@
         <section class="app-grid">
           <article class="section-card wide" id="learn">
             <div class="section-head">
-              <div><div class="section-kicker">Learn</div><h2>Learning paths, not a worksheet dump</h2><p>Domains are grouped as reusable learning paths so the app can serve many learners, subjects, ages, and goals.</p></div>
+              <div><div class="section-kicker">Learn</div><h2>Checked-in domains, not a subject catalogue</h2><p>Each domain is a question bank or validated pack already in this app. A learning path exists only when that data drives a usable activity.</p></div>
               <div class="section-icon">🧭</div>
             </div>
             <div class="domain-panel" id="domain-panel"><div class="domain-grid" id="domain-grid"></div></div>
@@ -988,7 +988,7 @@
 
           <article class="section-card wide" id="curriculum">
             <div class="section-head">
-              <div><div class="section-kicker">Curriculum architecture</div><h2>Multi-domain packs for every learner</h2><p>Languages, exams, school skills, adult learning, and primary practice now sit inside a clearer pack system.</p></div>
+              <div><div class="section-kicker">Available packs</div><h2>Checked-in practice only</h2><p>School prep, Traditional HK Chinese, Mandarin, Maths Foundation, and Life in the UK appear because their question or pack data is here. There is no Primary pack and no extra promised subjects.</p></div>
               <div class="section-icon">🧱</div>
             </div>
             <div class="domain-panel" id="curriculum-panel"><div class="curriculum-grid" id="curriculum-grid"></div></div>
@@ -1074,7 +1074,7 @@
     const LEARNER_KEY = 'learningquest-active-learner-v1';
     const APP_PROFILE = {
       product: 'LearningQuest',
-      tagline: 'Mobile-native practice for every learner',
+      tagline: 'Family learning practice on this browser',
       storagePrefix: 'learningquest'
     };
 
@@ -4453,8 +4453,7 @@
           </div>
           ${pack.recommended && pack.guidanceKind === 'baseline' ? '<div class="curriculum-badges"><span class="curriculum-badge">Baseline</span></div>' : ''}
           ${pack.recommended ? `<div class="curriculum-meta curriculum-insight"><strong>Evidence:</strong> ${escapeHTML(pack.recommendationReason)}</div>` : ''}
-          ${pack.recommended ? `<div class="curriculum-meta"><strong>Path:</strong> ${escapeHTML(progressionPathText(pack))}</div>` : ''}
-          <div class="curriculum-meta"><strong>Next:</strong> ${escapeHTML(pack.next)}</div>
+          ${pack.readiness === 'Pack unavailable' && pack.next ? `<div class="curriculum-meta"><strong>Recovery:</strong> ${escapeHTML(pack.next)}</div>` : ''}
           ${pack.recommended && pack.practiceAction ? `<button class="btn btn-secondary" type="button" onclick="openRecommendedPractice('${escapeHTML(pack.id || pack.title)}')">Open ${escapeHTML(pack.practiceAction.label || pack.title)}</button>` : ''}
         </article>
       `).join('');
@@ -4747,11 +4746,6 @@
       document.getElementById('practice-note').textContent = focusLabel === 'Mixed'
         ? `Mixed practice uses all ${count} questions.`
         : `${focusLabel} practice uses ${count} focused question${count === 1 ? '' : 's'}.`;
-      if (quizData) {
-        document.getElementById('quiz-desc').textContent = focusLabel === 'Mixed'
-          ? `Ready for ${count} questions? You've got ${Math.round(quizData.meta.timeLimit/60)} minutes. Good luck! ⭐`
-          : `Ready for ${count} ${focusLabel} questions? Focus mode keeps the same timer and saves progress. ⭐`;
-      }
       updateQuestionBankTestState();
     }
 
