@@ -1,12 +1,15 @@
 // TFL-CONTINUITY: this service worker is a browser-local cache only. It never
 // uploads, syncs, merges, or recovers accounts; progress moves between
 // browsers only through the explicit export/import the person chooses.
-const CACHE_NAME = 'learningquest-static-v2';
+const CACHE_NAME = 'learningquest-static-v3';
 const CORE_ASSETS = [
   './',
   './index.html',
   './questions.json',
   './manifest.webmanifest',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/apple-touch-icon.png',
   './content-packs/registry.json',
   './content-packs/hk-chinese-basics.json',
   './content-packs/mandarin-basics.json',
