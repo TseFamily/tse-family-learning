@@ -22,7 +22,7 @@
     "Run adaptive weak-topic drills from saved mock review data",
     "Use the review queue to revisit due citizenship topics from saved mastery",
     "Follow polished due/overdue review-queue scheduling for citizenship topics",
-    "Track full-mock score trends toward the 75% pass target",
+    "Track full-mock score trends from saved attempts",
     "Practise real-life citizenship scenarios drawn from everyday UK situations"
   ],
   "mock": {
