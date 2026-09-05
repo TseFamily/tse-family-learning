@@ -79,6 +79,24 @@ async function readLearnerHistories(page) {
   }));
 }
 
+async function expectGuidanceDoesNotSellHeuristicProof(page, { historySaved = false } = {}) {
+  const journey = page.locator('#journey');
+  await expect(page.locator('#daily-mission-card')).toBeVisible();
+  await expect(page.locator('#daily-mission-card')).not.toContainText(/\bXP\b|streak|pass target/i);
+  await expect(page.locator('#next-step-panel')).toBeVisible();
+  await expect(page.locator('#next-step-panel')).not.toContainText(/\bXP\b|streak|pass target/i);
+  await expect(journey).not.toContainText(/Milestone badges|practice XP|Practice streak|Level 2 learner/i);
+  await expect(page.locator('#badges-panel')).toHaveCount(0);
+  if (historySaved) {
+    const stats = page.locator('#stats-panel');
+    await expect(stats).toBeVisible();
+    await expect(stats.locator('.stat-lbl')).toHaveText(['Attempts', 'Best', 'Average']);
+    await expect(stats).not.toContainText(/\bXP\b|Streak|Level/i);
+  } else {
+    await expect(page.locator('#stats-panel')).toBeHidden();
+  }
+}
+
 test('validated content packs and the school-practice bank drive the catalog without planned cards', async ({ page }) => {
   await page.goto('/');
   await waitForShippedPacks(page);
@@ -1144,6 +1162,9 @@ test('guidance turns stage, packs, and saved evidence into the next available pr
   await expect(page.locator('#next-step-panel')).not.toContainText(/\bXP\b|streak|pass target|French first phrases/i);
   await expect(page.locator('.curriculum-card.recommended').getByText('Baseline').first()).toBeVisible();
   await expect(page.locator('.curriculum-card.recommended .curriculum-title', { hasText: 'French first phrases' })).toHaveCount(0);
+  await expect(page.locator('#challenge-panel')).toBeVisible();
+  await expect(page.locator('#challenge-panel')).not.toContainText(/\bXP\b|streak/i);
+  await expectGuidanceDoesNotSellHeuristicProof(page, { historySaved: false });
 
 
   await page.locator('#next-step-panel').getByRole('button', { name: /Open Maths Foundation practice/ }).tap();
@@ -1157,6 +1178,8 @@ test('guidance turns stage, packs, and saved evidence into the next available pr
   await expect(page.locator('#next-step-panel .next-step-title')).toHaveText('Review Make 20');
   await expect(page.locator('#next-step-panel')).toContainText('Saved Maths Foundation practice flagged Make 20');
   await expect(page.locator('#next-step-panel')).not.toContainText(/\bXP\b|streak|pass target/i);
+  await expectGuidanceDoesNotSellHeuristicProof(page, { historySaved: true });
+  await expect(page.locator('#stats-panel .stat-tile').filter({ hasText: 'Attempts' })).toContainText('1');
 
 
   await page.locator('#next-step-panel').getByRole('button', { name: /Open Maths Foundation practice/ }).tap();
@@ -1212,6 +1235,10 @@ test('saved evidence is not named as empty history on a stage/goal fallback', as
 
   await expect(page.locator('#next-step-panel')).not.toContainText('No saved practice yet');
   await expect(page.locator('#next-step-panel')).toContainText('Evidence:');
+  await expectGuidanceDoesNotSellHeuristicProof(page, { historySaved: true });
+  await expect(page.locator('#stats-panel .stat-tile').filter({ hasText: 'Attempts' })).toContainText('1');
+  await expect(page.locator('#stats-panel .stat-tile').filter({ hasText: 'Best' })).toContainText('90%');
+  await expect(page.locator('#stats-panel .stat-tile').filter({ hasText: 'Average' })).toContainText('90%');
 });
 
 test('saved 11+ results open the matching available question practice', async ({ page }) => {
