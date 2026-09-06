@@ -51,7 +51,7 @@ textual edge list.
 | `TFL-GUIDANCE` | Turn saved evidence into the next practice | `live` | `TFL-CONTENT`, `TFL-PROGRESS` | Stage/goal selection and available-pack metadata produce curriculum recommendations; saved results can reprioritize weak subjects, skills, or topics and open the matching available practice. Empty history produces a labeled baseline action. The recommendation names the evidence it used. Learner-journey surfaces — recommendations plus Life in the UK catalog, result, trend, drill, and scenario copy — never present a heuristic, XP, streak, planned pack, pass-target display, PASSED/Not-yet label, or official-exam-readiness claim as proof of learning. |
 | `TFL-FAMILY` | Provide an honest same-browser family coaching view | `live` | `TFL-LEARNER`, `TFL-PROGRESS`, `TFL-GUIDANCE` | The coach overview, local learner comparison, and follow-up action are derived only from histories saved for the generic profiles on the current browser; an action switches to the named local profile before opening practice. The shipped private-name regression check stays green, no progress is automatically published or uploaded, and the UI does not represent profile switching as authentication, parental authorization, or isolation from another person with browser access. |
 | `TFL-CONTINUITY` | Reopen and manually transfer local learning state | `live` | `TFL-CONTENT`, `TFL-PROGRESS` | On a browser where service-worker registration and installation succeed, `sw.js` caches the app shell, required question bank, manifest, registry, and shipped pack files and serves cached GETs when the network is unavailable. Local history survives an ordinary reload. Export creates an explicit versioned JSON backup for the selected learner; import validates and bounds its history before restoring that selected learner. Service-worker failure remains non-blocking online. No account recovery, background upload, automatic cross-device sync, merge, or conflict-resolution claim is made. |
-| `TFL-APP` | Deliver the family learning PWA journey | `live` | `TFL-PRACTICE`, `TFL-GUIDANCE`, `TFL-FAMILY`, `TFL-CONTINUITY` | In a mobile-sized supported browser, a person can open the LearningQuest shell without horizontal overflow, choose learner/stage/goal, start an available practice, receive feedback, observe the selected learner's saved result and next action, and use the honest same-browser coach and continuity paths. `manifest.webmanifest` exposes the standalone PWA identity. Passing source checks, producing an image, or reaching a URL does not by itself prove an installed, deployed, offline, or live journey. |
+| `TFL-APP` | Deliver the family learning PWA journey | `live` | `TFL-PRACTICE`, `TFL-GUIDANCE`, `TFL-FAMILY`, `TFL-CONTINUITY` | In a mobile-sized supported browser, a person can open the LearningQuest shell without horizontal overflow, choose learner/stage/goal, start an available practice, receive feedback, observe the selected learner's saved result and next action, and use the honest same-browser coach and continuity paths. `manifest.webmanifest` exposes the standalone PWA identity. Passing source checks, producing an image, reaching a URL, a leftover `sylphx.toml` `[[services]].type` key, GitHub Pages `200`, or doctrine deploy note `tart-duo-uvt9` does not close this identity and does not prove an installed, deployed, offline, or live journey. |
 
 ## Source grounding
 
@@ -67,6 +67,13 @@ textual edge list.
   `npm test` and `npm run smoke:mobile`.
 - `server.js` is a static file server. Its SPA fallback is not an account,
   progress, curriculum, or child-safety authority.
+- `sylphx.toml` dest is one typeless Apps `[[services]]` row named `web`
+  (service name, not a type discriminator), built from the repo `Dockerfile`,
+  health path `/`. Leftover `type` (`web` / `service` / `worker`) and
+  `build_only` are leftover, not dest; Apps typed-refuses a `type` key.
+  Omitting leftover `type` is later source execute against this dest and
+  does not close `TFL-APP`. This file is customer deploy intent, not live
+  proof.
 
 ## Reading rules
 
@@ -82,8 +89,7 @@ textual edge list.
 
 ## Release boundary (GOV-017)
 
-Declared 2026-08-31 per company ADR-030 and governance audit GOV-017
-(`SylphxAI/owner` runbook `GOVERNANCE-AUDIT-2026-08-28.md`). Docs declaration
+Declared 2026-08-31 per company release law ([owner `standards/release-control-plane.md`](https://github.com/SylphxAI/owner/blob/main/standards/release-control-plane.md)). Docs declaration
 of current truth only. This is a family product under the TseFamily
 organisation; company delivery vocabulary does not override the plain
 boundary below.
@@ -101,8 +107,13 @@ boundary below.
   locator.
 - **Owned manifest/migration writers.** Deployment uses the normal Sylphx
   product path for project `tart-duo-uvt9`, driven by this repo's
-  `sylphx.toml`: one static `web` service built from the repo `Dockerfile`
-  (health path `/`). CI (`.github/workflows/ci.yml`) validates, builds, and
+  `sylphx.toml`: one typeless `[[services]]` row named `web` (service name,
+  not a type discriminator), built from the repo `Dockerfile` (health path
+  `/`). Leftover `type` (`web` / `service` / `worker`) and `build_only` are
+  leftover, not dest; Apps typed-refuses a `type` key. This dest-lock does
+  not omit the key. Later omit is source execute against this dest; it does
+  not close `TFL-APP`, cut live, mutate Apps GitOps, or invent a public
+  customer URL. CI (`.github/workflows/ci.yml`) validates, builds, and
   runs the Playwright mobile smoke on PRs and merge groups. GitHub Pages
   publishes the preview surface from `main`. Migration writer: none — the
   product is a static app with no database and no migration step.
@@ -123,3 +134,9 @@ boundary below.
   school-specific promises must not become product data (`TFL-CONTENT`
   private-name check). CI, a deployment record, or a reachable URL must never
   be sold as an installed, offline, or live learning journey (`TFL-APP`).
+  Leftover `[[services]].type` (`web` / `service` / `worker`) and
+  `build_only` are leftover, not dest; Apps typed-refuses a `type` key. This
+  dest-lock does not omit the key. Later omit is source execute against this
+  dest; it does not close `TFL-APP`, cut live, mutate Apps GitOps,
+  dest-expand GitHub Pages `200` as `TFL-APP` Done, or treat doctrine deploy
+  note `tart-duo-uvt9` as a public locator.

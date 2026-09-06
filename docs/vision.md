@@ -91,3 +91,10 @@ live observations remain separate evidence layers.
   purchases, or a child-directed community.
 - Treating roadmap copy, a curriculum placeholder, CI, a deployment record, or
   a reachable URL as proof that a learning activity or whole journey works.
+- Selling leftover Apps `[[services]].type` (`web` / `service` / `worker`) or
+  `build_only` as dest. Sold LearningQuest compute is a typeless Apps
+  `[[services]]` row named `web` (service name, not a type discriminator).
+  Apps typed-refuses a `type` key. Omitting leftover `type` is later source
+  execute against this dest; it does not close `TFL-APP`, cut live, mutate
+  Apps GitOps, invent a public customer URL, or treat GitHub Pages or
+  doctrine deploy note `tart-duo-uvt9` as a production locator.
