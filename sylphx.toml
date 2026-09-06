@@ -8,9 +8,10 @@ strategy = "dockerfile"
 dockerfile = "Dockerfile"
 context = "."
 
+# Sold compute is a typeless Apps [[services]] row named web (service name).
+# Leftover type and build_only are leftover, not dest; Apps typed-refuses a type key.
 [[services]]
 name = "web"
-type = "web"
 port = 3000
 watch_paths = [
   "index.html",

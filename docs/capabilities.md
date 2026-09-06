@@ -71,9 +71,8 @@ textual edge list.
   (service name, not a type discriminator), built from the repo `Dockerfile`,
   health path `/`. Leftover `type` (`web` / `service` / `worker`) and
   `build_only` are leftover, not dest; Apps typed-refuses a `type` key.
-  Omitting leftover `type` is later source execute against this dest and
-  does not close `TFL-APP`. This file is customer deploy intent, not live
-  proof.
+  A typeless sold row does not close `TFL-APP`. This file is customer deploy
+  intent, not live proof.
 
 ## Reading rules
 
@@ -110,9 +109,8 @@ boundary below.
   `sylphx.toml`: one typeless `[[services]]` row named `web` (service name,
   not a type discriminator), built from the repo `Dockerfile` (health path
   `/`). Leftover `type` (`web` / `service` / `worker`) and `build_only` are
-  leftover, not dest; Apps typed-refuses a `type` key. This dest-lock does
-  not omit the key. Later omit is source execute against this dest; it does
-  not close `TFL-APP`, cut live, mutate Apps GitOps, or invent a public
+  leftover, not dest; Apps typed-refuses a `type` key. A typeless sold row
+  does not close `TFL-APP`, cut live, mutate Apps GitOps, or invent a public
   customer URL. CI (`.github/workflows/ci.yml`) validates, builds, and
   runs the Playwright mobile smoke on PRs and merge groups. GitHub Pages
   publishes the preview surface from `main`. Migration writer: none — the
@@ -135,8 +133,7 @@ boundary below.
   private-name check). CI, a deployment record, or a reachable URL must never
   be sold as an installed, offline, or live learning journey (`TFL-APP`).
   Leftover `[[services]].type` (`web` / `service` / `worker`) and
-  `build_only` are leftover, not dest; Apps typed-refuses a `type` key. This
-  dest-lock does not omit the key. Later omit is source execute against this
-  dest; it does not close `TFL-APP`, cut live, mutate Apps GitOps,
+  `build_only` are leftover, not dest; Apps typed-refuses a `type` key. A
+  typeless sold row does not close `TFL-APP`, cut live, mutate Apps GitOps,
   dest-expand GitHub Pages `200` as `TFL-APP` Done, or treat doctrine deploy
   note `tart-duo-uvt9` as a public locator.
