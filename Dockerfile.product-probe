@@ -1,0 +1,6 @@
+FROM mcr.microsoft.com/playwright:v1.60.0-noble
+WORKDIR /probe
+COPY package.json bun.lock ./
+RUN npm install --ignore-scripts --no-package-lock @playwright/test@1.60.0
+COPY scripts/product-delivery-probe.mjs ./scripts/product-delivery-probe.mjs
+ENTRYPOINT ["node", "scripts/product-delivery-probe.mjs"]
