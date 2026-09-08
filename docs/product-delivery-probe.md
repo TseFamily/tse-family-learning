@@ -35,3 +35,8 @@ runnerImageDigest. No new CI publisher or alternate registry writer is added.
 Local browser execution proves candidate behavior only. Root release admission,
 normal image build and deploy, per-target runtime observation, fault recovery,
 performance and soak remain separate delivery evidence.
+
+The runner declares numeric UID 1000 (the Playwright image pwuser) for Hands
+runAsNonRoot admission. Chromium writes only to its disposable /tmp profile and
+pwuser home. The normal artifact run must also prove the Hands memory/CPU cap;
+local execution alone does not establish that resource envelope.

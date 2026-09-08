@@ -2,4 +2,6 @@ FROM mcr.microsoft.com/playwright:v1.60.0-noble
 WORKDIR /probe
 RUN npm init -y && npm install --ignore-scripts --no-package-lock --save-exact @playwright/test@1.60.0
 COPY scripts/product-delivery-probe.mjs ./scripts/product-delivery-probe.mjs
+ENV HOME=/home/pwuser
+USER 1000
 ENTRYPOINT ["node", "scripts/product-delivery-probe.mjs"]
