@@ -10,7 +10,8 @@ Required assertion IDs, in order:
   three-question Phonics/Foundation/Sound patterns activity with answer
   feedback and a saved 3/3 result.
 - `learner.history-survives-reload`: reload restores the identical local
-  result and displays it in history; retained history is bounded to eight.
+  result and displays the single saved record in history. This does not
+  establish eviction at the eight-record bound.
 - `learner.history-isolated`: switching to Learner 1 shows empty history,
   returning to Learner 2 restores its unchanged result.
 
