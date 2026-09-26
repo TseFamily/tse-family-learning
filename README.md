@@ -1,13 +1,17 @@
 # LearningQuest
 
-Family learning PWA for children and adults who share a browser or device.
+<p align="center">
+  <img src="https://mark.sylphx.com/api/v1/mark/hero.svg?type=mesh&theme=sunset&text=LearningQuest&desc=Family%20learning%20practice%20in%20the%20browser" alt="LearningQuest" width="100%" />
+</p>
 
-- Ordinary: `none` — no customer domain or store listing. GitHub Pages is not production. A reachable URL is not the product contract. Doctrine deploy note `tart-duo-uvt9` is not a public locator.
-- Preview: https://tsefamily.github.io/tse-family-learning/ — GitHub Pages from `main` `/`. Not live product-complete. A `200` is not the destination oracle.
-- Vision: [`docs/vision.md`](docs/vision.md)
-- Capabilities: [`docs/capabilities.md`](docs/capabilities.md)
+A learning app for children and adults who share one browser or device, with
+personalised practice. It installs as a progressive web app (PWA).
 
-## Local
+- Try it: <https://tsefamily.github.io/tse-family-learning/> (GitHub Pages, built from `main`; still in development)
+- Vision: [docs/vision.md](docs/vision.md)
+- Capabilities: [docs/capabilities.md](docs/capabilities.md)
+
+## Run locally
 
 ```bash
 npm test
@@ -15,4 +19,4 @@ npm run build
 node server.js
 ```
 
-Serves the static app from this checkout. Local success is not deployed or live proof.
+`server.js` serves the static app from this checkout.
